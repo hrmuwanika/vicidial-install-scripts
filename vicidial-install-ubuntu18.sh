@@ -2,7 +2,8 @@
 
 echo "Vicidial installation Ubuntu 20.04 with WebPhone(WebRTC/SIP.js)"
 
-sudo apt update && sudo apt -y full-upgrade
+sudo apt update
+sudo apt -y install software-properties-common
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update
 sudo apt install build-essential linux-headers-`uname -r` subversion unzip libjansson-dev sqlite autoconf automake  libxml2-dev libncurses5-dev libsqlite3-dev  -y 
@@ -10,10 +11,15 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu bionic main'
 sudo apt update 
-sudo apt install -y apache2 apache2-bin apache2-data mariadb-server mariadb-client libapache2-mod-php php php-cli php-mysql php-common  php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap
-sudo apt-get install php5.6-xcache php5.6-dev php5.6-mbstring php5.6-cli php5.6-common php5.6-json php5.6-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libmysqlclient-dev libsrtp-dev uuid-dev libssl-dev git curl wget -y
+sudo apt install apache2 apache2-bin apache2-data mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
+git libssl-dev libmysqlclient-dev -y
+
+sudo apt install php5.6-xcache php7.4-dev php7.4-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl \
+ libsrtp-dev uuid-dev  -y
+
 #Special package for ASTblind and ASTloop(ip_relay need this package)
-apt-get install libc6-i386
+apt install libc6-i386 -y
 
 #Install Jansson
 cd /usr/src/
@@ -84,13 +90,13 @@ cpanm Text::CSV
 cpanm Text::CSV_XS
 
 #If the DBD::MYSQL Fail Run below Command
-apt install libdbd-mysql-perl
+apt install libdbd-mysql-perl -y
 
 
 
 read -p 'Press Enter to continue And Install Dahdi: '
 #Install dahdi
-apt-get install dahdi-* dahdi
+apt install dahdi-* dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
@@ -126,7 +132,7 @@ cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
 #Add mysql users and Databases
-echo "%%%%%%%%%%%%%%%Please Enter Mysql Password Or Just Press Enter if you Dont have Password%%%%%%%%%%%%%%%%%%%%%%%%%%"
+echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mysql -u root -p << MYSQLCREOF
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
@@ -148,16 +154,18 @@ quit
 MYSQLCREOF
 read -p 'Press Enter to continue: '
 echo 'Continuing...'
+
 #Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
-echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
+echo "%%%%%%%%% Please Enter This Server IP ADD %%%%%%%%%%%%"
 read serveripadd
 sed -i 's/$serveripadd/'$serveripadd'/g' /etc/astguiclient.conf
 echo "Install VICIDIAL"
 echo "Copy sample configuration files to /etc/asterisk/ SET TO  Y*"
 perl install.pl
+
 #Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 echo "Populate AREA CODES"
@@ -175,7 +183,8 @@ wget -O /etc/rc.local https://raw.githubusercontent.com/jaganthoutam/vicidial-in
 chmod +x /etc/rc.local
 systemctl start rc-local
 read -p 'Press Enter to Reboot: '
-echo "Restarting Centos"
+echo "Restarting Ubuntu"
+
 reboot
 
 
