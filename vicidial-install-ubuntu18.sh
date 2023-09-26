@@ -10,8 +10,8 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu bionic main'
 sudo apt update 
-sudo apt install -y apache2 apache2-bin apache2-data libapache2-mod-php php php-cli php-mysql php-common  php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap
-sudo apt-get install php5.6-xcache php5.6-dev php5.6-mbstring php5.6-cli php5.6-common php5.6-json php5.6-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl mariadb-server mariadb-client libelf-dev autogen libtool shtool libdbd-mysql-perl libmysqlclient-dev libsrtp-dev uuid-dev libssl-dev git curl wget -y
+sudo apt install -y apache2 apache2-bin apache2-data mariadb-server mariadb-client libapache2-mod-php php php-cli php-mysql php-common  php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap
+sudo apt-get install php5.6-xcache php5.6-dev php5.6-mbstring php5.6-cli php5.6-common php5.6-json php5.6-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libmysqlclient-dev libsrtp-dev uuid-dev libssl-dev git curl wget -y
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 apt-get install libc6-i386
 
