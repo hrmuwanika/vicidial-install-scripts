@@ -13,6 +13,12 @@ sudo apt install apache2 apache2-bin apache2-data mariadb-server mariadb-client 
 php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
 git libssl-dev libmysqlclient-dev php7.4-dev php7.4-readline sox sipsak lame screen htop uuid-dev -y
 
+systemctl enable apache2.service
+systemctl start apache2.service
+
+systemctl enable mariadb.service
+systemctl start mariadb.service
+
 sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp2-dev uuid-dev  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
@@ -117,8 +123,10 @@ menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
 make install
-make samples
+make config
 ldconfig
+systemctl enable asterisk
+systemctl start asterisk
 
 read -p 'Press Enter to continue: '
 echo 'Continuing...'
