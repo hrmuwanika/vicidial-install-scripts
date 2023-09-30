@@ -293,7 +293,7 @@ cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p << MYSQLCREOF
+mysql -u root -p<<MYSQL_SCRIPT
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
 GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
@@ -311,7 +311,7 @@ use asterisk;
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
 update servers set asterisk_version='13.29.2';
 quit
-MYSQLCREOF
+MYSQL_SCRIPT
 
 read -p 'Press Enter to continue: '
 
@@ -348,6 +348,10 @@ wget -O /etc/rc.d/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial
 chmod +x /etc/rc.d/rc.local
 systemctl enable rc-local
 systemctl start rc-local
+
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --reload
 
 read -p 'Press Enter to Reboot: '
 
