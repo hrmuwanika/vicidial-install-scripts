@@ -13,7 +13,7 @@ sudo apt install apache2 apache2-bin apache2-data mariadb-server mariadb-client 
 php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
 git libssl-dev libmysqlclient-dev php7.4-dev php7.4-readline sox sipsak lame screen htop uuid-dev -y
 
-sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp-dev uuid-dev  -y
+sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp2-dev uuid-dev  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 apt install libc6-i386 -y
