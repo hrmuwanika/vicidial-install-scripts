@@ -118,7 +118,7 @@ menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
 make install
 make samples
-
+ldconfig
 
 read -p 'Press Enter to continue: '
 echo 'Continuing...'
