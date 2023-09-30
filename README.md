@@ -1,5 +1,5 @@
 # VICIDIAL INSTALLATION SCRIPTS
-# Centos vididial Install pre_requisites 
+# Centos vicidial Install pre_requisites 
 
 ```
 yum check-update
