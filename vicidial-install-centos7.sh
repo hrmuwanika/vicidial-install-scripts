@@ -196,6 +196,7 @@ cd lame-3.99.5
 make
 make install
 
+#Install PjProject
 cd /usr/src/ 
 git clone https://github.com/pjsip/pjproject.git
 cd pjproject
@@ -271,6 +272,7 @@ tar -xvzf libpri-*
 cd /usr/src/asterisk/asterisk*
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+./configure NOISY_BUILD=YES
 ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled
 
 make menuselect/menuselect menuselect-tree menuselect.makeopts
