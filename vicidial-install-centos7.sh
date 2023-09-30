@@ -196,6 +196,15 @@ cd lame-3.99.5
 make
 make install
 
+cd /usr/src/ 
+git clone https://github.com/pjsip/pjproject.git
+cd pjproject
+./configure CFLAGS="-DNDEBUG -DPJ_HAS_IPV6=1" --prefix=/usr --libdir=/usr/lib64 --enable-shared --disable-video --disable-sound --disable-opencore-amr
+make dep
+make
+make install
+ldconfig
+
 #Install Jansson
 cd /usr/src/
 wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
