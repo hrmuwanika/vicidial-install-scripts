@@ -187,6 +187,10 @@ crontab -l
 wget -O /etc/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
 chmod +x /etc/rc.local
 systemctl start rc-local
+
+ufw allow 80/tcp
+ufw allow 443/tcp
+
 read -p 'Press Enter to Reboot: '
 echo "Restarting Ubuntu"
 
