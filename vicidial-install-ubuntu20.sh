@@ -93,7 +93,7 @@ apt install libdbd-mysql-perl -y
 
 read -p 'Press Enter to continue And Install Dahdi: '
 #Install dahdi
-apt install dahdi-* dahdi
+apt install dahdi-* dahdi -y
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
