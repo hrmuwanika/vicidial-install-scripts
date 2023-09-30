@@ -25,16 +25,16 @@ git clone https://github.com/jaganthoutam/vicidial-install-scripts.git
 cd vicidial-install-scripts
 ```
 
-# Excute Centos vididial Install
+# Excute Centos7 vicidial Install
 ```
-chmod +x vicidial-install-centos7.sh
-./vicidial-install-centos7.sh
+chmod +x vicidial-install-c7.sh
+./vicidial-install-c7.sh
 ```
 
-# Excute Ubuntu vididial Install
+# Excute Ubuntu vicidial Install
 ```
-chmod +x vicidial-install-ubuntu18.sh
-./vicidial-install-ubuntu18.sh
+chmod +x vicidial-install-ubuntu20.sh
+./vicidial-install-ubuntu20.sh
 ```
 
 # Install WEBRTC for VICIDIAL Now
