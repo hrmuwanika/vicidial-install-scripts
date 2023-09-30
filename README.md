@@ -27,8 +27,8 @@ cd vicidial-install-scripts
 
 # Excute Centos7 vicidial Install
 ```
-chmod +x vicidial-install-c7.sh
-./vicidial-install-c7.sh
+chmod +x vicidial-install-centos7.sh
+./vicidial-install-centos7.sh
 ```
 
 # Excute Ubuntu vicidial Install
