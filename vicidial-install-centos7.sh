@@ -221,14 +221,14 @@ make install
 #Change PHP config
 
 echo "Download the PHP ini file from Git"
-wget -O /etc/php.ini https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/php.ini
+wget -O /etc/php.ini https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/php.ini
 
 mkdir /tmp/eaccelerator
 chmod 0777 /tmp/eaccelerator
 php -v
 
 echo "Donwload httpd.cof file from git"
-wget -O /etc/httpd/conf/httpd.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/httpd.conf
+wget -O /etc/httpd/conf/httpd.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/httpd.conf
 
 
 #Install Dahdi
@@ -274,6 +274,11 @@ menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
 make install
 make samples
+make config
+ldconfig
+
+systemctl enable asterisk
+systemctl start asterisk
 
 read -p 'Press Enter to continue: '
 
@@ -287,7 +292,7 @@ svn checkout svn://svn.eflo.net/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
-echo "%%%%%%%%%%%%%%%Please Enter Mysql Password Or Just Press Enter if you Dont have Password%%%%%%%%%%%%%%%%%%%%%%%%%%"
+echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mysql -u root -p << MYSQLCREOF
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
@@ -314,7 +319,7 @@ echo 'Continuing...'
 
 #Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
-wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/astguiclient.conf
+wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
 echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
 read serveripadd
@@ -333,13 +338,13 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
 #Install Crontab
-wget -O /root/crontab-file https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/crontab
+wget -O /root/crontab-file https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/crontab
 crontab /root/crontab-file
 crontab -l
 
 #Install rc.local
 > /etc/rc.d/rc.local
-wget -O /etc/rc.d/rc.local https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/rc.local
+wget -O /etc/rc.d/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
 chmod +x /etc/rc.d/rc.local
 systemctl enable rc-local
 systemctl start rc-local
