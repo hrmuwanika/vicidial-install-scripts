@@ -112,9 +112,11 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #Install Asterisk 
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
-tar -xvf asterisk-13.29.2-vici.tar.gz
-cd asterisk-13.29.2
+wget http://download.vicidial.com/beta-apps/asterisk-16.17.0-vici.tar.gz  
+tar -xvf asterisk-16.17.0-vici.tar.gz
+cd asterisk-16.17.0
+contrib/scripts/get_mp3_source.sh
+sudo contrib/scripts/install_prereq install
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
 make menuselect/menuselect menuselect-tree menuselect.makeopts
