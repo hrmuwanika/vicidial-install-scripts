@@ -3,26 +3,23 @@
 echo "Vicidial installation Ubuntu 20.04 with WebPhone(WebRTC/SIP.js)"
 
 sudo apt update
-sudo apt -y upgrade
-
-sudo add-apt-repository universe
-
 sudo apt -y install software-properties-common
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update
 
-sudo apt install build-essential subversion subversion-tools unzip libjansson-dev sqlite3 autoconf automake libxml2-dev libxml2 libncurses5-dev \
-libsqlite3-dev libnewt libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp2-dev libedit-dev -y 
+sudo apt install build-essential linux-headers-`uname -r` subversion subversion-tools unzip libjansson-dev sqlite autoconf automake  libxml2-dev libncurses5-dev libsqlite3-dev  -y 
 
 sudo apt install apache2 apache2-bin apache2-data mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
 php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
-git libssl-dev libmysqlclient-dev php7.4-dev php7.4-readline sox sipsak lame screen htop uuid-dev sngrep -y
+git libssl-dev libmysqlclient-dev php7.4-dev php7.4-readline sox sipsak lame screen htop uuid-dev -y
 
 systemctl enable apache2.service
 systemctl start apache2.service
 
 systemctl enable mariadb.service
 systemctl start mariadb.service
+
+sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp2-dev uuid-dev  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 apt install libc6-i386 -y
@@ -115,8 +112,6 @@ cd /usr/src/asterisk
 wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
 tar -xvf asterisk-13.29.2-vici.tar.gz
 cd asterisk-13.29.2
-# contrib/scripts/get_mp3_source.sh
-# sudo contrib/scripts/install_prereq install
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
 make menuselect/menuselect menuselect-tree menuselect.makeopts
