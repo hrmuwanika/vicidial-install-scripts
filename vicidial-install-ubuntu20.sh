@@ -3,27 +3,36 @@
 echo "Vicidial installation Ubuntu 20.04 with WebPhone(WebRTC/SIP.js)"
 
 sudo apt update
-sudo apt -y install software-properties-common
+sudo apt install software-properties-common build-essential -y
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update
 
-sudo add-apt-repository universe
+sudo apt -y install linux-headers-$(uname -r)
+sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
+sudo apt install subversion -y
+
+sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
+
 sudo apt update 
+sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client mariadb-backup php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+ php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
+ git libssl-dev libmysqlclient-dev sox sipsak lame screen -y
 
-sudo apt install build-essential linux-headers-`uname -r` subversion subversion-tools unzip libjansson-dev sqlite3 autoconf automake  libxml2-dev libncurses5-dev \
-libsqlite3-dev libxml2 libedit-dev libnewt-dev -y 
+sudo a2enmod dav
+sudo a2enmod dav_svn
+ 
+sudo apt install php7.4-xcache php7.4-dev php7.4-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl \
+ libsrtp2-dev uuid-dev unzip libjansson-dev sqlite3 libxml2-dev libncurses5-dev libsqlite3-dev libedit-dev libnewt-dev htop sngrep -y
 
-sudo apt install apache2 apache2-bin apache2-data mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
-php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
-git libssl-dev libmysqlclient-dev php7.4-dev php7.4-readline sox sipsak lame screen htop uuid-dev -y
+sudo systemctl enable apache2.service
+sudo systemctl start apache2.service
+sudo systemctl restart apache2.service
 
-systemctl enable apache2.service
-systemctl start apache2.service
+sudo systemctl enable mariadb.service
+sudo systemctl start mariadb.service 
 
-systemctl enable mariadb.service
-systemctl start mariadb.service
-
-sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl libsrtp2-dev  -y
+sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 apt install libc6-i386 -y
@@ -103,7 +112,7 @@ apt install libdbd-mysql-perl -y
 
 read -p 'Press Enter to continue And Install Dahdi: '
 #Install dahdi
-apt install dahdi-* dahdi -y
+apt install dahdi-* dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
@@ -127,6 +136,7 @@ menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
 make install
+make samples
 make config
 ldconfig
 systemctl enable asterisk
@@ -134,12 +144,15 @@ systemctl start asterisk
 
 read -p 'Press Enter to continue: '
 echo 'Continuing...'
+
 #Install astguiclient
 echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
+
+
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mysql -u root -p<<MYSQL_SCRIPT
@@ -161,6 +174,7 @@ use asterisk;
 update servers set asterisk_version='13.29.2';
 quit
 MYSQL_SCRIPT
+
 read -p 'Press Enter to continue: '
 echo 'Continuing...'
 
@@ -196,7 +210,7 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 
 read -p 'Press Enter to Reboot: '
-echo "Restarting Ubuntu"
+echo "Now rebooting Ubuntu"
 
 reboot
 
