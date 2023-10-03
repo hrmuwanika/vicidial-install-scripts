@@ -22,7 +22,7 @@ sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server m
 sudo a2enmod dav
 sudo a2enmod dav_svn
  
-sudo apt install php7.4-xcache php7.4-dev php7.4-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl \
+sudo apt install php7.4-opcache  php7.4-devel php7.4-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl \
  libsrtp2-dev uuid-dev unzip libjansson-dev sqlite3 libxml2-dev libncurses5-dev libsqlite3-dev libedit-dev libnewt-dev htop sngrep -y
 
 sudo systemctl enable apache2.service
