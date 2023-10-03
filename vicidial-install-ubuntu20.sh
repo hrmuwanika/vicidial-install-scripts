@@ -35,14 +35,15 @@ sudo systemctl start mariadb.service
 sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
-apt install libc6-i386 -y
+sudo apt install libc6-i386 -y
 
 #Install Jansson
 cd /usr/src/
-wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
-tar -zxf jansson-2.5.tar.gz
+wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
+tar -zxf jansson-2.13.tar.gz
+
 #tar xvzf jasson*
-cd jansson-2.5
+cd jansson-2.13
 ./configure
 make clean
 make
@@ -128,10 +129,13 @@ cd asterisk-13.29.2
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
 make menuselect/menuselect menuselect-tree menuselect.makeopts
+
 #enable app_meetme
 menuselect/menuselect --enable app_meetme menuselect.makeopts
+
 #enable res_http_websocket
 menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+
 #enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
