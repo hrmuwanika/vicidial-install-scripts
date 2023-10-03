@@ -126,15 +126,16 @@ cd /usr/src/asterisk
 wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
 tar -xvf asterisk-13.29.2-vici.tar.gz
 cd asterisk-13.29.2
-
-#wget http://download.vicidial.com/beta-apps/asterisk-16.17.0-vici.tar.gz
-#tar -xvf asterisk-16.17.0-vici.tar.gz
-#cd asterisk-16.17.0-vici
-
-./configure 
-make menuselect
-
-make 
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make -j ${JOBS} all
 make install
 make samples
 make config
