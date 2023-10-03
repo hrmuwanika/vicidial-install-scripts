@@ -123,22 +123,18 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #Install Asterisk 
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
-tar -xvf asterisk-13.29.2-vici.tar.gz
-cd asterisk-13.29.2
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
-make menuselect/menuselect menuselect-tree menuselect.makeopts
+#wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
+#tar -xvf asterisk-13.29.2-vici.tar.gz
+#cd asterisk-13.29.2
 
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
+wget http://download.vicidial.com/beta-apps/asterisk-16.17.0-vici.tar.gz
+tar -xvf asterisk-16.17.0-vici.tar.gz
+cd asterisk-16.17.0-vici
 
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+./configure 
+make menuselect
 
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make -j ${JOBS} all
+make 
 make install
 make samples
 make config
