@@ -9,6 +9,21 @@ echo -e "\n============= Update Server ================"
 sudo apt update && sudo apt -y upgrade 
 sudo apt autoremove -y
 
+#--------------------------------------------------
+# Set up the timezones
+#--------------------------------------------------
+# set the correct timezone on ubuntu
+timedatectl set-timezone Africa/Kigali
+timedatectl
+
+#----------------------------------------------------
+# Disable password authentication
+#----------------------------------------------------
+sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo service sshd restart
+
 sudo apt install software-properties-common build-essential -y
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update && sudo apt -y upgrade
