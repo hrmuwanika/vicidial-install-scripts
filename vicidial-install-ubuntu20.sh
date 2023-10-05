@@ -2,10 +2,16 @@
 
 echo "Vicidial installation Ubuntu 20.04 with WebPhone(WebRTC/SIP.js)"
 
-sudo apt update
+#--------------------------------------------------
+# Update Server
+#--------------------------------------------------
+echo -e "\n============= Update Server ================"
+sudo apt update && sudo apt -y upgrade 
+sudo apt autoremove -y
+
 sudo apt install software-properties-common build-essential -y
 sudo add-apt-repository ppa:ondrej/php  -y
-sudo apt update
+sudo apt update && sudo apt -y upgrade
 
 sudo apt -y install linux-headers-$(uname -r)
 sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
@@ -14,7 +20,7 @@ sudo apt install subversion -y
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 
-sudo apt update 
+sudo apt update && sudo apt -y upgrade
 sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client mariadb-backup php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  git libssl-dev libmysqlclient-dev sox sipsak lame screen -y
