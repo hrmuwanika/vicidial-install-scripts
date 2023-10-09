@@ -32,6 +32,8 @@ sudo apt -y install linux-headers-$(uname -r)
 sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
 sudo apt install subversion -y
 
+sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 sudo apt update 
 
 sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
