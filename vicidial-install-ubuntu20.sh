@@ -32,13 +32,13 @@ sudo apt -y install linux-headers-$(uname -r)
 sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
 sudo apt install subversion -y
 
-sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
+#sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+#sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 
-sudo apt update && sudo apt -y upgrade
-sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client mariadb-backup php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+sudo apt update 
+sudo apt install apache2 apache2-bin apache2-data apache2-utils mysql-server mysql-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
- git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 mytop ploticus  -y
+ git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus  -y
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
@@ -53,7 +53,7 @@ sudo systemctl restart apache2.service
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service 
 
-sudo apt install libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
+sudo apt install libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install libc6-i386 -y
@@ -129,8 +129,6 @@ cpanm Text::CSV_XS
 
 #If the DBD::MYSQL Fail Run below Command
 apt install libdbd-mysql-perl -y
-
-
 
 read -p 'Press Enter to continue And Install Dahdi: '
 #--------------------------------------------------
@@ -229,8 +227,10 @@ perl install.pl
 
 #Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
+
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
+
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
