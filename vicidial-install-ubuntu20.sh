@@ -32,11 +32,9 @@ sudo apt -y install linux-headers-$(uname -r)
 sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
 sudo apt install subversion -y
 
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.26-1_all.deb
-sudo dpkg -i mysql-apt-config_0.8.26-1_all.deb
 sudo apt update 
 
-sudo apt install apache2 apache2-bin apache2-data apache2-utils mysql-server mysql-community-server mysql-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus  -y
 
@@ -50,8 +48,8 @@ sudo systemctl enable apache2.service
 sudo systemctl start apache2.service
 sudo systemctl restart apache2.service
 
-sudo systemctl enable mysql.service
-sudo systemctl start mysql.service 
+sudo systemctl enable mariadb.service
+sudo systemctl start mariadb.service 
 
 sudo mysql_secure_installation
 
@@ -194,11 +192,11 @@ mysql -u root -p<<MYSQL_SCRIPT
 SET GLOBAL connect_timeout=60;
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
+GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
 CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON asterisk.* TO 'cron'@'%';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON asterisk.* TO 'cron'@'localhost';
-GRANT ALTER,CREATE on asterisk.* TO 'custom'@'%';
-GRANT ALTER,CREATE on asterisk.* TO 'custom'@'localhost';
+GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';
+GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@localhost IDENTIFIED BY '1234';
+GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';
 GRANT RELOAD ON *.* TO cron@'%';
 GRANT RELOAD ON *.* TO cron@localhost;
 GRANT RELOAD ON *.* TO custom@'%';
