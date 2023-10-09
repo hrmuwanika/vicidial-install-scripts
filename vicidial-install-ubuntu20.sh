@@ -50,8 +50,8 @@ sudo systemctl enable apache2.service
 sudo systemctl start apache2.service
 sudo systemctl restart apache2.service
 
-sudo systemctl enable mariadb.service
-sudo systemctl start mariadb.service 
+sudo systemctl enable mysql.service
+sudo systemctl start mysql.service 
 
 sudo apt install libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
 
