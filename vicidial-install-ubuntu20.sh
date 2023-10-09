@@ -32,11 +32,11 @@ sudo apt -y install linux-headers-$(uname -r)
 sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
 sudo apt install subversion -y
 
-#sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-#sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
-
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.26-1_all.deb
+sudo dpkg -i mysql-apt-config_0.8.26-1_all.deb
 sudo apt update 
-sudo apt install apache2 apache2-bin apache2-data apache2-utils mysql-server mysql-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+
+sudo apt install apache2 apache2-bin apache2-data apache2-utils mysql-server mysql-community-server mysql-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus  -y
 
@@ -191,19 +191,19 @@ cd /usr/src/astguiclient/trunk
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mysql -u root -p<<MYSQL_SCRIPT
+SET GLOBAL connect_timeout=60;
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-CREATE USER 'cron'@'localhost' IDENTIFIED WITH mysql_native_password BY '1234';
-CREATE USER 'custom'@'localhost' IDENTIFIED WITH mysql_native_password BY 'custom1234';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'cron'@'localhost' WITH GRANT OPTION;
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'custom'@'localhost' WITH GRANT OPTION;
+CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
+CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
 GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'cron'@'%' WITH GRANT OPTION;
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'cron'@'localhost' WITH GRANT OPTION;
 GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'custom'@'%' WITH GRANT OPTION;
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD ON *.* TO 'custom'@'localhost' WITH GRANT OPTION;
 GRANT RELOAD ON *.* TO cron@'%';
 GRANT RELOAD ON *.* TO cron@localhost;
 GRANT RELOAD ON *.* TO custom@'%';
 GRANT RELOAD ON *.* TO custom@localhost;
 flush privileges;
-SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
