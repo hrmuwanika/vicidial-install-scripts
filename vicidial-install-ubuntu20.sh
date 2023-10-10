@@ -42,6 +42,7 @@ sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server m
 
 # Remove mariadb strict mode by setting sql_mode = "NO_ENGINE_SUBSTITUTION"
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo systemctl restart mariadb.service
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
