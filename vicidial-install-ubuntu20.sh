@@ -68,8 +68,6 @@ sudo apt install libc6-i386 -y
 cd /usr/src/
 wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
 tar -zxf jansson-2.13.tar.gz
-
-#tar xvzf jasson*
 cd jansson-2.13
 ./configure
 make clean
@@ -140,41 +138,49 @@ read -p 'Press Enter to continue And Install Dahdi: '
 #--------------------------------------------------
 # Install dahdi
 #--------------------------------------------------
-apt install dahdi-* dahdi -y
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+echo "Install Dahdi"
+cd /usr/src/
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0%2B3.2.0.tar.gz
+tar xzf dahdi*
+cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
+make
+make install
+make install-config
+
+#apt install dahdi-* dahdi -y
+#modprobe dahdi
+#modprobe dahdi_dummy
+#/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 
 #--------------------------------------------------
-# Install Asterisk core
+# Install Asterisk core and libpri
 #--------------------------------------------------
 
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
-tar -xvf asterisk-13.29.2-vici.tar.gz
-cd asterisk-13.29.2
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make -j ${JOBS} all
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
+tar -xvzf libpri-*
+cd libpri*
+make clean
+make
+make install
+
+cd /usr/src/asterisk
+tar -xvzf asterisk-20.4.0.tar.gz
+cd asterisk-20.4.0
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
+make clean
+make menuselect    ; ####### select chan_meetme 
+make 
 make install
 make samples
 make config
 ldconfig
-systemctl enable asterisk
-systemctl start asterisk
-
-read -p 'Press Enter to continue: '
-echo 'Continuing...'
+sudo systemctl enable asterisk
+sudo systemctl start asterisk
 
 #--------------------------------------------------
 # Install astguiclient
@@ -182,7 +188,8 @@ echo 'Continuing...'
 
 # Install Perl Asterisk Extension
 cd /usr/src
-tar -xf asterisk-perl-0.08.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
+tar xzf asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08/
 perl Makefile.PL && make all && make install
 
@@ -194,7 +201,7 @@ cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p<<MYSQL_SCRIPT
+mysql -u root -p << MYSQL_SCRIPT
 SET GLOBAL connect_timeout=60;
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
@@ -211,15 +218,11 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-\. /usr/src/astguiclient/trunk/extras/sip-iax_phones.sql
-update servers set asterisk_version='13.29.2';
+update servers set asterisk_version='20.4.0';
 quit
 MYSQL_SCRIPT
 
-read -p 'Press Enter to continue: '
-echo 'Continuing...'
-
-#Get astguiclient.conf file
+# Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
