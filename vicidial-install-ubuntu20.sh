@@ -177,7 +177,7 @@ contrib/scripts/install_prereq install
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
 make clean
 make menuselect    ; ####### select chan_meetme 
-make 
+make -j2
 make install
 make samples
 make config
