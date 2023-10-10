@@ -24,21 +24,22 @@ sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo service sshd restart
 
-sudo apt install software-properties-common build-essential -y
+sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update && sudo apt -y upgrade
 
 sudo apt -y install linux-headers-$(uname -r)
-sudo apt install libsvn-dev libapache2-mod-svn subversion-tools autoconf automake -y 
-sudo apt install subversion -y
+sudo apt install libsvn-dev libapache2-mod-svn subversion-tools automake -y 
 
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 sudo apt update 
 
+# Astguiclient dependencies
 sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
- git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus  -y
+ libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
+ libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libncurses5-dev libedit-dev libnewt-dev htop sngrep libcurl4 -y
 
 # Remove mariadb strict mode by setting sql_mode = "NO_ENGINE_SUBSTITUTION"
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -46,9 +47,9 @@ sudo systemctl restart mariadb.service
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
- 
-sudo apt install php7.4-opcache  php7.4-dev php7.4-readline sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool shtool libdbd-mysql-perl \
- libsrtp2-dev uuid-dev unzip libjansson-dev sqlite3 libxml2-dev libncurses5-dev libsqlite3-dev libedit-dev libnewt-dev htop sngrep libcurl4 -y
+
+# Asterisk dependencies
+sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool -y
 
 sudo systemctl enable apache2.service
 sudo systemctl start apache2.service
