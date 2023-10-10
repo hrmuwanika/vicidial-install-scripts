@@ -40,6 +40,9 @@ sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server m
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  git libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus  -y
 
+# Remove mariadb strict mode by setting sql_mode = "NO_ENGINE_SUBSTITUTION"
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+
 sudo a2enmod dav
 sudo a2enmod dav_svn
  
@@ -53,7 +56,7 @@ sudo systemctl restart apache2.service
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service 
 
-sudo mysql_secure_installation
+#sudo mysql_secure_installation
 
 sudo apt install libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
 
