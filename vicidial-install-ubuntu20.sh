@@ -29,7 +29,7 @@ sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update && sudo apt -y upgrade
 
 sudo apt -y install linux-headers-$(uname -r)
-sudo apt install libsvn-dev libapache2-mod-svn subversion-tools automake -y 
+sudo apt install libsvn-dev libapache2-mod-svn subversion-tools -y 
 
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
@@ -39,7 +39,7 @@ sudo apt update
 sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
- libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libncurses5-dev libedit-dev libnewt-dev htop sngrep libcurl4 -y
+ libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libedit-dev libnewt-dev htop sngrep libcurl4 libelf-dev autogen -y
 
 # Remove mariadb strict mode by setting sql_mode = "NO_ENGINE_SUBSTITUTION"
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -49,7 +49,7 @@ sudo a2enmod dav
 sudo a2enmod dav_svn
 
 # Asterisk dependencies
-sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool -y
+sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev -y
 
 sudo systemctl enable apache2.service
 sudo systemctl start apache2.service
@@ -60,8 +60,6 @@ sudo systemctl start mariadb.service
 
 #sudo mysql_secure_installation
 
-sudo apt install libelf-dev autogen libtool shtool libdbd-mysql-perl  -y
-
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install libc6-i386 -y
 
@@ -70,11 +68,11 @@ cd /usr/src/
 wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
 tar -zxf jansson-2.13.tar.gz
 cd jansson-2.13
-./configure
-make clean
-make
-make install 
-ldconfig
+sudo ./configure
+sudo make clean
+sudo make
+sudo make install 
+sudo ldconfig
 
 #Install CPAMN
 cd /usr/bin/
@@ -133,7 +131,7 @@ cpanm Text::CSV
 cpanm Text::CSV_XS
 
 #If the DBD::MYSQL Fail Run below Command
-apt install libdbd-mysql-perl -y
+sudo apt install libdbd-mysql-perl -y
 
 read -p 'Press Enter to continue And Install Dahdi: '
 #--------------------------------------------------
@@ -144,9 +142,9 @@ cd /usr/src/
 wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0%2B3.2.0.tar.gz
 tar xzf dahdi*
 cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
-make
-make install
-make install-config
+sudo make
+sudo make install
+sudo make install-config
 
 #apt install dahdi-* dahdi -y
 #modprobe dahdi
@@ -158,30 +156,29 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #--------------------------------------------------
 # Install Asterisk core and libpri
 #--------------------------------------------------
-
-mkdir /usr/src/asterisk
+sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
 tar -xvzf libpri-*
 cd libpri*
-make clean
-make
-make install
+sudo make clean
+sudo make
+sudo make install
 
 cd /usr/src/asterisk
 tar -xvzf asterisk-20.4.0.tar.gz
 cd asterisk-20.4.0
-contrib/scripts/get_mp3_source.sh
-contrib/scripts/install_prereq install
-./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
-make clean
-make menuselect    ; ####### select chan_meetme 
-make -j2
-make install
-make samples
-make config
-ldconfig
+sudo contrib/scripts/get_mp3_source.sh
+sudo contrib/scripts/install_prereq install
+sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
+sudo make clean
+sudo make menuselect    ; ####### select chan_meetme 
+sudo make -j2
+sudo make install
+sudo make samples
+sudo make config
+sudo ldconfig
 sudo systemctl enable asterisk
 sudo systemctl start asterisk
 
@@ -194,7 +191,7 @@ cd /usr/src
 wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08/
-perl Makefile.PL && make all && make install
+perl Makefile.PL && sudo make all && sudo make install
 
 echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
@@ -252,11 +249,13 @@ crontab -l
 
 #Install rc.local
 wget -O /etc/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
-chmod +x /etc/rc.local
-systemctl start rc-local
+sudo chmod +x /etc/rc.local
+sudo systemctl start rc-local
 
-ufw allow 80/tcp
-ufw allow 443/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 5060/udp
+sudo ufw allow 10000:20000/udp
 
 read -p 'Press Enter to Reboot: '
 echo "Now rebooting Ubuntu"
