@@ -172,6 +172,8 @@ make install
 cd /usr/src/asterisk
 tar -xvzf asterisk-20.4.0.tar.gz
 cd asterisk-20.4.0
+contrib/scripts/get_mp3_source.sh
+contrib/scripts/install_prereq install
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
 make clean
 make menuselect    ; ####### select chan_meetme 
