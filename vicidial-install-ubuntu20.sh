@@ -171,7 +171,7 @@ tar -xvzf asterisk-20.4.0.tar.gz
 cd asterisk-20*
 sudo ./contrib/scripts/get_mp3_source.sh
 contrib/scripts/install_prereq install
-sudo ./configure --libdir=/usr/lib64 --with-jansson-bundled --with-pjproject-bundled
+sudo ./configure --with-jansson-bundled --with-pjproject-bundled
 sudo make clean
 sudo make menuselect    
 sudo make 
@@ -188,8 +188,8 @@ sudo chown -R asterisk:asterisk /usr/lib/asterisk
 sudo mkdir /usr/lib/asterisk
 sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
 
-# sudo nano /etc/default/asterisk
-# sudo nano /etc/asterisk/asterisk.conf
+sudo nano /etc/default/asterisk
+sudo nano /etc/asterisk/asterisk.conf
 
 sudo systemctl restart asterisk
 sudo systemctl enable asterisk
