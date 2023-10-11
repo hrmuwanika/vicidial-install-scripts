@@ -9,6 +9,9 @@ echo -e "\n============= Update Server ================"
 sudo apt update && sudo apt -y upgrade 
 sudo apt autoremove -y
 
+sudo apt -y install linux-headers-$(uname -r)
+sudo apt install software-properties-common -y
+
 #--------------------------------------------------
 # Set up the timezones
 #--------------------------------------------------
@@ -24,46 +27,44 @@ sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo service sshd restart
 
-sudo apt install software-properties-common -y
-sudo add-apt-repository ppa:ondrej/php  -y
-sudo apt update && sudo apt -y upgrade
-
-sudo apt -y install linux-headers-$(uname -r)
-sudo apt install libsvn-dev libapache2-mod-svn subversion-tools -y 
-
+# Install mariadb databases
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 sudo apt update 
 
-# Install mariadb databases
 sudo apt install mariadb-server mariadb-client -y 
-sudo systemctl restart mariadb.service
-sudo systemctl enable mariadb.service 
-
-# Astguiclient dependencies
-sudo apt install apache2 apache2-bin apache2-data apache2-utils php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
- php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath  \
- sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
- libasterisk-agi-perl libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev  -y
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 # sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
 
+sudo systemctl restart mariadb.service
+sudo systemctl enable mariadb.service 
+
+#sudo mysql_secure_installation
+
+# Install PHP7.4
+sudo add-apt-repository ppa:ondrej/php  -y
+sudo apt update
+
+sudo apt install php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
+php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache -y
+
+# install apache 
+sudo apt install apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools -y 
+
+# Other astguiclient dependencies
+sudo apt install sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
+libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev  -y
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
-# Asterisk dependencies
-sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev subversion libsqlite3-dev libjansson-dev libxml2-dev uuid-dev libmysqlclient-dev sqlite3 autogen -y
-
 sudo systemctl enable apache2.service
-sudo systemctl start apache2.service
 sudo systemctl restart apache2.service
 
-
-
-#sudo mysql_secure_installation
+# Asterisk dependencies
+sudo apt install build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
+git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install libc6-i386 -y
@@ -166,7 +167,9 @@ cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
 tar -xvzf asterisk-20.4.0.tar.gz
 cd asterisk-20*
-sudo ./configure --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+sudo ./contrib/scripts/get_mp3_source.sh
+contrib/scripts/install_prereq install
+sudo ./configure --libdir=/usr/lib64 --with-jansson-bundled --with-pjproject-bundled
 sudo make clean
 sudo make menuselect    
 sudo make 
@@ -182,6 +185,9 @@ sudo chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
 sudo chown -R asterisk:asterisk /usr/lib/asterisk
 sudo mkdir /usr/lib/asterisk
 sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
+
+# sudo nano /etc/default/asterisk
+# sudo nano /etc/asterisk/asterisk.conf
 
 sudo systemctl restart asterisk
 sudo systemctl enable asterisk
@@ -222,7 +228,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.19.0';
+update servers set asterisk_version='20.4.0';
 quit
 MYSQL_SCRIPT
 
