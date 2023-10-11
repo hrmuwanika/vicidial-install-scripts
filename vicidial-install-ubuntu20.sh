@@ -166,9 +166,9 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #--------------------------------------------------
 sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
-tar -xvzf asterisk-20.4.0.tar.gz
-cd asterisk-20*
+wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18.19.0.tar.gz
+tar -xvzf asterisk-18.19.0.tar.gz
+cd asterisk-18*
 sudo ./contrib/scripts/get_mp3_source.sh
 contrib/scripts/install_prereq install
 sudo ./configure --with-jansson-bundled --with-pjproject-bundled
@@ -230,7 +230,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='20.4.0';
+update servers set asterisk_version='18.19.0';
 quit
 MYSQL_SCRIPT
 
