@@ -171,7 +171,7 @@ tar -xvzf asterisk-20.4.0.tar.gz
 cd asterisk-20.4.0
 sudo contrib/scripts/get_mp3_source.sh
 sudo contrib/scripts/install_prereq install
-sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
+sudo ./configure 
 sudo make clean
 sudo make menuselect    ; ####### select chan_meetme 
 sudo make 
