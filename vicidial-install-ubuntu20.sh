@@ -154,26 +154,16 @@ sudo make install-config
 read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 
 #--------------------------------------------------
-# Install Asterisk core and libpri
+# Install Asterisk core 
 #--------------------------------------------------
 sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
-tar -xvzf libpri-*
-cd libpri*
+wget http://download.vicidial.com/beta-apps/asterisk-16.17.0-vici.tar.gz
+tar -xvzf asterisk-16.17.0-vici.tar.gz
+cd asterisk-16*
+sudo ./configure --with-pjproject-bundled
 sudo make clean
-sudo make
-sudo make install
-
-cd /usr/src/asterisk
-tar -xvzf asterisk-20.4.0.tar.gz
-cd asterisk-20.4.0
-sudo contrib/scripts/get_mp3_source.sh
-sudo contrib/scripts/install_prereq install
-sudo ./configure 
-sudo make clean
-sudo make menuselect    ; ####### select chan_meetme 
+sudo make menuselect    
 sudo make 
 sudo make install
 sudo make samples
