@@ -172,14 +172,11 @@ sudo ldconfig
 sudo groupadd asterisk
 sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
 sudo usermod -aG audio,dialout asterisk
-sudo chown -R asterisk.asterisk /etc/asterisk
-sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
-sudo chown -R asterisk.asterisk /usr/lib/asterisk
+sudo chown -R asterisk:asterisk /etc/asterisk
+sudo chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
+sudo chown -R asterisk:asterisk /usr/lib/asterisk
 sudo mkdir /usr/lib/asterisk
 sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
-
-sudo nano /etc/default/asterisk
-sudo nano /etc/asterisk/asterisk.conf
 
 sudo systemctl restart asterisk
 sudo systemctl enable asterisk
