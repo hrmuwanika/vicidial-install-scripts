@@ -35,28 +35,33 @@ sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.a
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 sudo apt update 
 
+# Install mariadb databases
+sudo apt install mariadb-server mariadb-client -y 
+sudo systemctl restart mariadb.service
+sudo systemctl enable mariadb.service 
+
 # Astguiclient dependencies
-sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
- php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
- libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
- libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libedit-dev libnewt-dev htop sngrep libcurl4 libelf-dev autogen sqlite3 -y
+sudo apt install apache2 apache2-bin apache2-data apache2-utils php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
+ php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath  \
+ sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
+ libasterisk-agi-perl libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev  -y
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 # sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
-sudo systemctl restart mariadb.service
+
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
 # Asterisk dependencies
-sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev -y
+sudo apt install build-essential git autoconf wget subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
+git curl wget libnewt-dev libssl-dev subversion libsqlite3-dev libjansson-dev libxml2-dev uuid-dev libmysqlclient-dev sqlite3 autogen -y
 
 sudo systemctl enable apache2.service
 sudo systemctl start apache2.service
 sudo systemctl restart apache2.service
 
-sudo systemctl enable mariadb.service
-sudo systemctl start mariadb.service 
+
 
 #sudo mysql_secure_installation
 
@@ -158,9 +163,9 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #--------------------------------------------------
 sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18.19.0.tar.gz
-tar -xvzf asterisk-18.19.0.tar.gz
-cd asterisk-18*
+wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20.4.0.tar.gz
+tar -xvzf asterisk-20.4.0.tar.gz
+cd asterisk-20*
 sudo ./configure --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 sudo make clean
 sudo make menuselect    
