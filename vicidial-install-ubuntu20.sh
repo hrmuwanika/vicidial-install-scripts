@@ -39,7 +39,7 @@ sudo apt update
 sudo apt install apache2 apache2-bin apache2-data apache2-utils mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl \
  php7.4-intl php7.4-mbstring php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath wget unzip curl \
  libssl-dev libmysqlclient-dev sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus php7.4-opcache php7.4-dev php7.4-readline libnet-telnet-perl \
- libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libedit-dev libnewt-dev htop sngrep libcurl4 libelf-dev autogen -y
+ libasterisk-agi-perl libelf-dev autogen shtool libdbd-mysql-perl libsrtp2-dev libedit-dev libnewt-dev htop sngrep libcurl4 libelf-dev autogen sqlite3 -y
 
 # Remove mariadb strict mode by setting sql_mode = "NO_ENGINE_SUBSTITUTION"
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -174,13 +174,25 @@ sudo contrib/scripts/install_prereq install
 sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled --without-ogg
 sudo make clean
 sudo make menuselect    ; ####### select chan_meetme 
-sudo make -j2
+sudo make 
 sudo make install
 sudo make samples
 sudo make config
 sudo ldconfig
+sudo groupadd asterisk
+sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
+sudo usermod -aG audio,dialout asterisk
+sudo chown -R asterisk.asterisk /etc/asterisk
+sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
+sudo chown -R asterisk.asterisk /usr/lib/asterisk
+sudo mkdir /usr/lib/asterisk
+sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
+
+sudo nano /etc/default/asterisk
+sudo nano /etc/asterisk/asterisk.conf
+
+sudo systemctl restart asterisk
 sudo systemctl enable asterisk
-sudo systemctl start asterisk
 
 #--------------------------------------------------
 # Install astguiclient
