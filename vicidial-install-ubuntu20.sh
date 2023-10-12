@@ -12,6 +12,11 @@ sudo apt autoremove -y
 sudo apt -y install linux-headers-$(uname -r)
 sudo apt install software-properties-common -y
 
+# Add universe repository and install subversion
+sudo add-apt-repository universe
+sudo apt update 
+sudo apt -y install subversion
+
 #--------------------------------------------------
 # Set up the timezones
 #--------------------------------------------------
@@ -64,7 +69,7 @@ sudo a2enmod dav_svn
 sudo systemctl enable apache2.service
 sudo systemctl restart apache2.service
 
-# Asterisk dependencies
+# Install Asterisk 18 dependencies
 sudo apt install build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
 git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen -y
 
@@ -166,32 +171,72 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 #--------------------------------------------------
 sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
+
+# Download Asterisk 18 LTS tarball
 wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18.19.0.tar.gz
+
+# Extract the tarball file
 tar -xvzf asterisk-18.19.0.tar.gz
-cd asterisk-18*
-sudo ./contrib/scripts/get_mp3_source.sh
-contrib/scripts/install_prereq install
-sudo ./configure --with-jansson-bundled --with-pjproject-bundled
+cd asterisk-18*/
+
+# Download the mp3 decoder library
+sudo contrib/scripts/get_mp3_source.sh
+
+# Ensure all dependencies are resolved
+sudo contrib/scripts/install_prereq install
+
+# Run the configure script to satisfy build dependencies
+sudo ./configure 
 sudo make clean
-sudo make menuselect    
-sudo make 
+
+# Setup menu options by running the following command:
+sudo make menuselect
+
+# Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
+# On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
+# select Extra Sound Packages
+# Enable app_macro under Applications menu
+# Change other configurations as required
+
+# Build Asterisk
+sudo make
+
+# Install Asterisk by running the command:
 sudo make install
+
+# Install configs and samples
 sudo make samples
 sudo make config
 sudo ldconfig
+
+# Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
 sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
 sudo usermod -aG audio,dialout asterisk
-sudo chown -R asterisk:asterisk /etc/asterisk
-sudo chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
-sudo chown -R asterisk:asterisk /usr/lib/asterisk
-sudo mkdir /usr/lib/asterisk
-sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
+sudo chown -R asterisk.asterisk /etc/asterisk
+sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
+sudo chown -R asterisk.asterisk /usr/lib/asterisk
 
+#Set Asterisk default user to asterisk:
 sudo nano /etc/default/asterisk
-sudo nano /etc/asterisk/asterisk.conf
+# AST_USER="asterisk"
+# AST_GROUP="asterisk"
 
+sudo nano /etc/asterisk/asterisk.conf
+# runuser = asterisk ; The user to run as.
+# rungroup = asterisk ; The group to run as.
+
+# Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
+# radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
+# Solution
+sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+
+# Restart asterisk service
 sudo systemctl restart asterisk
+
+# Enable asterisk service to start on system  boot
 sudo systemctl enable asterisk
 
 #--------------------------------------------------
