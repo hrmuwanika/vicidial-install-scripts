@@ -78,8 +78,8 @@ sudo apt install libc6-i386 -y
 
 #Install Jansson
 cd /usr/src/
-wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
-tar -zxf jansson-2.13.tar.gz
+sudo wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
+sudo tar -xzf jansson-2.13.tar.gz
 cd jansson-2.13
 sudo ./configure
 sudo make clean
@@ -152,19 +152,14 @@ read -p 'Press Enter to continue And Install Dahdi: '
 #--------------------------------------------------
 echo "Install Dahdi"
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0%2B3.2.0.tar.gz
-tar xzf dahdi*
+sudo wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0%2B3.2.0.tar.gz
+sudo tar -xzf dahdi*
 cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
 sudo make
 sudo make install
 sudo make install-config
 
-#apt install dahdi-* dahdi -y
-#modprobe dahdi
-#modprobe dahdi_dummy
-#/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-
-read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
+read -p 'Press Enter to continue to install Asterisk: '
 
 #--------------------------------------------------
 # Install Asterisk core 
@@ -172,11 +167,11 @@ read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
 sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
-# Download Asterisk 18 LTS tarball
-wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+# Download Asterisk 20 LTS tarball
+sudo wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 # Extract the tarball file
-tar xvf asterisk-20-current.tar.gz
+sudo tar -xzf asterisk-20-current.tar.gz
 cd asterisk-20*/
 
 # Download the mp3 decoder library
@@ -200,7 +195,7 @@ sudo make menuselect
 # Change other configurations as required
 
 # Build Asterisk
-sudo make
+sudo make -j2
 
 # Install Asterisk by running the command:
 sudo make install
