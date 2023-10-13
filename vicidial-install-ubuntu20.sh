@@ -173,16 +173,17 @@ sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
 # Download Asterisk 18 LTS tarball
-wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18.19.0.tar.gz
+wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 # Extract the tarball file
-tar -xvzf asterisk-18.19.0.tar.gz
-cd asterisk-18*/
+tar xvf asterisk-20-current.tar.gz
+cd asterisk-20*/
 
 # Download the mp3 decoder library
 sudo contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
+sudo apt update
 sudo contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
@@ -275,7 +276,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.19.0';
+update servers set asterisk_version='20.0.0';
 quit
 MYSQL_SCRIPT
 
