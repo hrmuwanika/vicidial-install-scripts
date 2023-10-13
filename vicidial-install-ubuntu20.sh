@@ -195,7 +195,7 @@ sudo make menuselect
 # Change other configurations as required
 
 # Build Asterisk
-sudo make -j2
+sudo make
 
 # Install Asterisk by running the command:
 sudo make install
