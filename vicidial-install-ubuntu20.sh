@@ -171,7 +171,7 @@ cd /usr/src/asterisk
 sudo wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 # Extract the tarball file
-sudo tar -xzf asterisk-20-current.tar.gz
+sudo tar xvf asterisk-20-current.tar.gz
 cd asterisk-20*/
 
 # Download the mp3 decoder library
@@ -182,8 +182,10 @@ sudo apt update
 sudo contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure 
+sudo ./configure --with-pjproject-bundled --with-jansson-bundled
 sudo make clean
+sudo make menuselect.makeopts
+sudo menuselect/menuselect --enable app_macro --enable format_mp3 menuselect.makeopts
 
 # Setup menu options by running the following command:
 sudo make menuselect
@@ -204,6 +206,7 @@ sudo make install
 sudo make samples
 sudo make config
 sudo ldconfig
+update-rc.d -f asterisk remove 
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
