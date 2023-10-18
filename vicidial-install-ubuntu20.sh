@@ -170,7 +170,6 @@ sudo contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
 sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
-sudo make clean
 
 # Setup menu options by running the following command:
 sudo make menuselect
@@ -191,9 +190,6 @@ sudo make install
 sudo make samples
 sudo make config
 sudo ldconfig
-
-/usr/src/asterisk/asterisk-20*/contrib/scripts/safe_asterisk
-ln -s DIST/contrib/scripts/safe_asterisk /usr/sbin/safe_asterisk
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
