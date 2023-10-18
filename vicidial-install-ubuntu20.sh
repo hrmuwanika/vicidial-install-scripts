@@ -9,6 +9,7 @@ echo -e "\n============= Update Server ================"
 sudo apt update && sudo apt -y upgrade 
 sudo apt autoremove -y
 
+# need to find odbc-mariadb replacement
 sudo apt -y install linux-headers-$(uname -r)
 sudo apt install software-properties-common -y
 
@@ -37,7 +38,7 @@ sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.a
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
 sudo apt update 
 
-sudo apt install mariadb-server mariadb-client -y 
+sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -67,25 +68,24 @@ sudo a2enmod dav
 sudo a2enmod dav_svn
 
 sudo systemctl enable apache2.service
-sudo systemctl restart apache2.service
+
+# sed -i 's|128M|256M|' /etc/php/7.4/apache2/php.ini
+# sed -i 's|128M|256M|' /etc/php/7.4/cli/php.ini
+# sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/7.4/apache2/php.ini
+# sed -i 's/\(^memory_limit = \).*/\1256M/' /etc/php/7.4/apache2/php.ini
+# sed -i 's/^\(User\|Group\).*/\1 asterisk/' /etc/apache2/apache2.conf
+# sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+# a2enmod rewrite
+
+sudo systemctl restart apache2
+sudo rm /var/www/html/index.html
 
 # Install Asterisk 18 dependencies
 sudo apt install build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen -y
+git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid -y
 
 #Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install libc6-i386 -y
-
-#Install Jansson
-cd /usr/src/
-sudo wget http://www.digip.org/jansson/releases/jansson-2.13.tar.gz
-sudo tar -xzf jansson-2.13.tar.gz
-cd jansson-2.13
-sudo ./configure
-sudo make clean
-sudo make
-sudo make install 
-sudo ldconfig
 
 #Install CPAMN
 cd /usr/bin/
@@ -146,19 +146,6 @@ cpanm Text::CSV_XS
 #If the DBD::MYSQL Fail Run below Command
 sudo apt install libdbd-mysql-perl -y
 
-read -p 'Press Enter to continue And Install Dahdi: '
-#--------------------------------------------------
-# Install dahdi
-#--------------------------------------------------
-echo "Install Dahdi"
-cd /usr/src/
-sudo wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0%2B3.2.0.tar.gz
-sudo tar -xzf dahdi*
-cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
-sudo make
-sudo make install
-sudo make install-config
-
 read -p 'Press Enter to continue to install Asterisk: '
 
 #--------------------------------------------------
@@ -182,10 +169,8 @@ sudo apt update
 sudo contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure --with-pjproject-bundled --with-jansson-bundled
+sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 sudo make clean
-sudo make menuselect.makeopts
-sudo menuselect/menuselect --enable app_macro --enable format_mp3 menuselect.makeopts
 
 # Setup menu options by running the following command:
 sudo make menuselect
@@ -206,7 +191,9 @@ sudo make install
 sudo make samples
 sudo make config
 sudo ldconfig
-update-rc.d -f asterisk remove 
+
+/usr/src/asterisk/asterisk-20*/contrib/scripts/safe_asterisk
+ln -s DIST/contrib/scripts/safe_asterisk /usr/sbin/safe_asterisk
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
@@ -217,13 +204,14 @@ sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
 sudo chown -R asterisk.asterisk /usr/lib/asterisk
 
 #Set Asterisk default user to asterisk:
-sudo nano /etc/default/asterisk
-# AST_USER="asterisk"
-# AST_GROUP="asterisk"
+sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
+sed -i 's|#AST_GROUP|AST_GROUP|' /etc/default/asterisk
 
-sudo nano /etc/asterisk/asterisk.conf
-# runuser = asterisk ; The user to run as.
-# rungroup = asterisk ; The group to run as.
+sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
+sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
+
+echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+sudo ldconfig
 
 # Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
 # radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
@@ -232,11 +220,10 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-# Restart asterisk service
-sudo systemctl restart asterisk
-
 # Enable asterisk service to start on system  boot
+sudo systemctl daemon-reload
 sudo systemctl enable asterisk
+sudo systemctl start asterisk
 
 #--------------------------------------------------
 # Install astguiclient
