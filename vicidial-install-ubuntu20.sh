@@ -197,7 +197,7 @@ sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
 sudo usermod -aG audio,dialout asterisk
 sudo chown -R asterisk.asterisk /etc/asterisk
 sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
-sudo chown -R asterisk.asterisk /usr/lib/asterisk
+# sudo chown -R asterisk.asterisk /usr/lib/asterisk
 
 #Set Asterisk default user to asterisk:
 sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
@@ -219,7 +219,7 @@ sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiusc
 # Enable asterisk service to start on system  boot
 sudo systemctl daemon-reload
 sudo systemctl enable asterisk
-sudo systemctl start asterisk
+sudo systemctl restart asterisk
 
 #--------------------------------------------------
 # Install astguiclient
@@ -257,7 +257,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='20.0.0';
+update servers set asterisk_version='20.5.0';
 quit
 MYSQL_SCRIPT
 
