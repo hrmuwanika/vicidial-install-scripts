@@ -11,7 +11,6 @@ sudo apt autoremove -y
 
 # need to find odbc-mariadb replacement
 sudo apt -y install linux-headers-$(uname -r)
-sudo apt install software-properties-common -y
 
 # Add universe repository and install subversion
 sudo add-apt-repository universe
@@ -35,7 +34,7 @@ sudo service sshd restart
 
 # Install mariadb databases
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.8/ubuntu focal main'
 sudo apt update 
 
 sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
@@ -48,9 +47,10 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
 
-#sudo mysql_secure_installation
+# sudo mysql_secure_installation
 
 # Install PHP7.4
+sudo apt install ca-certificates apt-transport-https software-properties-common -y
 sudo add-apt-repository ppa:ondrej/php  -y
 sudo apt update
 
@@ -72,7 +72,7 @@ sudo systemctl enable apache2.service
 sudo systemctl restart apache2
 sudo rm /var/www/html/index.html
 
-# Install Asterisk 18 dependencies
+# Install Asterisk 20 dependencies
 sudo apt install build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
 git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid -y
 
@@ -187,9 +187,11 @@ sudo ldconfig
 sudo groupadd asterisk
 sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
 sudo usermod -aG audio,dialout asterisk
-sudo chown -R asterisk.asterisk /etc/asterisk
-sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
-# sudo chown -R asterisk.asterisk /usr/lib/asterisk
+chown -R asterisk.asterisk /etc/asterisk
+chown -R asterisk.asterisk /var/lib/asterisk
+chown -R asterisk.asterisk /var/log/asterisk
+chown -R asterisk.asterisk /var/spool/asterisk
+# chown -R asterisk.asterisk /usr/lib/asterisk
 
 #Set Asterisk default user to asterisk:
 sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
