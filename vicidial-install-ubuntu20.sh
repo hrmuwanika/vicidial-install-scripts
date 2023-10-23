@@ -181,7 +181,6 @@ sudo make install
 # Install configs and samples
 sudo make samples
 sudo make config
-sudo ldconfig
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
@@ -288,6 +287,7 @@ sudo systemctl start rc-local
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw allow 5060/udp
+sudo ufw allow 5060/tcp
 sudo ufw allow 10000:20000/udp
 
 read -p 'Press Enter to Reboot: '
