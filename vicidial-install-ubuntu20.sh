@@ -69,14 +69,6 @@ sudo a2enmod dav_svn
 
 sudo systemctl enable apache2.service
 
-# sed -i 's|128M|256M|' /etc/php/7.4/apache2/php.ini
-# sed -i 's|128M|256M|' /etc/php/7.4/cli/php.ini
-# sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/7.4/apache2/php.ini
-# sed -i 's/\(^memory_limit = \).*/\1256M/' /etc/php/7.4/apache2/php.ini
-# sed -i 's/^\(User\|Group\).*/\1 asterisk/' /etc/apache2/apache2.conf
-# sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
-# a2enmod rewrite
-
 sudo systemctl restart apache2
 sudo rm /var/www/html/index.html
 
