@@ -263,33 +263,75 @@ echo 'Continuing...'
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz
-wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz
-
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
 cd /usr/src/asterisk/asterisk*
 
+# Download the mp3 decoder library
+contrib/scripts/get_mp3_source.sh
+
+# Ensure all dependencies are resolved
+contrib/scripts/install_prereq install
+
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure NOISY_BUILD=YES
-./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled
 
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make -j ${JOBS} all
+# Run the configure script to satisfy build dependencies
+./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
+
+# Setup menu options by running the following command:
+make menuselect
+
+# Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
+# On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
+# select Extra Sound Packages
+# Enable app_macro under Applications menu
+# Change other configurations as required
+
+# Build Asterisk
+make
+
+# Install Asterisk by running the command:
 make install
+
+# Install configs and samples
 make samples
 make config
+
+# Create a separate user and group to run asterisk services, and assign correct permissions:
+groupadd asterisk
+useradd -r -d /var/lib/asterisk -g asterisk asterisk
+usermod -aG audio,dialout asterisk
+chown -R asterisk.asterisk /etc/asterisk
+chown -R asterisk.asterisk /var/lib/asterisk
+chown -R asterisk.asterisk /var/log/asterisk
+chown -R asterisk.asterisk /var/spool/asterisk
+# chown -R asterisk.asterisk /usr/lib/asterisk
+
+# Set Asterisk default user to asterisk:
+sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
+sed -i 's|#AST_GROUP|AST_GROUP|' /etc/default/asterisk
+
+sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
+sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
+
+echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
 ldconfig
 
+# Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
+# radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
+# Solution
+sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+
+# Enable asterisk service to start on system  boot
+systemctl daemon-reload
 systemctl enable asterisk
-systemctl start asterisk
+systemctl restart asterisk
 
 read -p 'Press Enter to continue: '
 
@@ -320,7 +362,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='13.29.2';
+update servers set asterisk_version='20.5.0';
 quit
 MYSQL_SCRIPT
 
@@ -362,6 +404,9 @@ systemctl start rc-local
 
 firewall-cmd --permanent --zone=public --add-service=http
 firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
 firewall-cmd --reload
 
 read -p 'Press Enter to Reboot: '
