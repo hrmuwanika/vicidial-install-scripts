@@ -347,6 +347,7 @@ cd /usr/src/astguiclient/trunk
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mysql -u root -p<<MYSQL_SCRIPT
+SET GLOBAL connect_timeout=60;
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
 GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
