@@ -4,16 +4,25 @@ echo "Vicidial installation Centos7 with WebPhone(WebRTC/SIP.js)"
 
 export LC_ALL=C
 
-yum install make patch gcc perl-Term-ReadLine-Gnu gcc-c++ subversion php php-devel php-gd gd-devel php-mbstring php-mcrypt php-imap php-ldap php-mysql php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick libxml2 libxml2-devel httpd libpcap libpcap-devel libnet ncurses ncurses-devel screen mysql-devel ntp mutt glibc.i686 wget nano unzip sipsak sox libss7* libopen* openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel -y
-yum -y install sqlite-devel
-yum install mariadb-server mariadb -y
+yum -y update
+
+setenforce 0
+sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
+
+yum -y groupinstall "Development Tools"
+
+yum install make patch gcc perl-Term-ReadLine-Gnu gcc-c++ subversion php php-devel php-gd gd-devel php-mbstring php-mcrypt \
+php-imap php-ldap php-mysql php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick libxml2 libxml2-devel \
+httpd libpcap libpcap-devel libnet ncurses ncurses-devel screen mysql-devel ntp mutt glibc.i686 wget nano unzip sipsak sox libss7* \
+libopen* openssl openssl-devel libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel epel-release dmidecode  \
+sqlite-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel libedit libedit-devel svn -y
+
+yum install sqlite-devel mariadb-server mariadb -y
 
 cp /etc/my.cnf /etc/my.cnf.original
-
 echo "" > /etc/my.cnf
 
-
-cat <<MYSQLCONF>> /etc/my.cnf
+cat <<EOF > /etc/my.cnf
 [mysql.server]
 user = mysql
 #basedir = /var/lib
@@ -86,16 +95,16 @@ interactive-timeout
 #log-error = /var/log/mysqld/mysqld.log
 #pid-file = /var/run/mysqld/mysqld.pid
 
-MYSQLCONF
+EOF 
 
-#Enable and Start httpd and MariaDb
+# Enable and Start httpd and MariaDb
 systemctl enable httpd.service
 systemctl enable mariadb.service
+
 systemctl restart httpd.service
 systemctl restart mariadb.service
 
-#Install Perl Modules
-
+# Install Perl Modules
 echo "Install Perl"
 
 yum install perl-CPAN -y
@@ -165,8 +174,7 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
-
-#Install Asterisk Perl 
+# Install Asterisk Perl 
 cd /usr/src
 wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
@@ -175,8 +183,7 @@ perl Makefile.PL
 make all
 make install 
 
-#Install SIPSack
-
+# Install SIPSack
 cd /usr/src
 wget http://download.vicidial.com/required-apps/sipsak-0.9.6-1.tar.gz
 tar -zxf sipsak-0.9.6-1.tar.gz
@@ -186,8 +193,7 @@ make
 make install
 /usr/local/bin/sipsak --version
 
-
-#Install Lame
+# Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
@@ -196,7 +202,7 @@ cd lame-3.99.5
 make
 make install
 
-#Install PjProject
+# Install Pjsip
 cd /usr/src/ 
 git clone https://github.com/pjsip/pjproject.git
 cd pjproject
@@ -206,16 +212,14 @@ make
 make install
 ldconfig
 
-#Install Jansson
+# Install Jansson
 cd /usr/src/
-wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
-tar -zxf jansson-2.5.tar.gz
-#tar xvzf jasson*
-cd jansson*
-./configure
-make clean
-make
-make install 
+git clone https://github.com/akheron/jansson.git
+cd jansson 
+autoreconf  -i 
+./configure --prefix=/usr/ 
+make 
+make install
 ldconfig
 
 cd /usr/src
