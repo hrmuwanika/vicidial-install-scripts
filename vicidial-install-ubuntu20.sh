@@ -164,7 +164,9 @@ sudo contrib/scripts/install_prereq install
 sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
 # Setup menu options by running the following command:
-sudo make menuselect
+make menuselect.makeopts
+menuselect/menuselect --enable app_macro menuselect.makeopts
+make menuselect
 
 # Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
 # On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
@@ -190,7 +192,7 @@ chown -R asterisk.asterisk /etc/asterisk
 chown -R asterisk.asterisk /var/lib/asterisk
 chown -R asterisk.asterisk /var/log/asterisk
 chown -R asterisk.asterisk /var/spool/asterisk
-# chown -R asterisk.asterisk /usr/lib/asterisk
+chown -R asterisk.asterisk /usr/lib64/asterisk
 
 #Set Asterisk default user to asterisk:
 sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
