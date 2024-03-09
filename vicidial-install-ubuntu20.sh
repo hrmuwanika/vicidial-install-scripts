@@ -297,7 +297,9 @@ echo "Now rebooting Ubuntu"
 
 reboot
 
+# Admin Interface:
+# yourserverip/vicidial/admin.php (username:6666, password:1234)
 
-
-
+# Agent Interface:
+# yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
 
