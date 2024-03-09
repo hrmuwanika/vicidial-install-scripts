@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Vicidial installation Ubuntu 20.04 with WebPhone(WebRTC/SIP.js)"
+echo "Vicidial installation Ubuntu 22.04 with WebPhone(WebRTC/SIP.js)"
 
 #--------------------------------------------------
 # Update Server
@@ -34,7 +34,7 @@ sudo service sshd restart
 
 # Install mariadb databases
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.8/ubuntu focal main'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/11.4/ubuntu jammy main'
 sudo apt update 
 
 sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
