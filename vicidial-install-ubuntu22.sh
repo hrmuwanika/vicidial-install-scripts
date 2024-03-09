@@ -15,7 +15,7 @@ sudo apt -y install linux-headers-$(uname -r)
 # Add universe repository and install subversion
 sudo add-apt-repository universe
 sudo apt update 
-sudo apt -y install subversion
+sudo apt -y install subversion curl
 
 #--------------------------------------------------
 # Set up the timezones
@@ -33,8 +33,7 @@ sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/
 sudo service sshd restart
 
 # Install mariadb databases
-sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/11.4/ubuntu jammy main'
+curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
 
 sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
