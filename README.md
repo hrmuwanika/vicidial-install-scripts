@@ -6,7 +6,7 @@ git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
 cd vicidial-install-scripts
 ```
 
-## Excute Ubuntu vicidial Install
+## Execute Debian vicidial Install
 ```
 chmod +x vicidial-install-debian12.sh
 ./vicidial-install-debian12.sh
