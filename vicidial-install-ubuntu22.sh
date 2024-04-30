@@ -158,6 +158,7 @@ sudo contrib/scripts/get_mp3_source.sh
 # Ensure all dependencies are resolved
 sudo apt update
 sudo contrib/scripts/install_prereq install
+make distclean
 
 # Run the configure script to satisfy build dependencies
 sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
@@ -172,6 +173,7 @@ make menuselect
 # select Extra Sound Packages
 # Enable app_macro under Applications menu
 # Change other configurations as required
+adduser asterisk --disabled-password --gecos "Asterisk User"
 
 # Build Asterisk
 sudo make
@@ -221,12 +223,12 @@ sudo systemctl restart asterisk
 
 # Install Perl Asterisk Extension
 cd /usr/src
-wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
+wget https://github.com/hrmuwanika/vicidial-install-scripts/blob/main/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08/
 perl Makefile.PL && sudo make all && sudo make install
 
-echo "Installing astguiclient"
+echo "========== Installing astguiclient ============"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
