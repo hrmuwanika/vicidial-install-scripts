@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Vicidial installation Ubuntu 22.04 with WebPhone(WebRTC/SIP.js)"
+echo "Vicidial installation Debian 12 (Bookworm) with WebPhone(WebRTC/SIP.js)"
 
 #--------------------------------------------------
 # Update Server
@@ -13,7 +13,6 @@ sudo apt autoremove -y
 sudo apt -y install linux-headers-$(uname -r)
 
 # Add universe repository and install subversion
-sudo add-apt-repository universe
 sudo apt update 
 sudo apt -y install subversion curl
 
@@ -50,11 +49,12 @@ sudo systemctl enable mariadb.service
 
 # Install PHP7.4
 sudo apt install ca-certificates apt-transport-https software-properties-common -y
-sudo add-apt-repository ppa:ondrej/php  -y
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
 sudo apt update
 
-sudo apt install php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-json php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
-php7.4-xmlrpc php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache -y
+sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 php8.2-curl php8.2-dev php8.2-readline php8.2-intl php8.2-mbstring \
+php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
 
 # install apache 
 sudo apt install apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools -y 
