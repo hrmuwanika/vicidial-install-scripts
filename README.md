@@ -8,8 +8,8 @@ cd vicidial-install-scripts
 
 ## Excute Ubuntu vicidial Install
 ```
-chmod +x vicidial-install-ubuntu20.sh
-./vicidial-install-ubuntu20.sh
+chmod +x vicidial-install-debian12.sh
+./vicidial-install-debian12.sh
 ```
 
 ## Install WEBRTC for VICIDIAL Now
