@@ -139,16 +139,19 @@ echo "Press Enter to continue to install Asterisk: "
 # Install Libpri
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
 tar -zxvf libpri-1-current.tar.gz
-cd libpri-1*
+cd libpri-1.*
 make
 make install
+cd ..
 
 # Install Dahdi
 wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
-tar -zxvf dahdi-linux-complete.tar.gz
-cd dahdi-linux-complete
+tar -zxvf dahdi-linux-complete-current.tar.gz
+cd dahdi-linux-complete*
 make 
 make install
+cd ..
+
 #--------------------------------------------------
 # Install Asterisk core 
 #--------------------------------------------------
