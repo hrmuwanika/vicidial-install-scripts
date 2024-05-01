@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Vicidial installation Debian 12 (Bookworm) with WebPhone(WebRTC/SIP.js)"
+echo "=== Vicidial installation Debian 12 (Bookworm) with WebPhone(WebRTC/SIP.js) ====="
 
 #--------------------------------------------------
 # Update Server
@@ -9,11 +9,10 @@ echo -e "\n============= Update Server ================"
 sudo apt update && sudo apt -y upgrade 
 sudo apt autoremove -y
 
-# need to find odbc-mariadb replacement
+# Install linux headers
 sudo apt -y install linux-headers-$(uname -r)
 
-# Add universe repository and install subversion
-sudo apt update 
+# Install subversion
 sudo apt -y install subversion curl
 
 #--------------------------------------------------
@@ -48,7 +47,7 @@ sudo systemctl enable mariadb.service
 # sudo mysql_secure_installation
 
 # Install PHP8.2
-sudo apt install ca-certificates apt-transport-https software-properties-common -y
+sudo apt install -y ca-certificates apt-transport-https software-properties-common 
 wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
 sudo apt update
@@ -57,34 +56,33 @@ sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 ph
 php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
 
 # install apache 
-sudo apt install apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools -y 
+sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 
 # Other astguiclient dependencies
-sudo apt install sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
-libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev  -y
+sudo apt install -y sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
+libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
 sudo systemctl enable apache2.service
-
 sudo systemctl restart apache2
 sudo rm /var/www/html/index.html
 
 # Install Asterisk 20 dependencies
-sudo apt install build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid -y
+sudo apt install -y build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
+git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid ntp 
 
-#Special package for ASTblind and ASTloop(ip_relay need this package)
-sudo apt install libc6-i386 -y
+# Special package for ASTblind and ASTloop(ip_relay need this package)
+sudo apt install -y libc6-i386 
 
-#Install CPAMN
+# Install CPAMN
 cd /usr/bin/
-apt install cpanminus -y
+apt install -y cpanminus 
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
 cpanm readline --force
-read -p 'Press Enter to continue Install perl modules: '
+echo "Press Enter to continue Install perl modules: "
 
 cpanm -f File::HomeDir
 cpanm -f File::Which
@@ -134,10 +132,23 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
-#If the DBD::MYSQL Fail Run below Command
-sudo apt install libdbd-mysql-perl -y
+# If the DBD::MYSQL Fail Run below Command
+sudo apt install -y libdbd-mysql-perl
 
-read -p 'Press Enter to continue to install Asterisk: '
+echo "Press Enter to continue to install Asterisk: "
+# Install Libpri
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
+tar -zxvf libpri-1.6.1
+cd libpri-1.6.1
+make
+make install
+
+# Install Dahdi
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
+tar -zxvf dahdi-linux-complete*
+cd dahdi-linux-complete
+make 
+make install
 
 #--------------------------------------------------
 # Install Asterisk core 
@@ -224,7 +235,7 @@ sudo systemctl restart asterisk
 # Install Perl Asterisk Extension
 cd /usr/src
 wget https://github.com/hrmuwanika/vicidial-install-scripts/blob/main/asterisk-perl-0.08.tar.gz
-tar xzf asterisk-perl-0.08.tar.gz
+tar -zxvf asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08/
 perl Makefile.PL && sudo make all && sudo make install
 
@@ -277,12 +288,12 @@ echo "Populate AREA CODES"
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
-#Install Crontab
+# Install Crontab
 wget -O /root/crontab-file https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/crontab
 crontab /root/crontab-file
 crontab -l
 
-#Install rc.local
+# Install rc.local
 wget -O /etc/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
 sudo chmod +x /etc/rc.local
 sudo systemctl start rc-local
@@ -293,14 +304,13 @@ sudo ufw allow 5060/udp
 sudo ufw allow 5060/tcp
 sudo ufw allow 10000:20000/udp
 
-read -p 'Press Enter to Reboot: '
 echo "Now rebooting Ubuntu"
 
 reboot
 
 # Admin Interface:
-# yourserverip/vicidial/admin.php (username:6666, password:1234)
+# http://yourserverip/vicidial/admin.php (username:6666, password:1234)
 
 # Agent Interface:
-# yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
+# http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
 
