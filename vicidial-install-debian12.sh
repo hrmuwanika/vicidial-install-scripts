@@ -60,13 +60,14 @@ sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev li
 
 # Other astguiclient dependencies
 sudo apt install -y sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
-libelf-dev shtool libdbd-mysql-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev 
+libelf-dev shtool libdbd-mariadb-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
 sudo systemctl enable apache2.service
-sudo systemctl restart apache2
+sudo systemctl restart apache2.service
+
 sudo rm /var/www/html/index.html
 
 # Install Asterisk 20 dependencies
@@ -82,8 +83,6 @@ apt install -y cpanminus
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
 cpanm readline --force
-echo "Press Enter to continue Install perl modules: "
-
 cpanm -f File::HomeDir
 cpanm -f File::Which
 cpanm CPAN::Meta::Requirements
