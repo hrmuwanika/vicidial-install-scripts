@@ -1,6 +1,8 @@
 #!/bin/sh
 
-echo "=== Vicidial installation Debian 12 (Bookworm) with WebPhone(WebRTC/SIP.js) ====="
+echo -e "\n=== Vicidial installation Debian 12 (Bookworm) with WebPhone(WebRTC/SIP.js) ====="
+
+export LC_ALL=C
 
 #--------------------------------------------------
 # Update Server
@@ -9,11 +11,7 @@ echo -e "\n============= Update Server ================"
 sudo apt update && sudo apt -y upgrade 
 sudo apt autoremove -y
 
-# Install linux headers
-sudo apt -y install linux-headers-$(uname -r)
-
-# Install subversion
-sudo apt -y install subversion curl
+sudo apt install -y lsb-release wget curl git flex libjansson* libedit* linux-headers-generic
 
 #--------------------------------------------------
 # Set up the timezones
@@ -34,12 +32,88 @@ sudo service sshd restart
 curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
 
-sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
+sudo apt install -y mariadb-server mariadb-client libmariadb-dev 
 
-# Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
-sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf
-cd /etc/mysql/mariadb.conf.d/
-wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/50-server.cnf
+#--------------------------------
+# Remove mariadb strict mode 
+#-------------------------------
+cp /etc/my.cnf /etc/my.cnf.original
+echo "" > /etc/my.cnf
+
+cat <<MYSQLCONF>> /etc/my.cnf
+[mysql.server]
+user = mysql
+#basedir = /var/lib
+
+[client]
+port = 3306
+socket = /var/lib/mysql/mysql.sock
+
+[mysqld]
+datadir = /var/lib/mysql
+#tmpdir = /home/mysql_tmp
+socket = /var/lib/mysql/mysql.sock
+user = mysql
+old_passwords = 0
+ft_min_word_len = 3
+max_connections = 800
+max_allowed_packet = 32M
+skip-external-locking
+sql_mode="NO_ENGINE_SUBSTITUTION"
+
+log-error = /var/log/mysqld/mysqld.log
+
+query-cache-type = 1
+query-cache-size = 32M
+
+long_query_time = 1
+#slow_query_log = 1
+#slow_query_log_file = /var/log/mysqld/slow-queries.log
+
+tmp_table_size = 128M
+table_cache = 1024
+
+join_buffer_size = 1M
+key_buffer = 512M
+sort_buffer_size = 6M
+read_buffer_size = 4M
+read_rnd_buffer_size = 16M
+myisam_sort_buffer_size = 64M
+
+max_tmp_tables = 64
+
+thread_cache_size = 8
+thread_concurrency = 8
+
+# If using replication, uncomment log-bin below
+#log-bin = mysql-bin
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+
+[isamchk]
+key_buffer = 256M
+sort_buffer_size = 256M
+read_buffer = 2M
+write_buffer = 2M
+
+[myisamchk]
+key_buffer = 256M
+sort_buffer_size = 256M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout
+
+[mysqld_safe]
+#log-error = /var/log/mysqld/mysqld.log
+#pid-file = /var/run/mysqld/mysqld.pid
+MYSQLCONF
 
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
@@ -55,12 +129,12 @@ sudo apt update
 sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 php8.2-curl php8.2-dev php8.2-readline php8.2-intl php8.2-mbstring \
 php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
 
-# install apache 
+# install apache2
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 
 # Other astguiclient dependencies
-sudo apt install -y sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
-libelf-dev shtool libdbd-mariadb-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev 
+sudo apt install -y sox sipsak lame screen screenie libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
+libelf-dev shtool libdbd-mariadb-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev libmcrypt-dev mcrypt screenie iselect db5.3-util
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
@@ -71,11 +145,16 @@ sudo systemctl restart apache2.service
 sudo rm /var/www/html/index.html
 
 # Install Asterisk 20 dependencies
-sudo apt install -y build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid ntp 
+sudo apt install -y build-essential autoconf pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
+libnewt-dev libssl-dev libmysqlclient-dev sqlite3 autogen uuid ntp 
 
 # Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install -y libc6-i386 
+
+# Install Perl Modules
+echo "Install Perl modules"
+sudo apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu \
+perl-SelfLoader perl-open.noarch 
 
 cpan -i String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu 
 Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile Spreadsheet::XLSX 
@@ -91,68 +170,77 @@ Mail::IMAPClient Mail::Message IO::Socket::SSL readline
 # Install CPAMN
 cd /usr/bin/
 apt install cpanminus -y
-curl -LOk http://xrl.us/cpanm
-chmod +x cpanm
-cpanm readline --force
-read -p 'Press Enter to continue Install perl modules: '
+cpan> install Bundle::CPAN
+cpan> reload cpan
+cpan> install YAML
+cpan> install MD5
+cpan> install Digest::MD5
+cpan> install Digest::SHA1
+cpan> install readline
+cpan> reload cpan
+cpan> install DBI
+cpan> force install DBD::mysql
+cpan> install Net::Telnet
+cpan> install Time::HiRes
+cpan> install Net::Server
+cpan> install Switch
+cpan> install Mail::Sendmail
+cpan> install Unicode::Map
+cpan> install Jcode
+cpan> install Spreadsheet::WriteExcel
+cpan> install OLE::Storage_Lite
+cpan> install Proc::ProcessTable
+cpan> install IO::Scalar
+cpan> install Spreadsheet::ParseExcel
+cpan> install Curses
+cpan> install Getopt::Long
+cpan> install Net::Domain
+cpan> install Term::ReadKey
+cpan> install Term::ANSIColor
+cpan> install Spreadsheet::XLSX
+cpan> install Spreadsheet::Read
+cpan> install LWP::UserAgent
+cpan> install HTML::Entities
+cpan> install HTML::Strip
+cpan> install HTML::FormatText
+cpan> install HTML::TreeBuilder
+cpan> install Time::Local
+cpan> install MIME::Decoder
+cpan> install Mail::POP3Client
+cpan> install Mail::IMAPClient
+cpan> install Mail::Message
+cpan> install IO::Socket::SSL
+cpan> install MIME::Base64
+cpan> install MIME::QuotedPrint
+cpan> install Crypt::Eksblowfish::Bcrypt
+cpan> quit 
 
-cpanm -f File::HomeDir
-cpanm -f File::Which
-cpanm CPAN::Meta::Requirements
-cpanm -f CPAN
-cpanm YAML
-cpanm MD5
-cpanm Digest::MD5
-cpanm Digest::SHA1
-cpanm Bundle::CPAN
-cpanm DBI
-cpanm -f DBD::mysql
-cpanm Net::Telnet
-cpanm Time::HiRes
-cpanm Net::Server
-cpanm Switch
-cpanm Mail::Sendmail
-cpanm Unicode::Map
-cpanm Jcode
-cpanm Spreadsheet::WriteExcel
-cpanm OLE::Storage_Lite
-cpanm Proc::ProcessTable
-cpanm IO::Scalar
-cpanm Spreadsheet::ParseExcel
-cpanm Curses
-cpanm Getopt::Long
-cpanm Net::Domain
-cpanm Term::ReadKey
-cpanm Term::ANSIColor
-cpanm Spreadsheet::XLSX
-cpanm Spreadsheet::Read
-cpanm LWP::UserAgent
-cpanm HTML::Entities
-cpanm HTML::Strip
-cpanm HTML::FormatText
-cpanm HTML::TreeBuilder
-cpanm Time::Local
-cpanm MIME::Decoder
-cpanm Mail::POP3Client
-cpanm Mail::IMAPClient
-cpanm Mail::Message
-cpanm User::Identity --force
-cpanm IO::Socket::SSL
-cpanm MIME::Base64
-cpanm MIME::QuotedPrint
-cpanm Crypt::Eksblowfish::Bcrypt
-cpanm Crypt::RC4
-cpanm Text::CSV
-cpanm Text::CSV_XS
-
-#If the DBD::MYSQL Fail Run below Command
+# If the DBD::MYSQL Fail Run below Command
 sudo apt install -y libdbd-mysql-perl
+
+#Install Asterisk Perl
+cd /usr/src
+wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
+tar xzf asterisk-perl-0.08.tar.gz
+cd asterisk-perl-0.08
+perl Makefile.PL
+make all
+make install 
+
+#Install Lame
+cd /usr/src
+wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+tar -zxf lame-3.99.5.tar.gz
+cd lame-3.99.5
+./configure
+make
+make install
 
 # Install Jansson
 cd /usr/src/
-wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
-tar -zvxf jansson-2.5.tar.gz
-cd jansson-2.5
+wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
+tar xvzf jansson*
+cd jansson-2.13
 ./configure
 make clean
 make
@@ -270,8 +358,31 @@ rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 systemctl restart ntpd
 
-sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
+
+tee -a /etc/php/8.2/apache2/php.ini <<EOF
+
+error_reporting  =  E_ALL & ~E_NOTICE
+memory_limit = 448M
+short_open_tag = On
+max_execution_time = 3330
+max_input_time = 3360
+post_max_size = 448M
+upload_max_filesize = 442M
+default_socket_timeout = 3360
+date.timezone = Africa/Kigali
+EOF
+
+tee -a /etc/apache2/apache2.conf <<EOF
+CustomLog /dev/null common
+Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
+<Directory "/var/spool/asterisk/monitorDONE/MP3/">
+    Options Indexes MultiViews
+    AllowOverride None
+    Require all granted
+</Directory>
+EOF
+
 sudo systemctl restart apache2
 
 # Install Perl Asterisk Extension
@@ -303,6 +414,9 @@ GRANT RELOAD ON *.* TO cron@localhost;
 GRANT RELOAD ON *.* TO custom@'%';
 GRANT RELOAD ON *.* TO custom@localhost;
 flush privileges;
+
+SET GLOBAL connect_timeout=60;
+
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
