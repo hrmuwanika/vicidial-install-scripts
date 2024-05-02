@@ -135,33 +135,38 @@ cpanm Text::CSV_XS
 sudo apt install -y libdbd-mysql-perl
 
 echo "Press Enter to continue to install Asterisk: "
-# Install Libpri
+# Download latest version of dahdi
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
+tar -zxvf dahdi-linux-complete-current.tar.gz
+cd dahdi-linux-complete-3.*
+make clean
+make 
+make install
+make config
+cd tools/
+./configure
+cd ..
+make install-config
+
+# Install and compile libpri
+cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
 tar -zxvf libpri-1-current.tar.gz
 cd libpri-1.*
 make
 make install
-cd ..
-
-# Install Dahdi
-wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
-tar -zxvf dahdi-linux-complete-current.tar.gz
-cd dahdi-linux-complete*
-make 
-make install
-cd ..
 
 #--------------------------------------------------
 # Install Asterisk core 
 #--------------------------------------------------
-sudo mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
 # Download Asterisk 20 LTS tarball
 sudo wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 # Extract the tarball file
-sudo tar xvf asterisk-20-current.tar.gz
+sudo tar -zxvf asterisk-20-current.tar.gz
 cd asterisk-20*/
 
 # Download the mp3 decoder library
@@ -173,7 +178,7 @@ sudo contrib/scripts/install_prereq install
 make distclean
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
+sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
 # Setup menu options by running the following command:
 make menuselect.makeopts
@@ -232,6 +237,12 @@ sudo systemctl restart asterisk
 #--------------------------------------------------
 # Install astguiclient
 #--------------------------------------------------
+rm /etc/localtime
+ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
+systemctl restart ntpd
+
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
 
 # Install Perl Asterisk Extension
 cd /usr/src
