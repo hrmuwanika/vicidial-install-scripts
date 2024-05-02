@@ -254,13 +254,13 @@ wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linu
 tar -zxvf dahdi-linux-complete-current.tar.gz
 cd dahdi-linux-complete-3.*
 make clean
-make 
+make all
 make install
+modprobe dahdi
+modprobe dahdi_dummy
 make config
-cd tools/
-./configure
-cd ..
-make install-config
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 # Install and compile libpri
 cd /usr/src
@@ -452,7 +452,26 @@ crontab -l
 # Install rc.local
 wget -O /etc/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
 sudo chmod +x /etc/rc.local
-sudo systemctl start rc-local
+
+# add rc-local as a service - thx to ras
+tee -a /etc/systemd/system/rc-local.service <<EOF
+[Unit]
+Description=/etc/rc.local Compatibility
+
+[Service]
+Type=oneshot
+ExecStart=/etc/rc.local
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable rc-local.service
+sudo systemctl start rc-local.service
 
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
