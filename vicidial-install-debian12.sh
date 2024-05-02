@@ -34,87 +34,6 @@ sudo apt update
 
 sudo apt install -y mariadb-server mariadb-client libmariadb-dev 
 
-#--------------------------------
-# Remove mariadb strict mode 
-#-------------------------------
-cp /etc/my.cnf /etc/my.cnf.original
-echo "" > /etc/my.cnf
-
-cat <<MYSQLCONF>> /etc/my.cnf
-[mysql.server]
-user = mysql
-#basedir = /var/lib
-
-[client]
-port = 3306
-socket = /var/lib/mysql/mysql.sock
-
-[mysqld]
-datadir = /var/lib/mysql
-#tmpdir = /home/mysql_tmp
-socket = /var/lib/mysql/mysql.sock
-user = mysql
-old_passwords = 0
-ft_min_word_len = 3
-max_connections = 800
-max_allowed_packet = 32M
-skip-external-locking
-sql_mode="NO_ENGINE_SUBSTITUTION"
-
-log-error = /var/log/mysqld/mysqld.log
-
-query-cache-type = 1
-query-cache-size = 32M
-
-long_query_time = 1
-#slow_query_log = 1
-#slow_query_log_file = /var/log/mysqld/slow-queries.log
-
-tmp_table_size = 128M
-table_cache = 1024
-
-join_buffer_size = 1M
-key_buffer = 512M
-sort_buffer_size = 6M
-read_buffer_size = 4M
-read_rnd_buffer_size = 16M
-myisam_sort_buffer_size = 64M
-
-max_tmp_tables = 64
-
-thread_cache_size = 8
-thread_concurrency = 8
-
-# If using replication, uncomment log-bin below
-#log-bin = mysql-bin
-
-[mysqldump]
-quick
-max_allowed_packet = 16M
-
-[mysql]
-no-auto-rehash
-
-[isamchk]
-key_buffer = 256M
-sort_buffer_size = 256M
-read_buffer = 2M
-write_buffer = 2M
-
-[myisamchk]
-key_buffer = 256M
-sort_buffer_size = 256M
-read_buffer = 2M
-write_buffer = 2M
-
-[mysqlhotcopy]
-interactive-timeout
-
-[mysqld_safe]
-#log-error = /var/log/mysqld/mysqld.log
-#pid-file = /var/run/mysqld/mysqld.pid
-MYSQLCONF
-
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
 
@@ -150,22 +69,6 @@ libnewt-dev libssl-dev libmysqlclient-dev sqlite3 autogen uuid ntp
 
 # Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install -y libc6-i386 
-
-# Install Perl Modules
-echo "Install Perl modules"
-sudo apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu \
-perl-SelfLoader perl-open.noarch 
-
-cpan -i String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu 
-Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile Spreadsheet::XLSX 
-Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage 
-Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail 
-Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable 
-IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib 
-Spreadsheet::XLSX Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings 
-Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities 
-HTML::Strip HTML::FormatText HTML::TreeBuilder Switch Time::Local MIME::POP3Client 
-Mail::IMAPClient Mail::Message IO::Socket::SSL readline 
 
 # Install CPAMN
 cd /usr/bin/
