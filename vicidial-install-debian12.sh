@@ -321,6 +321,8 @@ sudo ufw allow 10000:20000/udp
 
 echo "Now rebooting Ubuntu"
 
+a2enmod ssl
+
 reboot
 
 # Admin Interface:
