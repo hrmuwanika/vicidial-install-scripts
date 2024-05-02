@@ -254,7 +254,7 @@ perl Makefile.PL && sudo make all && sudo make install
 echo "========== Installing astguiclient ============"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
-svn checkout svn://svn.eflo.net/agc_2-X/trunk
+svn checkout svn://svn.eflo.net:3690/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
@@ -273,10 +273,13 @@ GRANT RELOAD ON *.* TO cron@localhost;
 GRANT RELOAD ON *.* TO custom@'%';
 GRANT RELOAD ON *.* TO custom@localhost;
 flush privileges;
+SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='20.5.0';
+update servers set asterisk_version='20.7.0';
+ALTER TABLE phones ALTER template_id SET DEFAULT '';
+\. /usr/src/astguiclient/trunk/extras/sip-iax_phones.sql
 quit
 MYSQL_SCRIPT
 
