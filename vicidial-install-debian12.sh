@@ -77,6 +77,17 @@ git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autog
 # Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install -y libc6-i386 
 
+cpan -i String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu 
+Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile Spreadsheet::XLSX 
+Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage 
+Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail 
+Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable 
+IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib 
+Spreadsheet::XLSX Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings 
+Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities 
+HTML::Strip HTML::FormatText HTML::TreeBuilder Switch Time::Local MIME::POP3Client 
+Mail::IMAPClient Mail::Message IO::Socket::SSL readline 
+
 # Install CPAMN
 cd /usr/bin/
 apt install -y cpanminus 
@@ -94,6 +105,7 @@ cpanm Digest::SHA1
 cpanm Bundle::CPAN
 cpanm DBI
 cpanm -f DBD::mysql
+cpanm User::Identity --force
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -256,6 +268,7 @@ mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net:3690/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
+perl install.pl
 
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
