@@ -90,10 +90,12 @@ Mail::IMAPClient Mail::Message IO::Socket::SSL readline
 
 # Install CPAMN
 cd /usr/bin/
-apt install -y cpanminus 
+apt install cpanminus -y
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
 cpanm readline --force
+read -p 'Press Enter to continue Install perl modules: '
+
 cpanm -f File::HomeDir
 cpanm -f File::Which
 cpanm CPAN::Meta::Requirements
@@ -105,7 +107,6 @@ cpanm Digest::SHA1
 cpanm Bundle::CPAN
 cpanm DBI
 cpanm -f DBD::mysql
-cpanm User::Identity --force
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -135,6 +136,7 @@ cpanm MIME::Decoder
 cpanm Mail::POP3Client
 cpanm Mail::IMAPClient
 cpanm Mail::Message
+cpanm User::Identity --force
 cpanm IO::Socket::SSL
 cpanm MIME::Base64
 cpanm MIME::QuotedPrint
@@ -143,8 +145,19 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
-# If the DBD::MYSQL Fail Run below Command
+#If the DBD::MYSQL Fail Run below Command
 sudo apt install -y libdbd-mysql-perl
+
+# Install Jansson
+cd /usr/src/
+wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
+tar -zvxf jansson-2.5.tar.gz
+cd jansson-2.5
+./configure
+make clean
+make
+make install 
+ldconfig
 
 echo "Press Enter to continue to install Asterisk: "
 # Download latest version of dahdi
@@ -190,12 +203,16 @@ sudo contrib/scripts/install_prereq install
 make distclean
 
 # Run the configure script to satisfy build dependencies
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
-
-# Setup menu options by running the following command:
-make menuselect.makeopts
-menuselect/menuselect --enable app_macro menuselect.makeopts
-make menuselect
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make -j ${JOBS} all
 
 # Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
 # On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
@@ -255,6 +272,7 @@ systemctl restart ntpd
 
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
+sudo systemctl restart apache2
 
 # Install Perl Asterisk Extension
 cd /usr/src
@@ -263,17 +281,16 @@ tar -zxvf asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08/
 perl Makefile.PL && sudo make all && sudo make install
 
-echo "========== Installing astguiclient ============"
+#Install astguiclient
+echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net:3690/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
-perl install.pl
 
 #Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p << MYSQL_SCRIPT
-SET GLOBAL connect_timeout=60;
+mysql -u root -p << MYSQLCREOF
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
 GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
@@ -286,15 +303,12 @@ GRANT RELOAD ON *.* TO cron@localhost;
 GRANT RELOAD ON *.* TO custom@'%';
 GRANT RELOAD ON *.* TO custom@localhost;
 flush privileges;
-SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='20.7.0';
-ALTER TABLE phones ALTER template_id SET DEFAULT '';
-\. /usr/src/astguiclient/trunk/extras/sip-iax_phones.sql
+update servers set asterisk_version='20.7';
 quit
-MYSQL_SCRIPT
+MYSQLCREOF
 
 # Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
@@ -303,7 +317,7 @@ echo "Replace IP address in Default"
 echo "%%%%%%%%% Please Enter This Server IP ADD %%%%%%%%%%%%"
 read serveripadd
 sed -i 's/$serveripadd/'$serveripadd'/g' /etc/astguiclient.conf
-echo "Install VICIDIAL"
+echo "Installing VICIDIAL"
 echo "Copy sample configuration files to /etc/asterisk/ SET TO  Y*"
 perl install.pl
 
@@ -331,11 +345,12 @@ sudo ufw allow 443/tcp
 sudo ufw allow 5060/udp
 sudo ufw allow 5060/tcp
 sudo ufw allow 10000:20000/udp
-
-echo "Now rebooting Ubuntu"
+sudo ufw reload
 
 a2enmod ssl
 
+read -p 'Press Enter to Reboot: '
+echo "Restarting Debian"
 reboot
 
 # Admin Interface:
@@ -343,4 +358,3 @@ reboot
 
 # Agent Interface:
 # http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
-
