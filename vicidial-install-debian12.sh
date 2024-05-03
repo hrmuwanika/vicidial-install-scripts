@@ -301,7 +301,8 @@ systemctl restart ntpd
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
 
-echo "========== Installing astguiclient ============"
+# Install astguiclient
+echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
@@ -322,28 +323,30 @@ patch -p0 < vicidial.php.diff
 
 cd /usr/src/astguiclient/trunk
 
-#Add mysql users and Databases
+# Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p << MYSQL_SCRIPT
-SET GLOBAL connect_timeout=60;
+mysql -u root -p << MYSQLCREOF
 CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
-CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@localhost IDENTIFIED BY '1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';
+GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
+GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@localhost IDENTIFIED BY '1234';
 GRANT RELOAD ON *.* TO cron@'%';
 GRANT RELOAD ON *.* TO cron@localhost;
+CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
+GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';
+GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';
 GRANT RELOAD ON *.* TO custom@'%';
 GRANT RELOAD ON *.* TO custom@localhost;
 flush privileges;
+
+SET GLOBAL connect_timeout=60;
+
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.22.0';
+update servers set asterisk_version='16.30.0';
 quit
-MYSQL_SCRIPT
+MYSQLCREOFT
 
 # Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
@@ -370,16 +373,80 @@ wget -O /root/crontab-file https://raw.githubusercontent.com/hrmuwanika/vicidial
 crontab /root/crontab-file
 crontab -l
 
-# Install rc.local
-wget -O /etc/rc.local https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
+# Download rc.local to /etc
+cd /etc
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
 sudo chmod +x /etc/rc.local
-sudo systemctl start rc-local
+
+# Add rc-local as a service - thx to ras
+tee -a /etc/systemd/system/rc-local.service <<EOF
+[Unit]
+Description=/etc/rc.local Compatibility
+
+[Service]
+Type=oneshot
+ExecStart=/etc/rc.local
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable rc-local.service
+sudo systemctl start rc-local.service
 
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw allow 5060/udp
 sudo ufw allow 5060/tcp
 sudo ufw allow 10000:20000/udp
+
+## Install Sounds
+
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
+
+#Place the audio files in their proper places:
+cd /var/lib/asterisk/sounds
+tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
+tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
+tar -zxf /usr/src/asterisk-core-sounds-en-wav-current.tar.gz
+tar -zxf /usr/src/asterisk-extra-sounds-en-gsm-current.tar.gz
+tar -zxf /usr/src/asterisk-extra-sounds-en-ulaw-current.tar.gz
+tar -zxf /usr/src/asterisk-extra-sounds-en-wav-current.tar.gz
+
+mkdir /var/lib/asterisk/mohmp3
+mkdir /var/lib/asterisk/quiet-mp3
+ln -s /var/lib/asterisk/mohmp3 /var/lib/asterisk/default
+
+cd /var/lib/asterisk/mohmp3
+tar -zxf /usr/src/asterisk-moh-opsound-gsm-current.tar.gz
+tar -zxf /usr/src/asterisk-moh-opsound-ulaw-current.tar.gz
+tar -zxf /usr/src/asterisk-moh-opsound-wav-current.tar.gz
+rm -f CHANGES*
+rm -f LICENSE*
+rm -f CREDITS*
+
+cd /var/lib/asterisk/moh
+rm -f CHANGES*
+rm -f LICENSE*
+rm -f CREDITS*
+
+cd /var/lib/asterisk/sounds
+rm -f CHANGES*
+rm -f LICENSE*
+rm -f CREDITS*
 
 echo "Now rebooting Ubuntu"
 
