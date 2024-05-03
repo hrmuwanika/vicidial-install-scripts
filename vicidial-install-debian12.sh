@@ -30,8 +30,7 @@ sudo service sshd restart
 # Install mariadb databases
 curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
-
-sudo apt install -y mariadb-server mariadb-client libmariadb-dev 
+sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev 
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -130,11 +129,13 @@ sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 ph
 php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
 
 # install apache and subversion
-sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
+sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-php8.2 libapache2-mod-svn subversion subversion-tools  
 
-# Other astguiclient dependencies
-sudo apt install -y sox sipsak lame screen libploticus0-dev libsox-fmt-all mpg123 ploticus libnet-telnet-perl libasterisk-agi-perl \
-libelf-dev shtool libdbd-mariadb-perl libsrtp2-dev libedit-dev htop sngrep libcurl4 libelf-dev 
+# Other dependencies
+sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool libnewt-dev libssl-dev unzip \
+uuid-dev uuid libssl-dev git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev \
+libedit-dev htop sngrep libcurl4 libelf-dev build-essential libjansson-dev autoconf automake libxml2-dev libncurses5-dev libsqlite3-dev  \
+pkg-config libxml2-dev libsqlite3-dev libtool automake sqlite3 ntp 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
@@ -144,19 +145,17 @@ sudo systemctl restart apache2.service
 
 sudo rm /var/www/html/index.html
 
-# Install Asterisk 18 dependencies
-sudo apt install -y build-essential autoconf pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev  libmysqlclient-dev sqlite3 autogen uuid ntp 
-
 # Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install -y libc6-i386 
 
 # Install CPAMN
 cd /usr/bin/
-apt install -y cpanminus 
+apt install cpanminus -y
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
 cpanm readline --force
+read -p 'Press Enter to continue Install perl modules: '
+
 cpanm -f File::HomeDir
 cpanm -f File::Which
 cpanm CPAN::Meta::Requirements
@@ -206,7 +205,7 @@ cpanm Text::CSV
 cpanm Text::CSV_XS
 
 # If the DBD::MYSQL Fail Run below Command
-sudo apt install -y libdbd-mysql-perl
+sudo apt install -y libdbd-mysql-perl libdbd-mariadb-perl
 
 # Install Perl Asterisk Extension
 cd /usr/src
@@ -217,7 +216,7 @@ perl Makefile.PL
 make all
 make install 
 
-#Install Lame
+# Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
@@ -228,7 +227,7 @@ make install
 
 # Install Jansson
 cd /usr/src/
-wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
+wget https://digip.org/jansson/releases/jansson-2.14.tar.gz
 tar xvzf jansson*
 cd jansson-2.13
 ./configure
@@ -341,11 +340,6 @@ sudo ldconfig
 sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
-
-# Enable asterisk service to start on system  boot
-sudo systemctl daemon-reload
-sudo systemctl enable asterisk
-sudo systemctl restart asterisk
 
 #--------------------------------------------------
 # Install astguiclient
