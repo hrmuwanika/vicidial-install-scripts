@@ -111,6 +111,10 @@ interactive-timeout
 #pid-file = /var/run/mysqld/mysqld.pid
 MYSQLCONF
 
+mkdir /var/log/mysqld
+sudo touch /var/log/mysqld/slow-queries.log
+sudo chown -R mysql:mysql /var/log/mysqld
+
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
 
@@ -371,7 +375,20 @@ rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 systemctl restart ntpd
 
-sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
+tee -a /etc/php/8.2/apache2/php.ini <<EOF
+
+error_reporting  =  E_ALL & ~E_NOTICE
+memory_limit = 448M
+short_open_tag = On
+max_execution_time = 3330
+max_input_time = 3360
+post_max_size = 448M
+upload_max_filesize = 442M
+default_socket_timeout = 3360
+date.timezone = Africa/Kigali
+EOF
+
+# sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
 
 # Install astguiclient
@@ -417,7 +434,7 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='16.30.0';
+update servers set asterisk_version='18.22.0';
 quit
 MYSQLCREOFT
 
@@ -522,7 +539,6 @@ rm -f LICENSE*
 rm -f CREDITS*
 
 echo "Now rebooting Ubuntu"
-
 reboot
 
 # Admin Interface:
