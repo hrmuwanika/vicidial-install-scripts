@@ -348,20 +348,7 @@ rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 systemctl restart ntpd
 
-tee -a /etc/php/8.2/apache2/php.ini <<EOF
-
-error_reporting  =  E_ALL & ~E_NOTICE
-memory_limit = 448M
-short_open_tag = On
-max_execution_time = 3330
-max_input_time = 3360
-post_max_size = 448M
-upload_max_filesize = 442M
-default_socket_timeout = 3360
-date.timezone = Africa/Kigali
-EOF
-
-# sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
 
 # Install astguiclient
@@ -369,21 +356,6 @@ echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
-
-cd /usr/src/astguiclient/trunk/extras/ConfBridge/
-cp * /usr/share/astguiclient/
-cd /usr/share/astguiclient/
-mv manager_send.php.diff vdc_db_query.php.diff vicidial.php.diff /var/www/html/agc/
-patch -p0 < ADMIN_keepalive_ALL.pl.diff
-patch -p0 < ADMIN_update_server_ip.pl.diff
-patch -p0 < AST_DB_optimize.pl.diff
-chmod +x AST_conf_update_screen.pl
-patch -p0 < AST_reset_mysql_vars.pl.diff
-cd /var/www/html/agc/
-patch -p0 < manager_send.php.diff
-patch -p0 < vdc_db_query.php.diff
-patch -p0 < vicidial.php.diff
-
 cd /usr/src/astguiclient/trunk
 
 # Add mysql users and Databases
