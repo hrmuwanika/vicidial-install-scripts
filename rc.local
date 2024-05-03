@@ -1,11 +1,5 @@
 #!/bin/sh
 #
-# This script will be executed *after* all the other init scripts.
-# You can put your own initialization stuff in here if you don't
-# want to do the full Sys V style init stuff.
-
-touch /var/lock/subsys/local
-
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
 /usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
 
