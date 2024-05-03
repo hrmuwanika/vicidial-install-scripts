@@ -237,22 +237,9 @@ make
 make install 
 ldconfig
 
-echo "Press Enter to continue to install Asterisk: "
+echo "Press Enter to continue to install Dahdi "
 # Download latest version of dahdi
-cd /usr/src
-wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
-tar -zxvf dahdi-linux-complete-current.tar.gz
-cd dahdi-linux-complete-3.*
-make clean
-make 
-make install
-make config
-cd tools/
-./configure
-cd ..
-make install-config
-
-cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+apt-get install -y dahdi-* dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
@@ -305,9 +292,8 @@ sudo contrib/scripts/install_prereq install
 make distclean
 
 # Run the configure script to satisfy build dependencies
-${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
-# Setup menu options by running the following command:
 make menuselect/menuselect menuselect-tree menuselect.makeopts
 #enable app_meetme
 menuselect/menuselect --enable app_meetme menuselect.makeopts
@@ -315,15 +301,8 @@ menuselect/menuselect --enable app_meetme menuselect.makeopts
 menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 #enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
-make samples
-sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
 make -j ${JOBS} all
 
-# Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
-# On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
-# select Extra Sound Packages
-# Enable app_macro under Applications menu
-# Change other configurations as required
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
 # Build Asterisk
