@@ -12,9 +12,6 @@ sudo apt autoremove -y
 # Install linux headers
 sudo apt -y install linux-headers-$(uname -r)
 
-# Install subversion
-sudo apt -y install subversion curl
-
 #--------------------------------------------------
 # Set up the timezones
 #--------------------------------------------------
@@ -34,7 +31,7 @@ sudo service sshd restart
 curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
 
-sudo apt install mariadb-server mariadb-client libmariadb-dev -y 
+sudo apt install -y mariadb-server mariadb-client libmariadb-dev 
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -55,7 +52,7 @@ sudo apt update
 sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 php8.2-curl php8.2-dev php8.2-readline php8.2-intl php8.2-mbstring \
 php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
 
-# install apache 
+# install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 
 # Other astguiclient dependencies
@@ -70,9 +67,9 @@ sudo systemctl restart apache2.service
 
 sudo rm /var/www/html/index.html
 
-# Install Asterisk 20 dependencies
-sudo apt install -y build-essential autoconf subversion pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
-git curl wget libnewt-dev libssl-dev subversion libmysqlclient-dev sqlite3 autogen uuid ntp 
+# Install Asterisk 18 dependencies
+sudo apt install -y build-essential autoconf pkg-config libjansson-dev libxml2-dev uuid-dev libsqlite3-dev libtool automake libncurses5-dev \
+git curl wget libnewt-dev libssl-dev  libmysqlclient-dev sqlite3 autogen uuid ntp 
 
 # Special package for ASTblind and ASTloop(ip_relay need this package)
 sudo apt install -y libc6-i386 
@@ -134,6 +131,35 @@ cpanm Text::CSV_XS
 # If the DBD::MYSQL Fail Run below Command
 sudo apt install -y libdbd-mysql-perl
 
+# Install Perl Asterisk Extension
+cd /usr/src
+wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
+tar xzf asterisk-perl-0.08.tar.gz
+cd asterisk-perl-0.08
+perl Makefile.PL
+make all
+make install 
+
+#Install Lame
+cd /usr/src
+wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+tar -zxf lame-3.99.5.tar.gz
+cd lame-3.99.5
+./configure
+make
+make install
+
+# Install Jansson
+cd /usr/src/
+wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
+tar xvzf jansson*
+cd jansson-2.13
+./configure
+make clean
+make
+make install 
+ldconfig
+
 echo "Press Enter to continue to install Asterisk: "
 # Download latest version of dahdi
 cd /usr/src
@@ -149,6 +175,11 @@ cd tools/
 cd ..
 make install-config
 
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+modprobe dahdi
+modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+
 # Install and compile libpri
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
@@ -160,14 +191,33 @@ make install
 #--------------------------------------------------
 # Install Asterisk core 
 #--------------------------------------------------
+mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
-# Download Asterisk 20 LTS tarball
-sudo wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+# Download Asterisk 18 tarball
+sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
 
 # Extract the tarball file
-sudo tar -zxvf asterisk-20-current.tar.gz
-cd asterisk-20*/
+sudo tar -xzvf asterisk-18-current.tar.gz
+cd /usr/src/asterisk/asterisk-18.*/
+
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
+cd apps/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
+yes | cp -rf enter.h.1 enter.h
+yes | cp -rf leave.h.1 leave.h
+
+cd /usr/src/asterisk/asterisk-18.*/
+patch < amd_stats-18.patch apps/app_amd.c
+patch < iax_peer_status-18.patch channels/chan_iax2.c
+patch < sip_peer_status-18.patch channels/chan_sip.c
+patch < timeout_reset_dial_app-18.patch apps/app_dial.c
+patch < timeout_reset_dial_core-18.patch main/dial.c
 
 # Download the mp3 decoder library
 sudo contrib/scripts/get_mp3_source.sh
@@ -178,12 +228,19 @@ sudo contrib/scripts/install_prereq install
 make distclean
 
 # Run the configure script to satisfy build dependencies
+${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
-
 # Setup menu options by running the following command:
-make menuselect.makeopts
-menuselect/menuselect --enable app_macro menuselect.makeopts
-make menuselect
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
+make -j ${JOBS} all
 
 # Use arrow keys to navigate, and Enter key to select. On Add-ons select chan_ooh323 and format_mp3 . 
 # On Core Sound Packages, select the formats of Audio packets. Music On Hold, select 'Music onhold file package' 
@@ -244,17 +301,25 @@ systemctl restart ntpd
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
 sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
 
-# Install Perl Asterisk Extension
-cd /usr/src
-wget https://github.com/hrmuwanika/vicidial-install-scripts/blob/main/asterisk-perl-0.08.tar.gz
-tar -zxvf asterisk-perl-0.08.tar.gz
-cd asterisk-perl-0.08/
-perl Makefile.PL && sudo make all && sudo make install
-
 echo "========== Installing astguiclient ============"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
+
+cd /usr/src/astguiclient/trunk/extras/ConfBridge/
+cp * /usr/share/astguiclient/
+cd /usr/share/astguiclient/
+mv manager_send.php.diff vdc_db_query.php.diff vicidial.php.diff /var/www/html/agc/
+patch -p0 < ADMIN_keepalive_ALL.pl.diff
+patch -p0 < ADMIN_update_server_ip.pl.diff
+patch -p0 < AST_DB_optimize.pl.diff
+chmod +x AST_conf_update_screen.pl
+patch -p0 < AST_reset_mysql_vars.pl.diff
+cd /var/www/html/agc/
+patch -p0 < manager_send.php.diff
+patch -p0 < vdc_db_query.php.diff
+patch -p0 < vicidial.php.diff
+
 cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
@@ -276,7 +341,7 @@ flush privileges;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='20.5.0';
+update servers set asterisk_version='18.22.0';
 quit
 MYSQL_SCRIPT
 
