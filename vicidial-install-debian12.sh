@@ -178,50 +178,23 @@ make install
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
-# Download Asterisk 18 tarball
-sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
+# Download Asterisk 20 tarball
+sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
 
 # Extract the tarball file
-sudo tar -xzvf asterisk-18-current.tar.gz
-cd /usr/src/asterisk/asterisk-18.*/
-
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
-cd apps/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
-yes | cp -rf enter.h.1 enter.h
-yes | cp -rf leave.h.1 leave.h
-
-cd /usr/src/asterisk/asterisk-18.*/
-patch < amd_stats-18.patch apps/app_amd.c
-patch < iax_peer_status-18.patch channels/chan_iax2.c
-patch < sip_peer_status-18.patch channels/chan_sip.c
-patch < timeout_reset_dial_app-18.patch apps/app_dial.c
-patch < timeout_reset_dial_core-18.patch main/dial.c
+sudo tar -xzvf asterisk-20-current.tar.gz
+cd /usr/src/asterisk/asterisk-20.*/
 
 # Download the mp3 decoder library
 sudo contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
-sudo apt update
 sudo contrib/scripts/install_prereq install
-make distclean
 
 # Run the configure script to satisfy build dependencies
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make -j ${JOBS} all
+
+make menuselect
 
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
