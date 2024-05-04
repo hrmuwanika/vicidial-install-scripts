@@ -388,19 +388,16 @@ mysql -u root -p asterisk < /usr/src/astguiclient/trunk/extras/first_server_inst
 rm /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
-echo "%%%%%%%%% Please Enter This Server IP ADD %%%%%%%%%%%%"
+echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
 read serveripadd
 sed -i 's/$serveripadd/'$serveripadd'/g' /etc/astguiclient.conf
 echo "Install VICIDIAL"
 echo "Copy sample configuration files to /etc/asterisk/ SET TO  Y*"
 perl install.pl
-
 #Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
-
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
-
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
@@ -441,8 +438,7 @@ sudo ufw allow 5060/tcp
 sudo ufw allow 10000:20000/udp
 
 ## Install Sounds
-
-cd /usr/src
+cd /var/lib/asterisk/sounds
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-gsm-current.tar.gz
@@ -453,37 +449,15 @@ wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-#Place the audio files in their proper places:
-cd /var/lib/asterisk/sounds
-tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-core-sounds-en-wav-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-wav-current.tar.gz
+# Place the audio files in their proper places:
+tar -zxf asterisk-core-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-core-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-core-sounds-en-wav-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-wav-current.tar.gz
 
-mkdir /var/lib/asterisk/mohmp3
-mkdir /var/lib/asterisk/quiet-mp3
-ln -s /var/lib/asterisk/mohmp3 /var/lib/asterisk/default
-
-cd /var/lib/asterisk/mohmp3
-tar -zxf /usr/src/asterisk-moh-opsound-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-moh-opsound-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-moh-opsound-wav-current.tar.gz
-rm -f CHANGES*
-rm -f LICENSE*
-rm -f CREDITS*
-
-cd /var/lib/asterisk/moh
-rm -f CHANGES*
-rm -f LICENSE*
-rm -f CREDITS*
-
-cd /var/lib/asterisk/sounds
-rm -f CHANGES*
-rm -f LICENSE*
-rm -f CREDITS*
-
+read -p 'Press Enter to Reboot: '
 echo "Now rebooting Ubuntu"
 reboot
 
