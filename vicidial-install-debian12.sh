@@ -212,11 +212,11 @@ sudo make config
 sudo groupadd asterisk
 sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
 sudo usermod -aG audio,dialout asterisk
-chown -R asterisk.asterisk /etc/asterisk
-chown -R asterisk.asterisk /var/lib/asterisk
-chown -R asterisk.asterisk /var/log/asterisk
-chown -R asterisk.asterisk /var/spool/asterisk
-chown -R asterisk.asterisk /usr/lib64/asterisk
+chown -R asterisk:asterisk /etc/asterisk
+chown -R asterisk:asterisk /var/lib/asterisk
+chown -R asterisk:asterisk /var/log/asterisk
+chown -R asterisk:asterisk /var/spool/asterisk
+chown -R asterisk:asterisk /usr/lib64/asterisk
 
 #Set Asterisk default user to asterisk:
 sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
