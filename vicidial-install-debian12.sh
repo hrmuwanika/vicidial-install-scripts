@@ -229,7 +229,7 @@ make install
 cd /usr/src/
 wget https://digip.org/jansson/releases/jansson-2.14.tar.gz
 tar xvzf jansson*
-cd jansson-2.13
+cd jansson-2.14
 ./configure
 make clean
 make
@@ -377,14 +377,15 @@ flush privileges;
 SET GLOBAL connect_timeout=60;
 
 use asterisk;
-\. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
-\. /usr/src/astguiclient/trunk/extras/first_server_install.sql
 update servers set asterisk_version='18.22.0';
 quit
-MYSQLCREOFT
+MYSQLCREOF
+
+mysql -u root -p asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
+mysql -u root -p asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
 
 # Get astguiclient.conf file
-echo "" > /etc/astguiclient.conf
+rm /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
 echo "%%%%%%%%% Please Enter This Server IP ADD %%%%%%%%%%%%"
@@ -414,7 +415,7 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 sudo chmod +x /etc/rc.local
 
 # Add rc-local as a service - thx to ras
-tee -a /etc/systemd/system/rc-local.service <<EOF
+cat <<EOF>> /etc/systemd/system/rc-local.service 
 [Unit]
 Description=/etc/rc.local Compatibility
 
