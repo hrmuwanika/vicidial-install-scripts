@@ -259,16 +259,16 @@ cd /usr/src/astguiclient/trunk
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
 mariadb --user="root" --password="" -h localhost -e "CREATE DATABASE asterisk;"
 mariadb --user="root" --password="" -h localhost -e "CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';";
-mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO cron@'%' IDENTIFIED BY '1234';"
-mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO cron@localhost IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO cron@'%' IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO cron@localhost IDENTIFIED BY '1234';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@'%';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@localhost;"
 mariadb --user="root" --password="" -h localhost -e "CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';"
-mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
-mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@'%';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
-mariadb --user="root" --password="" -h localhost -e "flush privileges;"
+mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
