@@ -273,7 +273,7 @@ mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
-mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.22.0';"
+mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='20.7';"
 sudo systemctl restart mariadb 
 
 # Get astguiclient.conf file
