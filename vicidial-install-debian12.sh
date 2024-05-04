@@ -257,29 +257,23 @@ cd /usr/src/astguiclient/trunk
 
 # Add mysql users and Databases
 echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p << MYSQLCREOF
-CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
-GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
-GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@localhost IDENTIFIED BY '1234';
-GRANT RELOAD ON *.* TO cron@'%';
-GRANT RELOAD ON *.* TO cron@localhost;
-CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
-GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';
-GRANT SELECT,CREATE,ALTER,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';
-GRANT RELOAD ON *.* TO custom@'%';
-GRANT RELOAD ON *.* TO custom@localhost;
-flush privileges;
-
-SET GLOBAL connect_timeout=60;
-
-use asterisk;
-update servers set asterisk_version='18.22.0';
-quit
-MYSQLCREOF
-
-mysql -u root -p asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
-mysql -u root -p asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
+mariadb --user="root" --password="" -h localhost -e "CREATE DATABASE asterisk;"
+mariadb --user="root" --password="" -h localhost -e "CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';";
+mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO cron@'%' IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO cron@localhost IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@'%';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@localhost;"
+mariadb --user="root" --password="" -h localhost -e "CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT GRANT ALL ON asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@'%';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
+mariadb --user="root" --password="" -h localhost -e "flush privileges;"
+mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
+mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.22.0';"
+sudo systemctl restart mariadb 
 
 # Get astguiclient.conf file
 rm /etc/astguiclient.conf
