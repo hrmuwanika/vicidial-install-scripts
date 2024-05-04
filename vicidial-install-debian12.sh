@@ -186,13 +186,13 @@ sudo tar -xzvf asterisk-20-current.tar.gz
 cd /usr/src/asterisk/asterisk-20.*/
 
 # Download the mp3 decoder library
-sudo contrib/scripts/get_mp3_source.sh
+sudo ./contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
-sudo contrib/scripts/install_prereq install
+sudo ./contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo CFLAGS='-DENABLE_SRTP_AES_256 -DENABLE_SRTP_AES_GCM' ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
+sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
 make menuselect
 
@@ -309,7 +309,7 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 sudo chmod +x /etc/rc.local
 
 # Add rc-local as a service - thx to ras
-cat <<EOF > /etc/systemd/system/rc-local.service 
+cat > /etc/systemd/system/rc-local.service << EOF
 [Unit]
 Description=/etc/rc.local Compatibility
 
