@@ -412,7 +412,7 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 sudo chmod +x /etc/rc.local
 
 # Add rc-local as a service - thx to ras
-cat <<EOF>> /etc/systemd/system/rc-local.service 
+cat <<EOF > /etc/systemd/system/rc-local.service 
 [Unit]
 Description=/etc/rc.local Compatibility
 
@@ -456,6 +456,14 @@ tar -zxf asterisk-core-sounds-en-wav-current.tar.gz
 tar -zxf asterisk-extra-sounds-en-gsm-current.tar.gz
 tar -zxf asterisk-extra-sounds-en-ulaw-current.tar.gz
 tar -zxf asterisk-extra-sounds-en-wav-current.tar.gz
+
+# Remove tar files:
+rm asterisk-core-sounds-en-gsm-current.tar.gz
+rm asterisk-core-sounds-en-ulaw-current.tar.gz
+rm asterisk-core-sounds-en-wav-current.tar.gz
+rm asterisk-extra-sounds-en-gsm-current.tar.gz
+rm asterisk-extra-sounds-en-ulaw-current.tar.gz
+rm asterisk-extra-sounds-en-wav-current.tar.gz
 
 read -p 'Press Enter to Reboot: '
 echo "Now rebooting Ubuntu"
