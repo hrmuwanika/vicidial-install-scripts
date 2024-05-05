@@ -33,9 +33,9 @@ sudo apt update
 sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev 
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
-# sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf 
-# cd /etc/mysql/mariadb.conf.d/
-# wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/50-server.cnf
+sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf 
+cd /etc/mysql/mariadb.conf.d/
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/50-server.cnf
 
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
