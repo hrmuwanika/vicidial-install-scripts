@@ -265,7 +265,7 @@ mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO 
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@'%';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@localhost;"
 mariadb --user="root" --password="" -h localhost -e "CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';"
-mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
 mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@'%';"
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
@@ -277,7 +277,6 @@ mariadb --user="root" --password="" asterisk -h localhost -e "update servers set
 sudo systemctl restart mariadb 
 
 # Get astguiclient.conf file
-rm /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
 echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
