@@ -1,91 +1,123 @@
-# VICIDIAL INSTALLATION SCRIPTS
-## Install VICIDIAL Now
+For those of you who don't know who I am, I am carpenox from the ViciDial forums and as most people can confirm, I help out of the goodness of my heart to our community. I want us all to succeed together! With that being said, If my knowledge base or my github has helped you or your business, please feel free to donate to help me keep the help going.
+
+
+# www.dialer.one for our full knowledge base
+
+# Need help? Hit me up on Skype: live:carpenox_3
+# Have I helped you? Please feel free to donate here: https://www.paypal.me/TheDialerOne
+
+
+# VICIDIAL INSTALLATION SCRIPTS (Default is Eastern Time Zone US)
+# Centos, Rocky and AlmaLinux Vicidial Install pre_requisites 
+# I have created a faster auto installer for Alma and Rocky 9 that will also install the dynamic portal and the CyburPhone
 
 ```
-git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
+
+hostnamectl set-hostname xxxxxx.xxxxx.xxx
+### Use YOUR SubDomain
+
+vi /etc/hosts
+##Change domain name for actual server ip (xxx.xxx.xxx.xxx   complete domain name    subdomain only)
+
+timedatectl set-timezone America/New_York
+
+yum check-update
+yum update -y
+yum -y install epel-release
+yum update -y
+yum install git -y
+yum install -y kernel*
+
+#Disable SELINUX
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config    
+
+cd /usr/src/
+git clone https://github.com/carpenox/vicidial-install-scripts.git
+
+reboot
+
+````
+  Reboot Before running this script
+
+# Install VICIDIAL scripts
+
+```
+cd /usr/src/vicidial-install-scripts
+git clone https://github.com/carpenox/vicidial-install-scripts.git
 cd vicidial-install-scripts
 ```
 
-## Execute Debian vicidial Install
-```
-chmod +x vicidial-install-debian12.sh
-./vicidial-install-debian12.sh
-```
-
-## Install WEBRTC for VICIDIAL Now
-## DO THIS IF YOU HAVE PUBLIC DOMAIN WITH PUBLIC IP ONLY
+# Alma/Rocky 9 Installer with Dynamic portal, CyburPhone, SSL Cert and Asterisk 11
 
 ```
+cd /usr/src/vicidial-install-scripts
+chmod +x alma-rocky9-ast11.sh
+./alma-rocky9-ast11.sh
+```
+
+# Alma/Rocky 9 Installer with Dynamic portal, CyburPhone, SSL Cert and Asterisk 16
+
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x alma-rocky9-ast16.sh
+./alma-rocky9-ast16.sh
+```
+
+Make sure you update your SSL cert location in /etc/httpd/conf.d/viciportal-ssl.conf
+
+# Alma/Rocky 9 Installer with Dynamic portal and CyburPhone with SSL cert with Asterisk 18
+
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x alma-rocky9-ast18.sh
+./alma-rocky9-ast18.sh
+```
+
+Make sure you update your SSL cert location in /etc/httpd/conf.d/viciportal-ssl.conf
+
+# Install a default database with everything setup ready to go
+
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x standard-db.sh
+./standard-db.sh
+```
+
+
+# Alma 8 Add on telephony server for a cluster
+
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x Vici-alma-dialer-install.sh
+./Vici-alma-dialer-install.sh
+```
+
+# Execute Centos7 Vicidial Install
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x vicidial-install-c7.sh
+./vicidial-install-c7.sh
+```
+
+# Execute Alma/Rocky 8 Linux Vicidial Install - Ast 16
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x alma-rocky-centos8-ast16.sh
+./alma-rocky-centos8-ast16.sh
+```
+
+# Execute Alma/Rocky 8 Linux Vicidial Install - Ast 18
+```
+cd /usr/src/vicidial-install-scripts
+chmod +x alma-rocky-centos-8-ast18.sh
+./alma-rocky-centos-8-ast18.sh
+```
+
+# Install Webphone and SSL cert for VICIDIAL
+# DO THIS IF YOU HAVE PUBLIC DOMAIN WITH PUBLIC IP ONLY
+
+```
+cd /usr/src/vicidial-install-scripts
 chmod +x vicidial-enable-webrtc.sh
 ./vicidial-enable-webrtc.sh
 ```
-## Tutorials
-[How to install VICIBOX ? ](https://www.youtube.com/watch?v=JZSXp8RI7vk&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ)
-
-[How to add phones to VICIdial ? ](https://www.youtube.com/watch?v=oNnYQvvfug8&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=2)
-
-[How to set Campaigns ( min options ) ? ](https://www.youtube.com/watch?v=BqDxPf5YiX4&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=4)
-
-[How to Load leads in VICIdial and set a preview dialing campaign ? ](https://www.youtube.com/watch?v=BFSInXcCRVE&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=5)
-
-[How to access reports in VICIdial? ](https://www.youtube.com/watch?v=Zp9b9713MKQ&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=6)
-
-[How to access call recordings? ](https://www.youtube.com/watch?v=aAcYjyXASUY&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=7)
-
-[How to enable and access call recordings in VICIdial?](https://www.youtube.com/watch?v=SIx0i75YKLE&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=8)
-
-[What is predictive dialing ? ](https://www.youtube.com/watch?v=nB6b9eICemg&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=9)
-
-[How to set a predictive Dialer campaign in VICIdial?](https://www.youtube.com/watch?v=uAImsbvf0xE&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=10)
-
-[How to setup pause codes in VICIdial?](https://www.youtube.com/watch?v=D-FW83NtjJU&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=11)
-
-[What is Call Spy and Call Barge Feature? Monitor and Barge in VICIdial](https://www.youtube.com/watch?v=tNL77-kK8UU&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=12)
-
-[Setup an Inbound call center using VICIdial- Ingroup and DID Configuration in VICIDIAL](https://www.youtube.com/watch?v=nWc3Lv7X_qE&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=13)
-
-[Manage VICIdial database - How to setup and use adminer in VICIdial](https://www.youtube.com/watch?v=AoYVrUKxTKw&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=14)
-
-[How to install G729 Codec in VICIdial?](https://www.youtube.com/watch?v=oIc7raCkzfw&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=15)
-
-[How to reset Leads in VICIdial?](https://www.youtube.com/watch?v=9kMGa6eOynk&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=16)
-
-[VICIdial Cluster Installation -VICIBOX10 MultiServer installation ](https://www.youtube.com/watch?v=dcU-GaCAg9k&list=PLcrU7LQXdqpe8FJtxIRdWnbolxmbx8MYZ&index=18)
-
-[SignalWire as SIP carrier in VICIdial -How to add a sip trunk in VICIdial?](https://github.com/Omid-Mohajerani/VICIdial/wiki/How-to-register-SIGNALWIRE-sip-trunk-as-carrier-in-VICIdial%3F)
-
-[How to backup VICIdial and Restore the Backup in VICIdial?](https://www.youtube.com/watch?v=_FMj0sitazU)
-
-[Using AGI to implement White list phone numbers in VICIdial](https://github.com/Omid-Mohajerani/VICIdial/wiki/Using-AGI-to-implement-White-list-phone-numbers-in-VICIdial)
-
-[Installing VICIDial on DigitalOcean (The easy way)](https://www.patreon.com/posts/installing-on-83499727)
-
-[Adding SignalWire as Carrier in VICIDial ( Step by Step)](https://www.patreon.com/posts/adding-as-in-by-88857331)
-
-[How to enable Agent Soundboard in VICIdial?](https://www.patreon.com/posts/how-to-enable-in-89062396)
-
-[Add Nextiva as sip carrier in VICIdial (Asterisk)](https://www.patreon.com/posts/add-nextiva-as-89729619)
-
-[The easiest way to install VICIbox on a cloud provider.](https://www.patreon.com/posts/easiest-way-to-90245327)
-
-[PJSIP TRUNK with username and password authentication with commpeak](https://www.patreon.com/posts/pjsip-trunk-with-90906387)
-
-[How to Enable IP Whitelisting in VICIbox Version 11?](https://www.patreon.com/posts/how-to-enable-ip-92333789)
-
-[Installing VICIBOX 11 on Digital Ocean (image included)](https://www.patreon.com/posts/installing-11-on-92601796)
-
-[Twilio as SIP Carrier for VICIdial](https://www.patreon.com/posts/twilio-as-sip-93948187)
-
-[Monitor And Barge in VICIdial using Webphone](https://www.patreon.com/posts/monitor-and-in-96035153?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[Voice Codecs in VICIDial](https://www.patreon.com/posts/voice-codecs-in-96816817?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[How to remove bloop sound in VICIdial?](https://www.patreon.com/posts/how-to-remove-in-97242273?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[VICIdial Call Recording - Access forbidden!](https://www.patreon.com/posts/vicidial-call-97836820?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[How to change IP Address in VICIbox?](https://www.patreon.com/posts/how-to-change-ip-98208548?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[VICIDial SIP Registration Troubleshooting](https://www.patreon.com/posts/vicidial-sip-98224649?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)
-
-[VICIdial Full backup and transfer to remote SFTP Server](https://www.patreon.com/posts/vicidial-full-to-98267818?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=postshare_creator&utm_content=join_link)

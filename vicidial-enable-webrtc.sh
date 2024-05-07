@@ -1,8 +1,14 @@
 #!/bin/bash
 
+echo "Download CyburPhone"
+cd /var/www/html
+git clone https://github.com/carpenox/CyburPhone.git
+chmod -R 744 CyburPhone
+chown -R apache:apache CyburPhone
+
 echo "Install certbot for LetsEncrypt"
 if [ -f /etc/redhat-release ]; then
-	yum -y install certbot python2-certbot-apache mod_ssl
+	yum -y install certbot python3-certbot-apache mod_ssl
 fi
 if [ -f /etc/lsb-release ]; then
 	sudo add-apt-repository ppa:certbot/certbot
@@ -12,18 +18,18 @@ fi
 echo "Enter the DOMAIN NAME HERE. ***********IF YOU DONT HAVE ONE PLEASE DONT CONTINUE: "
 read DOMAINNAME
 
-wget -O /etc/httpd/conf.d/$DOMAINNAME.conf https://github.com/GenXoutsourcing/vicidial-install-scripts/blob/main/DOMAINNAME.conf
+wget -O /etc/httpd/conf.d/$DOMAINNAME.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/DOMAINNAME.conf
 sed -i s/DOMAINNAME/"$DOMAINNAME"/g /etc/httpd/conf.d/$DOMAINNAME.conf
 
 echo "Please Enter EMAIL and Agree the Terms and Conditions "
 certbot --apache -d $DOMAINNAME
 
 echo "Change http.conf in Asterisk"
-wget -O /etc/asterisk/http.conf https://github.com/GenXoutsourcing/vicidial-install-scripts/main/asterisk-http.conf
+wget -O /etc/asterisk/http.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/asterisk-http.conf
 sed -i s/DOMAINNAME/"$DOMAINNAME"/g /etc/asterisk/http.conf
 
 echo "Change sip.conf in Asterisk"
-wget -O /etc/asterisk/sip.conf https://github.com/GenXoutsourcing/vicidial-install-scripts/main/asterisk-sip.conf
+wget -O /etc/asterisk/sip.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/asterisk-sip.conf
 sed -i s/DOMAINNAME/"$DOMAINNAME"/g /etc/asterisk/sip.conf
 
 echo "Reloading Asterisk"
@@ -35,7 +41,7 @@ mysql -e "use asterisk; update servers set web_socket_url='wss://$DOMAINNAME:808
 
 echo "Add DOMAINAME system_settings webphone_url"
 echo "%%%%%%%%%%%%%%%This Wont work if you SET root Password%%%%%%%%%%%%%%%"
-mysql -e "use asterisk; update system_settings set webphone_url='PBXWebPhone/index.php';"
+mysql -e "use asterisk; update system_settings set webphone_url='https://$DOMAINNAM/CyburPhone/cyburphone.php';"
 
 echo "update the SIP_generic"
 mysql -e "use asterisk; update vicidial_conf_templates set template_contents='type=friend 
