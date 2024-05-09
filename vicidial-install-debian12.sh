@@ -359,7 +359,7 @@ chmod +x confbridges.sh
 ./confbridges.sh
 
 read -p 'Press Enter to Reboot: '
-echo "Now rebooting Ubuntu"
+echo "Now rebooting Debian 12"
 reboot
 
 # Admin Interface:
