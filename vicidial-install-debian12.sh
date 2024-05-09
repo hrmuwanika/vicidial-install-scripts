@@ -149,9 +149,9 @@ make install
 
 # Install Jansson
 cd /usr/src/
-wget https://digip.org/jansson/releases/jansson-2.14.tar.gz
+wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
 tar xvzf jansson*
-cd jansson-2.14
+cd jansson-2.13
 ./configure
 make clean
 make
@@ -160,13 +160,22 @@ ldconfig
 
 echo "Press Enter to continue to install Dahdi "
 # Download latest version of dahdi
-apt-get install -y dahdi-* dahdi
+sudo apt install -y dahdi-* dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-# Install and compile libpri
 cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
+
+# Install and compile libpri
+mkdir /usr/src/asterisk
+cd /usr/src/asterisk
 wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
 tar -zxvf libpri-1-current.tar.gz
 cd libpri-1.*
@@ -176,15 +185,31 @@ make install
 #--------------------------------------------------
 # Install Asterisk core 
 #--------------------------------------------------
-mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 
 # Download Asterisk 20 tarball
-sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
 
 # Extract the tarball file
-sudo tar -xzvf asterisk-20-current.tar.gz
-cd /usr/src/asterisk/asterisk-20.*/
+sudo tar -xzvf asterisk-18-current.tar.gz
+cd /usr/src/asterisk/asterisk-18.*/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
+cd apps/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
+yes | cp -rf enter.h.1 enter.h
+yes | cp -rf leave.h.1 leave.h
+
+cd /usr/src/asterisk/asterisk-18.18.1/
+patch < amd_stats-18.patch apps/app_amd.c
+patch < iax_peer_status-18.patch channels/chan_iax2.c
+patch < sip_peer_status-18.patch channels/chan_sip.c
+patch < timeout_reset_dial_app-18.patch apps/app_dial.c
+patch < timeout_reset_dial_core-18.patch main/dial.c
 
 # Download the mp3 decoder library
 sudo ./contrib/scripts/get_mp3_source.sh
@@ -193,14 +218,19 @@ sudo ./contrib/scripts/get_mp3_source.sh
 sudo ./contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect
-
-adduser asterisk --disabled-password --gecos "Asterisk User"
-
-# Build Asterisk
-sudo make
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
+make -j ${JOBS} all
 
 # Install Asterisk by running the command:
 sudo make install
@@ -208,6 +238,8 @@ sudo make install
 # Install configs and samples
 sudo make samples
 sudo make config
+
+adduser asterisk --disabled-password --gecos "Asterisk User"
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 sudo groupadd asterisk
@@ -298,29 +330,12 @@ crontab /root/crontab-file
 crontab -l
 
 # Download rc.local to /etc
-cd /etc
+cd /etc/rc.d
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
-sudo chmod +x /etc/rc.local
+sudo chmod +x /etc/rc.d/rc.local
 
-# Add rc-local as a service - thx to ras
-cat > /etc/systemd/system/rc-local.service << EOF
-[Unit]
-Description=/etc/rc.local Compatibility
-
-[Service]
-Type=oneshot
-ExecStart=/etc/rc.local
-TimeoutSec=0
-StandardInput=tty
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable rc-local.service
-sudo systemctl start rc-local.service
+sudo systemctl enable rc-local
+sudo systemctl start rc-local
 
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
@@ -355,6 +370,12 @@ rm asterisk-core-sounds-en-wav-current.tar.gz
 rm asterisk-extra-sounds-en-gsm-current.tar.gz
 rm asterisk-extra-sounds-en-ulaw-current.tar.gz
 rm asterisk-extra-sounds-en-wav-current.tar.gz
+
+# Patch the confbridge
+cd /usr/src
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
+chmod +x confbridges.sh
+./confbridges.sh
 
 read -p 'Press Enter to Reboot: '
 echo "Now rebooting Ubuntu"
