@@ -160,10 +160,17 @@ ldconfig
 
 echo "Press Enter to continue to install Dahdi "
 # Download latest version of dahdi
-sudo apt install -y dahdi-* dahdi
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+cd /usr/src/
+wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0+3.2.0.tar.gz
+tar xzf dahdi*
+cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
+
+sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
+sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+
+make
+make install
+make install-config
 
 cd /usr/src
 wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
