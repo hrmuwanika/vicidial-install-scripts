@@ -4,6 +4,21 @@ echo "Vicidial installation AlmaLinux/RockyLinux with CyburPhone and Dynamic por
 
 export LC_ALL=C
 
+timedatectl set-timezone Africa/Kigali
+
+yum check-update
+yum update -y
+yum -y install epel-release
+yum update -y
+yum install git -y
+yum install -y kernel*
+
+#Disable SELINUX
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config    
+
+cd /usr/src/
+git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
+
 yum groupinstall "Development Tools" -y
 
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
