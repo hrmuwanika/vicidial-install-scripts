@@ -1,49 +1,65 @@
 #!/bin/sh
 
-echo "Vicidial installation AlmaLinux/RockyLinux with CyburPhone and Dynamic portal"
+echo "================================================"
+echo "Vicidial installation on AlmaLinux/RockyLinux"
+echo "================================================"
 
-export LC_ALL=C
-
-timedatectl set-timezone Africa/Kigali
-
+# Update Server
 yum check-update
 yum update -y
 yum -y install epel-release
-yum update -y
-yum install git -y
-yum install -y kernel*
+yum -y groupinstall 'Development Tools'
+yum -y update
+yum -y install kernel*
 
-#Disable SELINUX
-sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config    
+# Disable SELINUX
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
 
-cd /usr/src/
-git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
+# Disable password authentication
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo service sshd restart
 
-yum groupinstall "Development Tools" -y
+# Set the timezone
+timedatectl set-timezone Africa/Kigali
 
-yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+export LC_ALL=C
+
+# Updating YUM Repos
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 yum -y install yum-utils
-dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y
-dnf install https://rpms.remirepo.net/enterprise/remi-release-9.rpm -y
+yum-config-manager --enable remi-php74
+
 dnf module enable php:remi-7.4 -y
 dnf module enable mariadb:10.5 -y
 
 dnf -y install dnf-plugins-core
 
-yum install -y php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
-yum install -y wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt 
-yum install -y php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
+yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring 
+yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick mysql-devel
+yum -y install mariadb-server mariadb mariadb-devel httpd
 
-sleep 3
+systemctl enable httpd.service
+systemctl enable mariadb.service
+systemctl start httpd.service
+systemctl start mariadb.service
 
-yum install -y newt-devel libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
-yum install -y php-opcache libss7 mariadb-devel libss7* libopen* 
+yum install -y newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
+yum install -y libss7 libss7* libopen* unzip sipsak ntp perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
+yum install -y openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel  
 yum copr enable irontec/sngrep -y
 dnf install sngrep -y
 
 dnf --enablerepo=crb install libsrtp-devel -y
 dnf config-manager --set-enabled crb
-yum install libsrtp-devel -y
+yum -y install libsrtp-devel
+
+cd /usr/src/
+git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
 
@@ -57,8 +73,6 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
     Require all granted
 </Directory>
 EOF
-
-sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 tee -a /etc/php.ini <<EOF
 
@@ -76,21 +90,16 @@ EOF
 
 systemctl restart httpd
 
-yum in -y sqlite-devel httpd mod_ssl nano chkconfig htop atop mytop iftop
-yum in -y libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
-dnf install -y mariadb-server mariadb
+yum install -y mod_ssl nano chkconfig atop mytop
+yum install -y libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
 
-
-systemctl enable mariadb
-
 cp /etc/my.cnf /etc/my.cnf.original
 echo "" > /etc/my.cnf
 
-
-cat <<MYSQLCONF>> /etc/my.cnf
+cat > /etc/my.cnf << MYSQLCONF
 [mysql.server]
 user = mysql
 #basedir = /var/lib
