@@ -205,12 +205,16 @@ make
 make install 
 ldconfig
 
+cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
+
 #Install Dahdi
 echo "Install Dahdi"
-ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
-cd /etc/include
-wget https://dialer.one/newt.h
-
 cd /usr/src/
 mkdir dahdi-linux-complete-3.2.0+3.2.0
 cd dahdi-linux-complete-3.2.0+3.2.0
@@ -226,7 +230,8 @@ make
 make install
 make install-config
 
-yum -y install dahdi-tools-libs
+yum install -y dahdi-tools-libs
+yum install libuuid-devel libxml2-devel -y
 
 cd tools
 make clean
@@ -239,44 +244,76 @@ modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-read -p 'Press Enter to continue: '
-
-echo 'Continuing...'
-
-#Install Asterisk and LibPRI
+# Install and compile libpri
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
-tar -xvzf asterisk-18.*
-tar -xvzf libpri-*
-
-cd /usr/src
-wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
-tar xfv v2.1.0.tar.gz
-cd libsrtp-2.1.0
-./configure --prefix=/usr --enable-openssl
-make shared_library && sudo make install
-ldconfig
-
-cd /usr/src/asterisk/asterisk-18.*
-
-
-yum in libuuid-devel libxml2-devel -y
-
-
-./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
-
-make menuselect
-make -j 
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
+tar -zxvf libpri-1-current.tar.gz
+cd libpri-1.*
+make
 make install
 
+# Install Asterisk
+mkdir /usr/src/asterisk
+cd /usr/src/asterisk
+wget wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
+tar -xvzf asterisk-18.*
+cd /usr/src/asterisk/asterisk-18.*
 
-read -p 'Press Enter to continue: '
+# Download the mp3 decoder library
+sudo ./contrib/scripts/get_mp3_source.sh
 
-echo 'Continuing...'
+# Ensure all dependencies are resolved
+sudo ./contrib/scripts/install_prereq install
 
-#Install astguiclient
+# Run the configure script to satisfy build dependencies
+sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+
+make menuselect
+make
+
+# Install Asterisk by running the command:
+sudo make install
+
+# Install configs and samples
+sudo make samples
+sudo make config
+
+adduser asterisk --disabled-password --gecos "Asterisk User"
+
+# Create a separate user and group to run asterisk services, and assign correct permissions:
+sudo groupadd asterisk
+sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
+sudo usermod -aG audio,dialout asterisk
+chown -R asterisk:asterisk /etc/asterisk
+chown -R asterisk:asterisk /var/lib/asterisk
+chown -R asterisk:asterisk /var/log/asterisk
+chown -R asterisk:asterisk /var/spool/asterisk
+chown -R asterisk:asterisk /usr/lib64/asterisk
+
+#Set Asterisk default user to asterisk:
+sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
+sed -i 's|#AST_GROUP|AST_GROUP|' /etc/default/asterisk
+
+sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
+sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
+
+echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+sudo ldconfig
+
+# Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
+# radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
+# Solution
+sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+
+sudo sytemctl enable asterisk
+sudo sytemctl start asterisk
+
+#--------------------------------------------------
+# Install astguiclient
+#--------------------------------------------------
 echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
