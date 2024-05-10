@@ -845,3 +845,9 @@ read -p 'Press Enter to Reboot: '
 echo "Restarting AlmaLinux"
 
 reboot
+
+# Admin Interface:
+# http://yourserverip/vicidial/admin.php (username:6666, password:1234)
+
+# Agent Interface:
+# http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
