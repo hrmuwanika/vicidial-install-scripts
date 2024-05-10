@@ -195,10 +195,10 @@ make install
 cd /usr/src/asterisk
 
 # Download Asterisk 20 tarball
-sudo wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
+sudo wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 
 # Extract the tarball file
-sudo tar -xzvf asterisk-18-current.tar.gz
+sudo tar -xzvf asterisk-18.21.0-vici.tar.gz
 cd /usr/src/asterisk/asterisk-18.*/
 
 # Download the mp3 decoder library
