@@ -84,9 +84,8 @@ max_input_time = 3360
 post_max_size = 448M
 upload_max_filesize = 442M
 default_socket_timeout = 3360
-date.timezone = America/New_York
+date.timezone = Africa/Kigali
 EOF
-
 
 systemctl restart httpd
 
@@ -99,7 +98,7 @@ dnf config-manager --set-enabled powertools
 cp /etc/my.cnf /etc/my.cnf.original
 echo "" > /etc/my.cnf
 
-cat > /etc/my.cnf << MYSQLCONF
+cat > /etc/my.cnf <<MYSQLCONF
 [mysql.server]
 user = mysql
 #basedir = /var/lib
@@ -177,25 +176,82 @@ MYSQLCONF
 mkdir /var/log/mysqld
 touch /var/log/mysqld/slow-queries.log
 chown -R mysql:mysql /var/log/mysqld
-systemctl restart mariadb
 
-systemctl enable httpd.service
-systemctl enable mariadb.service
 systemctl restart httpd.service
 systemctl restart mariadb.service
 
-#Install Perl Modules
-
+# Install Perl Modules
 echo "Install Perl"
+yum -y install perl-CPAN 
+yum -y install perl-YAML 
+yum -y install perl-CPAN-DistnameInfo 
+yum -y install perl-libwww-perl 
+yum -y install perl-DBI 
+yum -y install perl-DBD-MySQL 
+yum -y install perl-GD 
+yum -y install perl-Env 
+yum -y install perl-Term-ReadLine-Gnu 
+yum -y install perl-SelfLoader 
+yum -y install perl-open.noarch 
 
-yum install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+cd /usr/bin/
+curl -LOk http://xrl.us/cpanm
+chmod +x cpanm
+cpanm -f File::HomeDir
+cpanm -f File::Which
+cpanm CPAN::Meta::Requirements
+cpanm -f CPAN
+cpanm YAML
+cpanm MD5
+cpanm Digest::MD5
+cpanm Digest::SHA1
+cpanm readline
+cpanm Bundle::CPAN
+cpanm DBI
+cpanm -f DBD::mysql
+cpanm Net::Telnet
+cpanm Time::HiRes
+cpanm Net::Server
+cpanm Switch
+cpanm Mail::Sendmail
+cpanm Unicode::Map
+cpanm Jcode
+cpanm Spreadsheet::WriteExcel
+cpanm OLE::Storage_Lite
+cpanm Proc::ProcessTable
+cpanm IO::Scalar
+cpanm Spreadsheet::ParseExcel
+cpanm Curses
+cpanm Getopt::Long
+cpanm Net::Domain
+cpanm Term::ReadKey
+cpanm Term::ANSIColor
+cpanm Spreadsheet::XLSX
+cpanm Spreadsheet::Read
+cpanm LWP::UserAgent
+cpanm HTML::Entities
+cpanm HTML::Strip
+cpanm HTML::FormatText
+cpanm HTML::TreeBuilder
+cpanm Time::Local
+cpanm MIME::Decoder
+cpanm Mail::POP3Client
+cpanm Mail::IMAPClient
+cpanm Mail::Message
+cpanm IO::Socket::SSL
+cpanm MIME::Base64
+cpanm MIME::QuotedPrint
+cpanm Crypt::Eksblowfish::Bcrypt
+cpanm Crypt::RC4
+cpanm Text::CSV
+cpanm Text::CSV_XS
 
-#CPM install
+# CPM install
 cd /usr/src/vicidial-install-scripts
 curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
 /usr/local/bin/cpm install -g
 
-#Install Asterisk Perl
+# Install Asterisk Perl
 cd /usr/src
 wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
@@ -204,11 +260,19 @@ perl Makefile.PL
 make all
 make install 
 
-yum install libsrtp-devel -y
-yum install -y elfutils-libelf-devel libedit-devel
+yum -y install libsrtp-devel
+yum -y install elfutils-libelf-devel libedit-devel
 
+# Installation of sipsak
+cd /usr/src
+wget http://download.vicidial.com/required-apps/sipsak-0.9.6-1.tar.gz
+tar -zvxf sipsak-0.9.6-1.tar.gz
+cd sipsak-0.9.6
+./configure
+make
+make install
 
-#Install Lame
+# Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
@@ -217,8 +281,7 @@ cd lame-3.99.5
 make
 make install
 
-
-#Install Jansson
+# Install Jansson
 cd /usr/src/
 wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
 tar xvzf jansson*
@@ -229,6 +292,16 @@ make
 make install 
 ldconfig
 
+# Installation of eaccelerator
+cd /usr/src/
+wget https://github.com/eaccelerator/eaccelerator/zipball/master -O eaccelerator.zip
+unzip eaccelerator.zip
+cd eaccelerator-*
+export PHP_PREFIX=”/usr”
+$PHP_PREFIX/bin/phpize
+./configure –enable-eaccelerator=shared –with-php-config=$PHP_PREFIX/bin/php-config
+make
+
 cd /usr/src
 wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
 tar xfv v2.1.0.tar.gz
@@ -237,14 +310,13 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
-#Install Dahdi
+# Install Dahdi
 echo "Install Dahdi"
 cd /usr/src/
 mkdir dahdi-linux-complete-3.2.0+3.2.0
 cd dahdi-linux-complete-3.2.0+3.2.0
 wget https://dialer.one/dahdi-alma9.zip
 unzip dahdi-alma9.zip
-yum in newt* -y
 
 sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
 sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
@@ -255,7 +327,7 @@ make install
 make install-config
 
 yum install -y dahdi-tools-libs
-yum install libuuid-devel libxml2-devel -y
+yum install -y libuuid-devel libxml2-devel 
 
 cd tools
 make clean
@@ -281,7 +353,7 @@ make install
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
-tar -xvzf asterisk-18.*
+tar -zxvf asterisk-18.*
 cd /usr/src/asterisk/asterisk-18.*
 
 # Download the mp3 decoder library
@@ -293,8 +365,8 @@ sudo ./contrib/scripts/install_prereq install
 # Run the configure script to satisfy build dependencies
 sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect
-make
+sudo make menuselect
+sudo make
 
 # Install Asterisk by running the command:
 sudo make install
@@ -365,16 +437,18 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='16.30.0';
+update servers set asterisk_version='18.21.0';
 quit
 MYSQLCREOF
 
-read -p 'Press Enter to continue: '
+# update the timezone
+cp /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 
+read -p 'Press Enter to continue: '
 echo 'Continuing...'
 
-#Get astguiclient.conf file
-cat <<ASTGUI>> /etc/astguiclient.conf
+# Get astguiclient.conf file
+cat > /etc/astguiclient.conf <<ASTGUI
 # astguiclient.conf - configuration elements for the astguiclient package
 # this is the astguiclient configuration file
 # all comments will be lost if you run install.pl again
@@ -417,7 +491,7 @@ VARDB_port => 3306
 VARactive_keepalives => 12345689EC
 
 # Asterisk version VICIDIAL is installed for
-VARasterisk_version => 16.X
+VARasterisk_version => 18.X
 
 # FTP recording archive connection information
 VARFTP_host => 10.0.0.4
@@ -448,30 +522,22 @@ ExpectedDBSchema => 1645
 ASTGUI
 
 echo "Replace IP address in Default"
-echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
+echo "%%%%%%%%% Please Enter This Server IP ADD %%%%%%%%%%%%"
 read serveripadd
-sed -i s/SERVERIP/"$serveripadd"/g /etc/astguiclient.conf
-
+sed -i 's/$serveripadd/'$serveripadd'/g' /etc/astguiclient.conf
 echo "Install VICIDIAL"
-perl install.pl --no-prompt --copy_sample_conf_files=Y
+echo "Copy sample configuration files to /etc/asterisk/ SET TO  Y*"
+perl install.pl
 
 #Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
-
-#Add chan_sip to Asterisk 18
-
-
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
-
-perl install.pl --no-prompt
-
-
-#Install Crontab
-cat <<CRONTAB>> /root/crontab-file
+# Install Crontab
+cat > /root/crontab-file <<CRONTAB
 
 ###Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -570,127 +636,90 @@ cat <<CRONTAB>> /root/crontab-file
 ### Daily Reboot
 #30 6 * * * /sbin/reboot
 
-######TILTIX GARBAGE FILES DELETE
+###### TILTIX GARBAGE FILES DELETE
 #00 22 * * * root cd /tmp/ && find . -name '*TILTXtmp*' -type f -delete
-
-### Dynportal
-@reboot /usr/bin/VB-firewall --whitelist=ViciWhite --dynamic --quiet
-* * * * * /usr/bin/VB-firewall --whitelist=ViciWhite --dynamic --quiet
-* * * * * sleep 10; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 20; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 30; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 40; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
-
 
 CRONTAB
 
 crontab /root/crontab-file
 crontab -l
 
-#Install rc.local
-
+# Install rc.local
 sudo sed -i 's|exit 0|### exit 0|g' /etc/rc.d/rc.local
 
 tee -a /etc/rc.d/rc.local <<EOF
 
-
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
-
 /usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
 
-
 # Disable console blanking and powersaving
-
 /usr/bin/setterm -blank
-
 /usr/bin/setterm -powersave off
-
 /usr/bin/setterm -powerdown
 
-
 ### start up the MySQL server
-
 systemctl start mariadb.service
 
-
 ### start up the apache web server
-
 systemctl start httpd.service
 
-
 ### roll the Asterisk logs upon reboot
-
 /usr/share/astguiclient/ADMIN_restart_roll_logs.pl
 
-
 ### clear the server-related records from the database
-
 /usr/share/astguiclient/AST_reset_mysql_vars.pl
 
-
 ### load dahdi drivers
-
 modprobe dahdi
 modprobe dahdi_dummy
 
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-
 ### sleep for 20 seconds before launching Asterisk
 
 sleep 20
 
-
 ### start up asterisk
-
 /usr/share/astguiclient/start_asterisk_boot.pl
 
 exit 0
-
 EOF
 
 chmod +x /etc/rc.d/rc.local
+
+# add rc-local as a service - thx to ras
+tee -a /etc/systemd/system/rc-local.service <<EOF
+[Unit]
+Description=/etc/rc.local Compatibility
+
+[Service]
+Type=oneshot
+ExecStart=/etc/rc.local
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 systemctl enable rc-local
 systemctl start rc-local
 
-##Install CyburPhone
-cd /var/www/html
-git clone https://github.com/carpenox/CyburPhone.git
-chmod -R 744 CyburPhone
-chown -R apache:apache CyburPhone
+# Firewall
+yum -y install firewalld
+systemctl start firewalld 
+systemctl enable firewalld
 
-##Install Dynportal
-yum install -y firewalld
-cd /home
-wget https://dialer.one/dynportal.zip
-wget https://dialer.one/firewall.zip
-wget https://dialer.one/aggregate
-wget https://dialer.one/VB-firewall
+# Firewall configuration
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
 
-mkdir -p /var/www/vhosts/dynportal
-mv /home/dynportal.zip /var/www/vhosts/dynportal/
-mv /home/firewall.zip /etc/firewalld/
-cd /var/www/vhosts/dynportal/
-unzip dynportal.zip
-chmod -R 755 *
-chown -R apache:apache *
-cd etc/httpd/conf.d/
-mv viciportal-ssl.conf viciportal.conf /etc/httpd/conf.d/
-cd /etc/firewalld/
-unzip -o firewall.zip
-cd zones/
-rm -rf public.xml trusted.xml
-cd /etc/firewalld/
-mv -bf public.xml trusted.xml /etc/firewalld/zones/
-mv /home/aggregate /usr/bin/
-chmod +x /usr/bin/aggregate
-mv /home/VB-firewall /usr/bin/
-chmod +x /usr/bin/VB-firewall
-
-firewall-offline-cmd --add-port=446/tcp --zone=public
-
-##Fix ip_relay
+## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
 unzip ip_relay_1.1.112705.zip
 cd ip_relay_1.1/src/unix/
@@ -717,8 +746,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-##Install Sounds
-
+## Install Sounds
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
@@ -730,7 +758,7 @@ wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-#Place the audio files in their proper places:
+# Place the audio files in their proper places:
 cd /var/lib/asterisk/sounds
 tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
 tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -747,6 +775,7 @@ cd /var/lib/asterisk/mohmp3
 tar -zxf /usr/src/asterisk-moh-opsound-gsm-current.tar.gz
 tar -zxf /usr/src/asterisk-moh-opsound-ulaw-current.tar.gz
 tar -zxf /usr/src/asterisk-moh-opsound-wav-current.tar.gz
+
 rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
@@ -760,8 +789,6 @@ cd /var/lib/asterisk/sounds
 rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
-
-yum -y in sox
 
 cd /var/lib/asterisk/quiet-mp3
 sox ../mohmp3/macroform-cold_day.wav macroform-cold_day.wav vol 0.25
@@ -791,35 +818,7 @@ tee -a ~/.bashrc <<EOF
 /usr/sbin/asterisk -V
 EOF
 
-sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
-
-
-tee -a /etc/ssh/sshd_banner <<EOF
-Thank you for choosing CyburDial and carpenox's auto installer!
-
-Visit our Knowledge Base at https://www.dialer.one
-
-Support: info@dialer.one
-Skype Live Chat Support: https://join.skype.com/ujkQ7i5lV78O
-EOF
-
-#add rc-local as a service - thx to ras
-tee -a /etc/systemd/system/rc-local.service <<EOF
-[Unit]
-Description=/etc/rc.local Compatibility
-
-[Service]
-Type=oneshot
-ExecStart=/etc/rc.local
-TimeoutSec=0
-StandardInput=tty
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-##fstab entry
+## fstab entry
 tee -a /etc/fstab <<EOF
 none /var/spool/asterisk/monitor tmpfs nodev,nosuid,noexec,nodiratime,size=500M 0 0
 EOF
@@ -836,18 +835,7 @@ mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.o
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
-systemctl start firewalld 
-systemctl enable firewalld
-
-firewall-cmd --zone=public --add-port=80/tcp --permanent
-firewall-cmd --zone=public --add-port=443/tcp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
-firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
-firewall-cmd --reload
-
 read -p 'Press Enter to Reboot: '
-
 echo "Restarting AlmaLinux"
 
 reboot
