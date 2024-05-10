@@ -247,8 +247,8 @@ echo 'Continuing...'
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18-current.tar.gz
-tar -xvzf asterisk-*
+wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
+tar -xvzf asterisk-18.*
 tar -xvzf libpri-*
 
 cd /usr/src
