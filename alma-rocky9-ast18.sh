@@ -4,7 +4,6 @@ echo "Vicidial installation AlmaLinux/RockyLinux with CyburPhone and Dynamic por
 
 export LC_ALL=C
 
-
 yum groupinstall "Development Tools" -y
 
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
@@ -16,15 +15,16 @@ dnf module enable mariadb:10.5 -y
 
 dnf -y install dnf-plugins-core
 
-yum install -y php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache -y 
-yum in -y wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt 
-yum in -y php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+yum install -y php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
+yum install -y wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt 
+yum install -y php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+
 sleep 3
-yum in -y newt-devel libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
-yum in -y php-opcache libss7 mariadb-devel libss7* libopen* 
+
+yum install -y newt-devel libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
+yum install -y php-opcache libss7 mariadb-devel libss7* libopen* 
 yum copr enable irontec/sngrep -y
 dnf install sngrep -y
-
 
 dnf --enablerepo=crb install libsrtp-devel -y
 dnf config-manager --set-enabled crb
@@ -804,28 +804,23 @@ systemctl daemon-reload
 sudo systemctl enable rc-local.service
 sudo systemctl start rc-local.service
 
-cat <<WELCOME>> /var/www/html/index.html
-<META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
-Please Hold while I redirect you!
-WELCOME
-
 chmod 777 /var/spool/asterisk/monitorDONE
 chkconfig asterisk off
 
 mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
 
-yum in certbot -y
-systemctl enable certbot-renew.timer
-systemctl start certbot-renew.timer
-cd /usr/src/vicidial-install-scripts
-chmod +x vicidial-enable-webrtc.sh
-service firewalld stop
-./vicidial-enable-webrtc.sh
-service firewalld start
-systemctl enable firewalld
-
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
+
+systemctl start firewalld 
+systemctl enable firewalld
+
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
 
 read -p 'Press Enter to Reboot: '
 
