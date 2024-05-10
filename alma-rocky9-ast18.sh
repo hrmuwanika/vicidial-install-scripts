@@ -835,6 +835,12 @@ mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.o
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
+# Patch the confbridge
+cd /usr/src
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
+chmod +x confbridges.sh
+./confbridges.sh
+
 read -p 'Press Enter to Reboot: '
 echo "Restarting AlmaLinux"
 
