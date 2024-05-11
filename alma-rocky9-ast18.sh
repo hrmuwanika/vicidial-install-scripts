@@ -55,9 +55,9 @@ yum -y install mariadb-server mariadb
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which kernel-devel
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache
-yum -y install openssl openssl-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf mod_ssl certbot uuid*
+yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which kernel-devel
+yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache --skip-broken
+yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl certbot uuid*
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
@@ -97,10 +97,7 @@ EOF
 systemctl restart httpd
 
 yum -y install chkconfig atop mytop
-yum -y install libedit-devel speex-devel speex* postfix dovecot s-nail roundcubemail inxi
-
-systemctl enable postfix
-systemctl start postfix
+yum -y install libedit-devel speex* postfix dovecot s-nail roundcubemail inxi
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
