@@ -273,9 +273,9 @@ make install
 
 # Install Jansson
 cd /usr/src/
-wget https://digip.org/jansson/releases/jansson-2.14.tar.gz
+wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
 tar xvzf jansson*
-cd jansson-2.14
+cd jansson-2.13
 ./configure
 make clean
 make
