@@ -6,8 +6,8 @@ echo "================================================"
 
 # Update Server
 yum check-update
-dnf update -y
-dnf -y install nano wget tar epel-release chkconfig libedit-devel
+dnf -y update
+dnf -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
 yum -y update
 yum -y install kernel*
@@ -33,35 +33,36 @@ export LC_ALL=C
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 yum -y install yum-utils
-yum-config-manager --enable remi-php74
 
-dnf module enable php:remi-7.4 -y
-dnf module enable mariadb:10.5 -y
+dnf module reset php
+dnf module install php:remi-8.2
+
+dnf -y module enable php:remi-8.2 
+dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
 
 yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
 yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring 
 yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick
-yum -y install mariadb-server mariadb mariadb-devel httpd
 
+yum -y install httpd
 systemctl enable httpd.service
-systemctl enable mariadb.service
 systemctl start httpd.service
+
+yum -y install mariadb-server mariadb mariadb-devel 
+systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum install -y newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
-yum install -y libss7 libss7* libopen* unzip sipsak ntp perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
-yum install -y openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf
-yum copr enable irontec/sngrep -y
+yum -y install newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
+yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
+yum -y install openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf
+yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
 dnf --enablerepo=crb install libsrtp-devel -y
 dnf config-manager --set-enabled crb
-yum -y install libsrtp-devel
-
-cd /usr/src/
-git clone https://github.com/hrmuwanika/vicidial-install-scripts.git
+yum -y install libsrtp-devel elfutils-libelf-devel
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
 
@@ -91,8 +92,8 @@ EOF
 
 systemctl restart httpd
 
-yum install -y mod_ssl nano chkconfig atop mytop
-yum install -y libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install mod_ssl nano chkconfig atop mytop
+yum -y install libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -210,7 +211,6 @@ cpanm Digest::SHA1
 cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm -f DBD::mysql
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -262,18 +262,6 @@ perl Makefile.PL
 make all
 make install 
 
-yum -y install libsrtp-devel
-yum -y install elfutils-libelf-devel libedit-devel
-
-# Installation of sipsak
-cd /usr/src
-wget http://download.vicidial.com/required-apps/sipsak-0.9.6-1.tar.gz
-tar -zvxf sipsak-0.9.6-1.tar.gz
-cd sipsak-0.9.6
-./configure
-make
-make install
-
 # Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
@@ -315,22 +303,29 @@ ldconfig
 # Install Dahdi
 echo "Install Dahdi"
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/dahdi-linux/dahdi-linux-current.tar.gz
-wget http://downloads.asterisk.org/pub/telephony/dahdi-tools/dahdi-tools-current.tar.gz
-tar -zxvf dahdi-linux-current.tar.gz
-tar -zxvf dahdi-tools-current.tar.gz
+wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.3.0+3.3.0.tar.gz
+tar -zvxf dahdi-linux-complete-3.3.0+3.3.0.tar.gz
+cd /usr/src/dahdi-linux-complete-3.3.0+3.3.0
 
-cd dahdi-linux-*
+sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
+sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/include/dahdi/kernel.h
+
+yum -y install kernel-devel-$(uname -r)
+
 make
 make install
+make install-config
 
-cd /usr/src/dahdi-tools-*
-./bootstrap.sh
-./configure
+yum -y install dahdi-tools-libs
 
-make all
+cd tools
+make clean
+make
 make install
 make install-config
+
+modprobe dahdi
+modprobe dahdi_dummy
 
 # Install and compile libpri
 mkdir /usr/src/asterisk
