@@ -27,7 +27,7 @@ reboot
 ````
   Reboot Before running this script
 
-## Install VICIDIAL scripts
+Install VICIDIAL scripts
 
 ```
 cd /usr/src/vicidial-install-scripts
