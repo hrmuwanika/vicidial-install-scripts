@@ -6,13 +6,12 @@ echo "================================================"
 
 # Update Server
 yum check-update
-dnf -y update
-dnf -y upgrade 
+yum -y update
 
 yum -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
 yum -y update
-yum -y install kernel*
+yum -y install kernel-*
 
 # Disable SELINUX
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
