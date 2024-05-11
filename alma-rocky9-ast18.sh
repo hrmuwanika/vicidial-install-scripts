@@ -565,8 +565,10 @@ perl install.pl
 
 #Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
+
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
+
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
@@ -646,7 +648,6 @@ cat > /root/crontab-file <<CRONTAB
 #25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 
-
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
 
@@ -675,13 +676,10 @@ cat > /root/crontab-file <<CRONTAB
 
 CRONTAB
 
-crontab /root/crontab-file
 crontab -l
 
 # Install rc.local
-sudo sed -i 's|exit 0|### exit 0|g' /etc/rc.d/rc.local
-
-tee -a /etc/rc.d/rc.local <<EOF
+cat > /etc/rc.d/rc.local <<EOF
 
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
 /usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
@@ -722,7 +720,7 @@ EOF
 chmod +x /etc/rc.d/rc.local
 
 # add rc-local as a service - thx to ras
-tee -a /etc/systemd/system/rc-local.service <<EOF
+cat > /etc/systemd/system/rc-local.service <<EOF
 [Unit]
 Description=/etc/rc.local Compatibility
 
@@ -737,8 +735,8 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 
-systemctl enable rc-local
-systemctl start rc-local
+#systemctl enable rc-local
+#systemctl start rc-local
 
 # Firewall
 yum -y install firewalld
