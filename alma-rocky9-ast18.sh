@@ -6,14 +6,16 @@ echo "================================================"
 
 # Update Server
 yum check-update
-yum update -y
-yum -y install epel-release
+dnf update -y
+dnf -y install nano wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
 yum -y update
 yum -y install kernel*
 
 # Disable SELINUX
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
+setenforce 0
+sestatus
 
 # Disable password authentication
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -353,34 +355,34 @@ make install
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
-tar -zxvf asterisk-18.*
-cd /usr/src/asterisk/asterisk-18.*
+tar -zxvf asterisk-18.21.0-vici.tar.gz
+rm asterisk-18.21.0-vici.tar.gz
+cd /usr/src/asterisk/asterisk-18*/
 
 # Download the mp3 decoder library
-sudo ./contrib/scripts/get_mp3_source.sh
+/contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
-sudo ./contrib/scripts/install_prereq install
+/contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
-sudo make menuselect
-sudo make
+make menuselect
+make
 
 # Install Asterisk by running the command:
-sudo make install
+make install
 
 # Install configs and samples
-sudo make samples
-sudo make config
+make samples
 
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
-sudo groupadd asterisk
-sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
-sudo usermod -aG audio,dialout asterisk
+groupadd asterisk
+useradd -r -d /var/lib/asterisk -g asterisk asterisk
+usermod -aG audio,dialout asterisk
 chown -R asterisk:asterisk /etc/asterisk
 chown -R asterisk:asterisk /var/lib/asterisk
 chown -R asterisk:asterisk /var/log/asterisk
@@ -404,8 +406,40 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-sudo sytemctl enable asterisk
-sudo sytemctl start asterisk
+touch /usr/lib/systemd/system/asterisk.service
+cat > /usr/lib/systemd/system/asterisk.service << EOF
+[Unit]
+Description=Asterisk PBX and telephony daemon.
+#After=network.target
+#include these if asterisk need to bind to a specific IP (other than 0.0.0.0)
+Wants=network-online.target
+After=network-online.target network.target
+
+[Service]
+Type=simple
+Environment=HOME=/var/lib/asterisk
+WorkingDirectory=/var/lib/asterisk
+ExecStart=/usr/sbin/asterisk -mqf -C /etc/asterisk/asterisk.conf
+ExecReload=/usr/sbin/asterisk -rx 'core reload'
+ExecStop=/usr/sbin/asterisk -rx 'core stop now'
+
+LimitCORE=infinity
+Restart=always
+RestartSec=4
+
+# Prevent duplication of logs with color codes to /var/log/messages
+StandardOutput=null
+
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl disable asterisk.service
+systemctl enable asterisk.service
+systemctl start asterisk
+systemctl status asterisk
 
 #--------------------------------------------------
 # Install astguiclient
