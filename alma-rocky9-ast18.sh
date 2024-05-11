@@ -6,7 +6,7 @@ echo "================================================"
 
 # Update Server
 yum check-update
-yum -y update
+dnf -y update
 
 yum -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
