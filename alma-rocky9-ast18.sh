@@ -35,8 +35,8 @@ yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarc
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 yum -y install yum-utils
 
-dnf module reset php
-dnf module install php:remi-7.4
+dnf -y module reset php
+dnf -y module install php:remi-7.4
 
 dnf -y module enable php:remi-7.4 
 dnf -y module enable mariadb:10.5 
