@@ -36,9 +36,9 @@ yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 yum -y install yum-utils
 
 dnf -y module reset php
-dnf -y module install php:remi-7.4
+dnf -y module install php:remi-8.2
 
-dnf -y module enable php:remi-7.4 
+dnf -y module enable php:remi-8.2
 dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
