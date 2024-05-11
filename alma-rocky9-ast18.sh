@@ -52,7 +52,7 @@ systemctl start mariadb.service
 
 yum install -y newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
 yum install -y libss7 libss7* libopen* unzip sipsak ntp perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
-yum install -y openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel  
+yum install -y openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf
 yum copr enable irontec/sngrep -y
 dnf -y install sngrep 
 
@@ -285,9 +285,9 @@ make install
 
 # Install Jansson
 cd /usr/src/
-wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
+wget https://digip.org/jansson/releases/jansson-2.14.tar.gz
 tar xvzf jansson*
-cd jansson-2.13
+cd jansson-2.14
 ./configure
 make clean
 make
@@ -315,32 +315,22 @@ ldconfig
 # Install Dahdi
 echo "Install Dahdi"
 cd /usr/src/
-mkdir dahdi-linux-complete-3.2.0+3.2.0
-cd dahdi-linux-complete-3.2.0+3.2.0
-wget https://dialer.one/dahdi-alma9.zip
-unzip dahdi-alma9.zip
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux/dahdi-linux-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/dahdi-tools/dahdi-tools-current.tar.gz
+tar -zxvf dahdi-linux-current.tar.gz
+tar -zxvf dahdi-tools-current.tar.gz
 
-sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
-sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
-
-make clean
+cd dahdi-linux-*
 make
 make install
-make install-config
 
-yum install -y dahdi-tools-libs
-yum install -y libuuid-devel libxml2-devel 
+cd /usr/src/dahdi-tools-*
+./bootstrap.sh
+./configure
 
-cd tools
-make clean
-make
+make all
 make install
 make install-config
-
-cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 # Install and compile libpri
 mkdir /usr/src/asterisk
@@ -366,10 +356,17 @@ cd /usr/src/asterisk/asterisk-18*/
 /contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect
-make
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make -j ${JOBS} all
 
 # Install Asterisk by running the command:
 make install
@@ -779,7 +776,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 EOF
 
 ## Install Sounds
-cd /usr/src
+cd /var/lib/asterisk/sounds
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-gsm-current.tar.gz
@@ -850,20 +847,6 @@ tee -a ~/.bashrc <<EOF
 /usr/sbin/asterisk -V
 EOF
 
-## fstab entry
-tee -a /etc/fstab <<EOF
-none /var/spool/asterisk/monitor tmpfs nodev,nosuid,noexec,nodiratime,size=500M 0 0
-EOF
-
-systemctl daemon-reload
-sudo systemctl enable rc-local.service
-sudo systemctl start rc-local.service
-
-chmod 777 /var/spool/asterisk/monitorDONE
-chkconfig asterisk off
-
-mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
-
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
@@ -872,6 +855,11 @@ cd /usr/src
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
 chmod +x confbridges.sh
 ./confbridges.sh
+
+cat > /var/www/html/index.html <<WELCOME
+<META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
+Please Hold while I redirect you!
+WELCOME
 
 read -p 'Press Enter to Reboot: '
 echo "Restarting AlmaLinux"
