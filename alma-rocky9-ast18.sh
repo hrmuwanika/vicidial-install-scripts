@@ -42,7 +42,7 @@ dnf -y install dnf-plugins-core
 
 yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
 yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring 
-yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick mysql-devel
+yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick
 yum -y install mariadb-server mariadb mariadb-devel httpd
 
 systemctl enable httpd.service
@@ -54,7 +54,7 @@ yum install -y newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuui
 yum install -y libss7 libss7* libopen* unzip sipsak ntp perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
 yum install -y openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel  
 yum copr enable irontec/sngrep -y
-dnf install sngrep -y
+dnf -y install sngrep 
 
 dnf --enablerepo=crb install libsrtp-devel -y
 dnf config-manager --set-enabled crb
