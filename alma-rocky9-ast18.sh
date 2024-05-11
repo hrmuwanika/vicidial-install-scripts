@@ -8,10 +8,11 @@ echo "================================================"
 yum check-update
 dnf -y update
 dnf -y upgrade 
-dnf -y install nano git wget tar epel-release chkconfig libedit-devel
+
+yum -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
 yum -y update
-yum -y install kernel-devel kernel-headers
+yum -y install kernel*
 
 # Disable SELINUX
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
@@ -44,8 +45,12 @@ dnf -y module enable mariadb:10.5
 dnf -y install dnf-plugins-core
 
 yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
-yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring 
+yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
 yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick
+
+yum -y install postfix
+systemctl enable postfix
+systemctl start postfix
 
 yum -y install httpd
 systemctl enable httpd.service
@@ -55,15 +60,15 @@ yum -y install mariadb-server mariadb mariadb-devel
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum -y install newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686
-yum -y install openssl libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf
+yum -y install newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which kernel-devel
+yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache
+yum -y install openssl openssl-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf mod_ssl certbot
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
-dnf --enablerepo=crb install libsrtp-devel -y
+dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
 dnf config-manager --set-enabled crb
-yum -y install libsrtp-devel elfutils-libelf-devel
+yum -y install elfutils-libelf-devel
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
 
