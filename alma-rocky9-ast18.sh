@@ -359,17 +359,10 @@ cd /usr/src/asterisk/asterisk-18*/
 /contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-sudo ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make -j ${JOBS} all
+./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+make menuselect
+make 
 
 # Install Asterisk by running the command:
 make install
