@@ -352,7 +352,7 @@ cd /usr/src/asterisk/asterisk-18*/
 
 # Run the configure script to satisfy build dependencies
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-sudo ./configure --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
+sudo ./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
 make menuselect/menuselect menuselect-tree menuselect.makeopts
 #enable app_meetme
