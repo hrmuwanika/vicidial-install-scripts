@@ -48,10 +48,6 @@ yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysq
 yum -y install wget git unzip make patch gcc gcc-c++ subversion php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
 yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick
 
-yum -y install postfix
-systemctl enable postfix
-systemctl start postfix
-
 yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
@@ -60,9 +56,9 @@ yum -y install mariadb-server mariadb mariadb-devel
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum -y install newt-devel libxml2 libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which kernel-devel
+yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which kernel-devel
 yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache
-yum -y install openssl openssl-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf mod_ssl certbot
+yum -y install openssl openssl-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel speex speex-devel libtool automake autoconf mod_ssl certbot uuid*
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
@@ -81,6 +77,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
     AllowOverride None
     Require all granted
 </Directory>
+
 EOF
 
 tee -a /etc/php.ini <<EOF
@@ -94,12 +91,17 @@ post_max_size = 448M
 upload_max_filesize = 442M
 default_socket_timeout = 3360
 date.timezone = Africa/Kigali
+max_input_vars = 20000
+
 EOF
 
 systemctl restart httpd
 
-yum -y install mod_ssl nano chkconfig atop mytop
-yum -y install libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install chkconfig atop mytop
+yum -y install libedit-devel speex-devel speex* postfix dovecot s-nail roundcubemail inxi
+
+systemctl enable postfix
+systemctl start postfix
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -309,15 +311,14 @@ ldconfig
 # Install Dahdi
 echo "Install Dahdi"
 cd /usr/src/
-wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.3.0+3.3.0.tar.gz
-tar -zvxf dahdi-linux-complete-3.3.0+3.3.0.tar.gz
-cd /usr/src/dahdi-linux-complete-3.3.0+3.3.0
+wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0+3.2.0.tar.gz
+tar -zvxf dahdi-linux-complete-3.2.0+3.2.0.tar.gz
+cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
 
-sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
-sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/include/dahdi/kernel.h
+sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
+sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
 
-yum -y install kernel-devel-$(uname -r)
-
+make clean
 make
 make install
 make install-config
@@ -330,8 +331,10 @@ make
 make install
 make install-config
 
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
 modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 # Install and compile libpri
 mkdir /usr/src/asterisk
