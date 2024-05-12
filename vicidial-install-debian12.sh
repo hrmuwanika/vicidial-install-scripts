@@ -15,9 +15,8 @@ sudo apt -y install linux-headers-$(uname -r)
 #--------------------------------------------------
 # Set up the timezones
 #--------------------------------------------------
-# set the correct timezone on ubuntu
+# set the correct timezone on Debian
 timedatectl set-timezone Africa/Kigali
-timedatectl
 
 #----------------------------------------------------
 # Disable password authentication
@@ -48,11 +47,14 @@ wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
 sudo apt update
 
-sudo apt install -y php8.2 libapache2-mod-php8.2 php8.2-common php8.2-sqlite3 php8.2-curl php8.2-dev php8.2-readline php8.2-intl php8.2-mbstring \
-php8.2-xmlrpc php8.2-mysql php8.2-ldap php8.2-gd php8.2-xml php8.2-cli php8.2-zip php8.2-soap php8.2-imap php8.2-bcmath php8.2-opcache 
+apt install -y uuid* libxml2*
+
+sudo apt install -y php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
+php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache php7.4-ldap \
+php7.4-mysqli php7.4-odbc php-pear php7.4-xmlrpc php7.4-mcrypt
 
 # install apache and subversion
-sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-php8.2 libapache2-mod-svn subversion subversion-tools  
+sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 
 # Other dependencies
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
@@ -62,8 +64,35 @@ build-essential libjansson-dev autoconf automake libxml2-dev libncurses5-dev lib
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
-sudo systemctl enable apache2.service
-sudo systemctl restart apache2.service
+tee -a /etc/apache2/apache2.conf <<EOF
+
+CustomLog /dev/null common
+
+Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
+
+<Directory "/var/spool/asterisk/monitorDONE/MP3/">
+    Options Indexes MultiViews
+    AllowOverride None
+    Require all granted
+</Directory>
+EOF
+
+tee -a /etc/php/7.4/apache2/php.ini <<EOF
+
+error_reporting  =  E_ALL & ~E_NOTICE
+memory_limit = 448M
+short_open_tag = On
+max_execution_time = 3330
+max_input_time = 3360
+post_max_size = 448M
+upload_max_filesize = 442M
+default_socket_timeout = 3360
+date.timezone = Africa/Kigali
+
+EOF
+
+systemctl enable apache2.service
+systemctl restart apache2.service
 
 sudo rm /var/www/html/index.html
 
@@ -259,8 +288,8 @@ rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 systemctl restart ntpd
 
-sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/apache2/php.ini
-sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.2/cli/php.ini
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/7.4/apache2/php.ini
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/7.4/cli/php.ini
 
 # Install astguiclient
 echo "Installing astguiclient"
@@ -313,16 +342,17 @@ crontab -l
 # Download rc.local to /etc
 cd /etc/rc.d
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/rc.local
-sudo chmod +x /etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
 
-sudo systemctl enable rc-local
-sudo systemctl start rc-local
+# systemctl enable rc-local
+# systemctl start rc-local
 
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 5060/udp
-sudo ufw allow 5060/tcp
-sudo ufw allow 10000:20000/udp
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw allow 5060/udp
+ufw allow 5060/tcp
+ufw allow 10000:20000/udp
+ufw reload
 
 ## Install Sounds
 cd /var/lib/asterisk/sounds
