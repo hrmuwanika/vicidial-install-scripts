@@ -113,6 +113,15 @@ collation-server      = utf8mb4_general_ci
 [mariadb-11.2]
 
 [mysqld]
-sql_mode=NO_ENGINE_SUBSTITUTION
+datadir = /var/lib/mysql
+#tmpdir = /home/mysql_tmp
+socket = /var/lib/mysql/mysql.sock
+user = mysql
+old_passwords = 0
+ft_min_word_len = 3
+max_connections = 800
+max_allowed_packet = 32M
+skip-external-locking
+sql_mode="NO_ENGINE_SUBSTITUTION"
 max_connections=200
 
