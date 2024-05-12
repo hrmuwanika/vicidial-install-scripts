@@ -114,3 +114,5 @@ collation-server      = utf8mb4_general_ci
 
 [mysqld]
 sql_mode=NO_ENGINE_SUBSTITUTION
+max_connections=200
+
