@@ -189,17 +189,36 @@ ldconfig
 
 echo "Press Enter to continue to install Dahdi "
 # Download latest version of dahdi
+cd /etc/include
+wget https://dialer.one/newt.h
+
 cd /usr/src/
-wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0+3.2.0.tar.gz
-tar -zvxf dahdi-linux-complete-3.2.0+3.2.0.tar.gz
-cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
+mkdir dahdi-linux-complete-3.2.0+3.2.0
+cd dahdi-linux-complete-3.2.0+3.2.0
+wget https://dialer.one/dahdi-alma9.zip
+unzip dahdi-alma9.zip
+apt install newt* -y
 
 sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
 sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
 
+make clean
 make
 make install
 make install-config
+
+cd tools
+make clean
+make
+make install
+make install-config
+
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+modprobe dahdi
+modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+
+sleep 20
 
 cd /usr/src
 wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
