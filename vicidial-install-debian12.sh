@@ -29,7 +29,7 @@ sudo service sshd restart
 # Install mariadb databases
 curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
-sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev 
+sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev libmariadbclient-dev
 
 # Remove mariadb strict mode by setting sql_mode = NO_ENGINE_SUBSTITUTION
 sudo rm /etc/mysql/mariadb.conf.d/50-server.cnf 
@@ -50,7 +50,7 @@ sudo apt update
 apt install -y uuid* libxml2*
 
 sudo apt install -y php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
-php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache php7.4-ldap \
+php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache php7.4-ldap php7.4-json \
 php7.4-mysqli php7.4-odbc php-pear php7.4-xmlrpc php7.4-mcrypt
 
 # install apache and subversion
@@ -58,8 +58,8 @@ sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev li
 
 # Other dependencies
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
-git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 libelf-dev \
-build-essential libjansson-dev autoconf automake libxml2-dev libncurses5-dev libsqlite3-dev pkg-config libxml2-dev libsqlite3-dev libtool automake sqlite3 ntp 
+git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 libelf-dev make \
+build-essential libjansson-dev autoconf automake libxml2-dev libncurses5-dev libsqlite3-dev pkg-config libxml2-dev libsqlite3-dev sqlite3 ntp 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
@@ -117,7 +117,7 @@ cpanm Digest::MD5
 cpanm Digest::SHA1
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm -f DBD::mysql
+cpanm -f DBD::MariaDB
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
