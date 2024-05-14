@@ -303,13 +303,19 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
-cd /usr/src/
-wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.2.0+3.2.0.tar.gz
-tar -zvxf dahdi-linux-complete-3.2.0+3.2.0.tar.gz
-cd /usr/src/dahdi-linux-complete-3.2.0+3.2.0
+ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
+cd /etc/include
+wget https://dialer.one/newt.h
 
-sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
-sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+cd /usr/src/
+mkdir dahdi-linux-complete-3.2.0+3.2.0
+cd dahdi-linux-complete-3.2.0+3.2.0
+wget https://dialer.one/dahdi-alma9.zip
+unzip dahdi-alma9.zip
+yum in newt* -y
+
+sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
+sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
 
 make clean
 make
