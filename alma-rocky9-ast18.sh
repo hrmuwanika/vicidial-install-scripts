@@ -47,7 +47,7 @@ yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
 
-yum -y install mariadb-server mariadb 
+yum -y install mariadb-server mariadb-devel mariadb-libs
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
@@ -190,7 +190,7 @@ yum -y install perl-YAML
 yum -y install perl-CPAN-DistnameInfo 
 yum -y install perl-libwww-perl 
 yum -y install perl-DBI 
-yum -y install perl-DBD-MySQL 
+yum -y install perl-DBD-MariaDB
 yum -y install perl-GD 
 yum -y install perl-Env 
 yum -y install perl-Term-ReadLine-Gnu 
@@ -211,6 +211,7 @@ cpanm Digest::SHA1
 cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
+cpanm DBI::MariaDB
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
