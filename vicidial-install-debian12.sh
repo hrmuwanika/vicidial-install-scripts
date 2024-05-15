@@ -57,9 +57,9 @@ php7.4-mysqli php7.4-odbc php-pear php7.4-xmlrpc php7.4-mcrypt
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 
 # Other dependencies
-sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl libelf-dev autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
-git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 libelf-dev make \
-build-essential libjansson-dev autoconf automake libxml2-dev libncurses5-dev libsqlite3-dev pkg-config libxml2-dev libsqlite3-dev sqlite3 ntp 
+sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
+git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 make \
+build-essential libjansson-dev autoconf automake libxml2-dev libsqlite3-dev pkg-config sqlite3 ntp 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
