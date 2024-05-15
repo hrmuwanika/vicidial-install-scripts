@@ -11,7 +11,7 @@ dnf -y update
 yum -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
 yum -y update
-yum -y install kernel-*
+yum -y install kernel-devel-`uname -r`
 
 # Disable SELINUX
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
@@ -301,6 +301,15 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
+# Install and compile libpri
+mkdir /usr/src/asterisk
+cd /usr/src/asterisk
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
+tar -zxvf libpri-1-current.tar.gz
+cd libpri-1.*
+make
+make install
+
 # Install Dahdi
 echo "Install Dahdi"
 ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
@@ -334,15 +343,6 @@ cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-
-# Install and compile libpri
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
-wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
-tar -zxvf libpri-1-current.tar.gz
-cd libpri-1.*
-make
-make install
 
 # Install Asterisk
 mkdir /usr/src/asterisk
