@@ -256,10 +256,19 @@ sudo ./contrib/scripts/get_mp3_source.sh
 sudo ./contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
-sudo ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect
-make
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
+make -j ${JOBS} all
 
 # Install Asterisk by running the command:
 sudo make install
