@@ -187,6 +187,24 @@ make
 make install 
 ldconfig
 
+cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
+
+echo "Press Enter to continue to install Libpri "
+# Install and compile libpri
+mkdir /usr/src/asterisk
+cd /usr/src/asterisk
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
+tar -zxvf libpri-1-current.tar.gz
+cd libpri-1.*
+make
+make install
+
 echo "Press Enter to continue to install Dahdi "
 # Download latest version of dahdi
 cd /etc/include
@@ -219,23 +237,6 @@ modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 sleep 20
-
-cd /usr/src
-wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
-tar xfv v2.1.0.tar.gz
-cd libsrtp-2.1.0
-./configure --prefix=/usr --enable-openssl
-make shared_library && sudo make install
-ldconfig
-
-# Install and compile libpri
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
-wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
-tar -zxvf libpri-1-current.tar.gz
-cd libpri-1.*
-make
-make install
 
 #--------------------------------------------------
 # Install Asterisk core 
