@@ -359,10 +359,19 @@ cd /usr/src/asterisk/asterisk-18*/
 /contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
+: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
-./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
-make menuselect
-make 
+make menuselect/menuselect menuselect-tree menuselect.makeopts
+#enable app_meetme
+menuselect/menuselect --enable app_meetme menuselect.makeopts
+#enable res_http_websocket
+menuselect/menuselect --enable res_http_websocket menuselect.makeopts
+#enable res_srtp
+menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
+make -j ${JOBS} all
 
 # Install Asterisk by running the command:
 make install
@@ -845,12 +854,6 @@ EOF
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
-
-# Patch the confbridge
-cd /usr/src
-wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
-chmod +x confbridges.sh
-./confbridges.sh
 
 cat > /var/www/html/index.html <<WELCOME
 <META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
