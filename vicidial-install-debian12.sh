@@ -272,11 +272,12 @@ sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.co
 make -j ${JOBS} all
 
 # Install Asterisk by running the command:
-sudo make install
+make install
 
 # Install configs and samples
-sudo make samples
-sudo make config
+make samples
+make config
+make basic-pbx
 
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
@@ -430,7 +431,8 @@ sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_ca
 tee -a ~/.bashrc <<EOF
 
 # Commands
-/usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
+/usr/share/astguiclient/start_asterisk_boot.pl
+/usr/share/astguiclient/ADMIN_keepalive_ALL.pl
 /usr/bin/systemctl status apache2 --no-pager
 /usr/bin/systemctl status ufw --no-pager
 /usr/bin/screen -ls
