@@ -431,8 +431,7 @@ sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_ca
 tee -a ~/.bashrc <<EOF
 
 # Commands
-/usr/share/astguiclient/start_asterisk_boot.pl
-/usr/share/astguiclient/ADMIN_keepalive_ALL.pl
+/usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
 /usr/bin/systemctl status apache2 --no-pager
 /usr/bin/systemctl status ufw --no-pager
 /usr/bin/screen -ls
