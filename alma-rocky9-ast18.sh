@@ -347,16 +347,16 @@ modprobe dahdi_dummy
 # Install Asterisk
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -zxvf asterisk-18.21.0-vici.tar.gz
 rm asterisk-18.21.0-vici.tar.gz
 cd /usr/src/asterisk/asterisk-18*/
 
 # Download the mp3 decoder library
-/contrib/scripts/get_mp3_source.sh
+./contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
-/contrib/scripts/install_prereq install
+./contrib/scripts/install_prereq install
 
 # Run the configure script to satisfy build dependencies
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
