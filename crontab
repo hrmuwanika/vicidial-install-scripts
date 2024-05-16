@@ -17,7 +17,7 @@
 * * * * * /usr/share/astguiclient/AST_vm_update.pl
 
 ### updater for conference validator
-* * * * * /usr/share/astguiclient/AST_conf_update.pl
+* * * * * /usr/share/astguiclient/AST_conf_update_screen.pl
 
 ### flush queue DB table every hour for entries older than 1 hour
 11 * * * * /usr/share/astguiclient/AST_flush_DBqueue.pl -q
@@ -25,6 +25,7 @@
 ### fix the vicidial_agent_log once every hour and the full day run at night
 33 * * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl
 50 0 * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl --last-24hours
+
 ## uncomment below if using QueueMetrics
 #*/5 * * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl --only-qm-live-call-check
 
