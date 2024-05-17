@@ -190,6 +190,7 @@ yum -y install perl-YAML
 yum -y install perl-CPAN-DistnameInfo 
 yum -y install perl-libwww-perl 
 yum -y install perl-DBI 
+yum -y install perl-DBD-MySQL
 yum -y install perl-DBD-MariaDB
 yum -y install perl-GD 
 yum -y install perl-Env 
@@ -211,7 +212,7 @@ cpanm Digest::SHA1
 cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm DBI::MariaDB
+cpanm -f DBD::mysql
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
