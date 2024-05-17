@@ -92,6 +92,8 @@ EOF
 
 systemctl restart httpd
 
+sleep 5
+
 yum -y install chkconfig atop mytop
 yum -y install libedit-devel speex* postfix dovecot s-nail roundcubemail inxi
 
@@ -209,7 +211,8 @@ cpanm YAML
 cpanm MD5
 cpanm Digest::MD5
 cpanm Digest::SHA1
-cpanm readline
+cpanm readline --force
+
 cpanm Bundle::CPAN
 cpanm DBI
 cpanm -f DBD::mysql
@@ -345,13 +348,15 @@ modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
+sleep 5
+
 # Install Asterisk
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
-tar -zxvf asterisk-18.21.0-vici.tar.gz
-rm asterisk-18.21.0-vici.tar.gz
-cd /usr/src/asterisk/asterisk-18*/
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+tar -zxvf asterisk-20-current.tar.gz
+rm asterisk-20-current.tar.gz
+cd /usr/src/asterisk/asterisk-20*/
 
 # Download the mp3 decoder library
 ./contrib/scripts/get_mp3_source.sh
@@ -359,26 +364,21 @@ cd /usr/src/asterisk/asterisk-18*/
 # Ensure all dependencies are resolved
 ./contrib/scripts/install_prereq install
 
+make distclean
+
 # Run the configure script to satisfy build dependencies
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+./configure  --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make samples
-sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
-make -j ${JOBS} all
+make menuselect
 
-# Install Asterisk by running the command:
+#build Asterisk
+make
+
+#Install Asterisk by running the command:
 make install
 
-# Install configs and samples
-make samples
+#Install configs and samples
+sudo make samples
 
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
