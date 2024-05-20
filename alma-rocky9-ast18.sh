@@ -253,6 +253,8 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
+cpan install Crypt::Eksblowfish::Bcrypt
+
 # CPM install
 cd /usr/src/vicidial-install-scripts
 curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
@@ -575,8 +577,13 @@ echo "Populate AREA CODES"
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
+# Enable password encryption in vicidial
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX --test
+ /usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX
+ /usr/share/astguiclient/ADMIN_bcrypt_convert.pl --clear-plaintext-pass
+ 
 # Install Crontab
-cat > /root/crontab-file <<CRONTAB
+tee > /etc/crontab <<CRONTAB
 
 ###Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
