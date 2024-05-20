@@ -579,11 +579,11 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 
 # Enable password encryption in vicidial
 /usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX --test
- /usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX
- /usr/share/astguiclient/ADMIN_bcrypt_convert.pl --clear-plaintext-pass
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --clear-plaintext-pass
  
 # Install Crontab
-tee > /etc/crontab <<CRONTAB
+tee -a /etc/crontab <<EOF
 
 ###Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -684,7 +684,7 @@ tee > /etc/crontab <<CRONTAB
 ###### TILTIX GARBAGE FILES DELETE
 #00 22 * * * root cd /tmp/ && find . -name '*TILTXtmp*' -type f -delete
 
-CRONTAB
+EOF
 
 crontab -l
 
