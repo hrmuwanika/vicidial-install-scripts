@@ -32,12 +32,10 @@ eventfilter=Event: Confbridge
 EOF
 
 tee -a /etc/asterisk/modules.conf <<EOF
-
+load = chan_dahdi.so
 load = res_timing_dahdi.so
 load = res_timing_timerfd.so
-
-noload = res_timing_kqueue.so
-noload = res_timing_pthread.so
+load = res_timing_pthread.so
 EOF
 
 sed -i 's|vicidial_conferences|vicidial_confbridges|g' /var/www/html/vicidial/non_agent_api.php
