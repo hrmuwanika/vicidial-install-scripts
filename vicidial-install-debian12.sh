@@ -358,8 +358,9 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
 # Install Crontab
-wget -O /root/crontab-file https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/crontab
-crontab /root/crontab-file
+cd /etc
+rm crontab
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/crontab
 crontab -l
 
 # Download rc.local to /etc
@@ -426,11 +427,7 @@ tee -a ~/.bashrc <<EOF
 
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
-/usr/bin/systemctl status apache2 --no-pager
-/usr/bin/systemctl status ufw --no-pager
-/usr/bin/screen -ls
-/usr/sbin/dahdi_cfg -v
-/usr/sbin/asterisk -V
+
 EOF
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
