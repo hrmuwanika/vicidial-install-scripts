@@ -427,7 +427,7 @@ tee -a ~/.bashrc <<EOF
 
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
-
+/usr/share/astguiclient/AST_VDhopper.pl
 EOF
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
