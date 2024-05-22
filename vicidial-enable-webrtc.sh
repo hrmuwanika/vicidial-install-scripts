@@ -12,7 +12,7 @@ if [ -f /etc/redhat-release ]; then
 fi
 if [ -f /etc/lsb-release ]; then
 	sudo add-apt-repository ppa:certbot/certbot
-	sudo apt install python-certbot-apache
+	sudo apt -y install python-certbot-apache
 fi
 
 echo "Enter the DOMAIN NAME HERE. ***********IF YOU DONT HAVE ONE PLEASE DONT CONTINUE: "
