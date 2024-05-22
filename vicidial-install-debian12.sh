@@ -244,32 +244,26 @@ sleep 20
 cd /usr/src/asterisk
 
 # Download Asterisk 20 tarball
-sudo wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
-
-# Extract the tarball file
-sudo tar -xzvf asterisk-18.21.0-vici.tar.gz
-cd /usr/src/asterisk/asterisk-18.*/
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+tar -zxvf asterisk-20-current.tar.gz
+rm asterisk-20-current.tar.gz
+cd /usr/src/asterisk/asterisk-20*/
 
 # Download the mp3 decoder library
-sudo ./contrib/scripts/get_mp3_source.sh
+./contrib/scripts/get_mp3_source.sh
 
 # Ensure all dependencies are resolved
-sudo ./contrib/scripts/install_prereq install
+./contrib/scripts/install_prereq install
+
+make distclean
 
 # Run the configure script to satisfy build dependencies
-: ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+./configure  --libdir=/usr/lib64 --with-pjproject-bundled --with-jansson-bundled
 
-make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
-menuselect/menuselect --enable app_meetme menuselect.makeopts
-#enable res_http_websocket
-menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
-menuselect/menuselect --enable res_srtp menuselect.makeopts
-make samples
-sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
-make -j ${JOBS} all
+make menuselect
+
+#build Asterisk
+make
 
 # Install Asterisk by running the command:
 make install
