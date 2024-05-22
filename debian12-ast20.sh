@@ -155,6 +155,8 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
+cpan install Crypt::Eksblowfish::Bcrypt
+
 # If the DBD::MYSQL Fail Run below Command
 sudo apt install -y libdbd-mysql-perl libdbd-mariadb-perl
 
