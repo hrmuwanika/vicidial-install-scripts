@@ -359,6 +359,11 @@ echo "Populate AREA CODES"
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
+# Enable password encryption in vicidial
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX --test
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --debugX
+/usr/share/astguiclient/ADMIN_bcrypt_convert.pl --clear-plaintext-pass
+
 # Install Crontab
 cd /etc
 rm crontab
