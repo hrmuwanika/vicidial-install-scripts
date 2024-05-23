@@ -782,19 +782,6 @@ wget http://asterisk.hosting.lv/bin/codec_g729-ast160-gcc4-glibc-x86_64-core2-ss
 mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
 chmod 777 codec_g729.so
 
-tee -a /etc/httpd/conf/httpd.conf <<EOF
-
-CustomLog /dev/null common
-
-Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
-<Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options Indexes MultiViews
-    AllowOverride None
-    Require all granted
-</Directory>
-EOF
-
 ## Install Sounds
 cd /var/lib/asterisk/sounds
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -838,6 +825,8 @@ cd /var/lib/asterisk/sounds
 rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
+
+yum -y in sox
 
 cd /var/lib/asterisk/quiet-mp3
 sox ../mohmp3/macroform-cold_day.wav macroform-cold_day.wav vol 0.25
