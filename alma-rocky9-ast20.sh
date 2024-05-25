@@ -1,22 +1,18 @@
 #!/bin/sh
 
-echo "================================================"
-echo "Vicidial installation on AlmaLinux/RockyLinux"
-echo "================================================"
+echo "============================================================"
+echo " Vicidial Scratch Installation Alma Linux 9 Asterisk 20 "
+echo "============================================================"
 
-# Update Server
-yum check-update
-dnf -y update
+# Set server hostname
+hostnamectl set-hostname vicidial.rw
 
-yum -y install nano git wget tar epel-release chkconfig libedit-devel
-yum -y groupinstall 'Development Tools'
-yum -y update
-yum -y install kernel-devel-`uname -r`
+# Set the timezone
+timedatectl set-timezone Africa/Kigali
 
 # Disable SELINUX
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
 setenforce 0
-sestatus
 
 # Disable password authentication
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -25,10 +21,21 @@ sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo service sshd restart
 
-# Set the timezone
-timedatectl set-timezone Africa/Kigali
-
 export LC_ALL=C
+
+tee -a /etc/systemd/system.conf <<EOF
+DefaultLimitNOFILE=65536
+EOF
+
+# Update Server
+yum check-update
+yum update -y
+yum -y install epel-release
+yum update -y
+
+yum -y install nano git wget tar epel-release chkconfig libedit-devel
+yum -y groupinstall 'Development Tools'
+yum -y install kernel*
 
 # Updating YUM Repos
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
@@ -64,15 +71,12 @@ yum -y install elfutils-libelf-devel
 tee -a /etc/httpd/conf/httpd.conf <<EOF
 
 CustomLog /dev/null common
-
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
     Options Indexes MultiViews
     AllowOverride None
     Require all granted
 </Directory>
-
 EOF
 
 tee -a /etc/php.ini <<EOF
@@ -185,14 +189,6 @@ chown -R mysql:mysql /var/log/mysqld
 systemctl restart httpd.service
 systemctl restart mariadb.service
 
-cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local \
-RPM::Specfile Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes \
-Net::Server Mail::Sendmail Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel \
-Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS \
-Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message \
-IO::Socket::SSL readline
-
-# Install Perl Modules
 echo "Install Perl"
 yum -y install perl-CPAN 
 yum -y install perl-YAML 
@@ -205,7 +201,15 @@ yum -y install perl-GD
 yum -y install perl-Env 
 yum -y install perl-Term-ReadLine-Gnu 
 yum -y install perl-SelfLoader 
-yum -y install perl-open.noarch 
+yum -y install perl-open.noarch
+
+# Install Perl Modules
+cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local \
+RPM::Specfile Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes \
+Net::Server Mail::Sendmail Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel \
+Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS \
+Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message \
+IO::Socket::SSL readline 
 
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
@@ -460,7 +464,7 @@ systemctl status asterisk
 echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
-svn checkout svn://svn.eflo.net/agc_2-X/trunk
+svn checkout svn://svn.eflo.net:3690/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
 
 #Add mysql users and Databases
@@ -576,7 +580,7 @@ echo "Install VICIDIAL"
 echo "Copy sample configuration files to /etc/asterisk/ SET TO  Y*"
 perl install.pl
 
-#Secure Manager 
+# Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
 echo "Populate AREA CODES"
@@ -698,7 +702,8 @@ crontab -l
 
 # Install rc.local
 cat > /etc/rc.d/rc.local <<EOF
-
+#!/bin/sh
+#
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
 /usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
 
@@ -741,20 +746,22 @@ chmod +x /etc/rc.d/rc.local
 cat > /etc/systemd/system/rc-local.service <<EOF
 [Unit]
 Description=/etc/rc.local Compatibility
+ConditionPathExists=/etc/rc.d/rc.local
 
 [Service]
-Type=oneshot
-ExecStart=/etc/rc.local
+Type=forking
+ExecStart=/etc/rc.d/rc.local start
 TimeoutSec=0
-StandardInput=tty
+StandardOutput=tty
 RemainAfterExit=yes
+SysVStartPriority=99
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-#systemctl enable rc-local
-#systemctl start rc-local
+systemctl enable rc-local.service
+systemctl start rc-local.service
 
 # Firewall
 yum -y install firewalld
