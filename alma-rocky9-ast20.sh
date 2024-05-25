@@ -760,13 +760,46 @@ SysVStartPriority=99
 WantedBy=multi-user.target
 EOF
 
+systemctl daemon-reload
 systemctl enable rc-local.service
-systemctl start rc-local.service
+#systemctl start rc-local.service
 
-# Firewall
-yum -y install firewalld
+# Firewall and fail2ban
+yum -y install firewalld fail2ban
+
 systemctl start firewalld 
 systemctl enable firewalld
+
+cat > /etc/fail2ban/jail.local <<EOF
+[DEFAULT]
+bantime  = 21600
+findtime  = 300
+maxretry = 3
+banaction = iptables-multiport
+backend = systemd
+banaction_allports = iptables-allports
+
+[ssh]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+
+[postfix]
+enabled  = true
+port     = smtp,465,submission
+
+[dovecot]
+enabled = true
+port    = pop3,pop3s,imap,imaps,submission,465,sieve
+
+[postfix-sasl]
+enabled  = true
+port     = smtp,465,submission,imap,imaps,pop3,pop3s
+EOF
+
+systemctl start fail2ban
+systemctl enable fail2ban
 
 # Firewall configuration
 firewall-cmd --zone=public --add-port=80/tcp --permanent
