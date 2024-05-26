@@ -231,7 +231,7 @@ cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
 cpanm Switch
-cpanm Mail::Sendmail
+cpanm Mail::Sendmail --force
 cpanm Unicode::Map
 cpanm Jcode
 cpanm Spreadsheet::WriteExcel
@@ -263,7 +263,6 @@ cpanm Crypt::Eksblowfish::Bcrypt
 cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
-cpanm Mail::Sendmail --force
 
 cpan install Crypt::Eksblowfish::Bcrypt
 
