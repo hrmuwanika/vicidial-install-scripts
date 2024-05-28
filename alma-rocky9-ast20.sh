@@ -35,7 +35,7 @@ yum update -y
 
 yum -y install nano git wget tar epel-release chkconfig libedit-devel
 yum -y groupinstall 'Development Tools'
-yum -y install kernel*
+yum -y install kernel-*
 
 # Updating YUM Repos
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
