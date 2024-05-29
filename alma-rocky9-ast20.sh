@@ -58,9 +58,10 @@ yum -y install mariadb-server
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which kernel-devel
+yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ 
 yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache --skip-broken
-yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl certbot uuid*
+yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl certbot uuid* gtk2-devel binutils-devel libedit-devel
+
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
@@ -322,36 +323,9 @@ ldconfig
 echo "Install Dahdi"
 yum -y install kernel-devel-$(uname -r)
 
-cd /usr/src
-wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.3.0+3.3.0.tar.gz
-tar -zvxf dahdi-linux-complete-3.3.0+3.3.0.tar.gz
-cd /usr/src/dahdi-linux-complete-3.3.0+3.3.0/
-
-sudo sed -i 's|, 64);|);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
-#sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
-#sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/include/dahdi/kernel.h
-
-make clean
-make
-make install
-make install-config
+yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
-sleep 5
 
-yum -y install dahdi-tools-libs
-
-cd tools
-make clean
-make
-make install
-make install-config
-/usr/sbin/dahdi_cfg -vvvvvvvvvv
-sleep 5
-
-cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvv
 sleep 5
 
 # Install and compile libpri
