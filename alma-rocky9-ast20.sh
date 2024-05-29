@@ -318,36 +318,25 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
-# Install and compile libpri
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
-wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1-current.tar.gz
-tar -zxvf libpri-1-current.tar.gz
-cd libpri-1.*
-make
-make install
-
 # Install Dahdi
 echo "Install Dahdi"
-ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
-cd /etc/include
-wget https://dialer.one/newt.h
+yum -y install kernel-devel-$(uname -r)
 
-cd /usr/src/
-mkdir dahdi-linux-complete-3.2.0+3.2.0
-cd dahdi-linux-complete-3.2.0+3.2.0
-wget https://dialer.one/dahdi-alma9.zip
-unzip dahdi-alma9.zip
-yum in newt* -y
+cd /usr/src
+wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.3.0+3.3.0.tar.gz
+tar -zvxf dahdi-linux-complete-3.3.0+3.3.0.tar.gz
+cd /usr/src/dahdi-linux-complete-3.3.0+3.3.0/
 
-sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
-sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+sudo sed -i 's|, 64);|);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
+#sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/drivers/dahdi/wctc4xxp/base.c
+#sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.3.0+3.3.0/linux/include/dahdi/kernel.h
 
 make clean
 make
 make install
 make install-config
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
 
 yum -y install dahdi-tools-libs
 
@@ -357,13 +346,22 @@ make
 make install
 make install-config
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
 
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
 modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
 sleep 5
+
+# Install and compile libpri
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.0.tar.gz
+tar -zvxf libpri-1.6.1.tar.gz
+cd /usr/src/libpri-1.6.0
+make clean
+make
+make install
 
 # Install Asterisk
 mkdir /usr/src/asterisk
