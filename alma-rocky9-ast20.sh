@@ -346,7 +346,8 @@ sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete
 make clean
 make
 make install
-make config
+make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
 
 yum -y install dahdi-tools-libs
 
@@ -354,7 +355,8 @@ cd tools
 make clean
 make
 make install
-make config
+make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
 
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
