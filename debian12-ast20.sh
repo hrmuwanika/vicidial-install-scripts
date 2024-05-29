@@ -225,11 +225,18 @@ make install-config
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
 sleep 5
 
+cd tools
+make clean
+make
+make install
+make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
+
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
 modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvv
-
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
 sleep 5
 
 #--------------------------------------------------
