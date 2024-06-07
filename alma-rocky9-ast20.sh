@@ -772,6 +772,11 @@ systemctl daemon-reload
 systemctl enable rc-local.service
 #systemctl start rc-local.service
 
+##fstab entry
+tee -a /etc/fstab <<EOF
+none /var/spool/asterisk/monitor tmpfs nodev,nosuid,noexec,nodiratime,size=500M 0 0
+EOF
+
 # Firewall and fail2ban
 yum -y install firewalld fail2ban
 
@@ -908,6 +913,17 @@ cat > /var/www/html/index.html <<WELCOME
 <META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
 Please Hold while I redirect you!
 WELCOME
+
+# Install certbot
+dnf install certbot python3-certbot-apache mod_ssl
+systemctl enable certbot-renew.timer
+systemctl start certbot-renew.timer
+certbot --apache 
+
+# Enable webrtc
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/vicidial-enable-webrtc.sh
+chmod +x vicidial-enable-webrtc.sh
+./vicidial-enable-webrtc.sh
 
 read -p 'Press Enter to Reboot: '
 echo "Restarting AlmaLinux"
