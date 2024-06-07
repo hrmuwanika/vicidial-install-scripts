@@ -59,8 +59,8 @@ systemctl enable mariadb.service
 systemctl start mariadb.service
 
 yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ 
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686 python3-certbot-apache --skip-broken
-yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl certbot uuid* gtk2-devel binutils-devel libedit-devel
+yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt glibc.i686  --skip-broken
+yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl uuid* gtk2-devel binutils-devel libedit-devel
 
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
@@ -900,10 +900,9 @@ sox ../mohmp3/manolo_camp-morning_coffee.gsm manolo_camp-morning_coffee.gsm vol 
 sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_camp-morning_coffee.ulaw vol 0.25
 
 tee -a ~/.bashrc <<EOF
-
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
-/usr/share/astguiclient/AST_VDhopper.pl -q
+/usr/share/astguiclient/AST_VDhopper.pl --debug
 EOF
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
@@ -915,12 +914,12 @@ Please Hold while I redirect you!
 WELCOME
 
 # Install certbot
-dnf install certbot python3-certbot-apache mod_ssl
+dnf -y install certbot python3-certbot-apache mod_ssl
 systemctl enable certbot-renew.timer
 systemctl start certbot-renew.timer
-certbot --apache 
 
 # Enable webrtc
+cd /usr/src
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/vicidial-enable-webrtc.sh
 chmod +x vicidial-enable-webrtc.sh
 ./vicidial-enable-webrtc.sh
