@@ -321,6 +321,41 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
+ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
+cd /etc/include
+wget https://dialer.one/newt.h
+
+cd /usr/src/
+mkdir dahdi-linux-complete-3.4.0-rc1+3.4.0-rc1
+cd dahdi-linux-complete-3.4.0-rc1+3.4.0-rc1
+wget https://cybur-dial.com/dahdi-9.4-fix.zip
+unzip dahdi-9.4-fix.zip
+yum in newt* -y
+
+## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
+## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+
+make clean
+make
+make install
+make install-config
+
+yum -y install dahdi-tools-libs
+
+cd tools
+make clean
+make
+make install
+make install-config
+
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+modprobe dahdi
+modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+
+sleep 5
+
+echo "Install Dahdi package"
 yum -y install kernel-devel-$(uname -r)
 
 yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
