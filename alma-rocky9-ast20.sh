@@ -57,12 +57,14 @@ sleep 3
 yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
+systemctl status httpd.service
 
 sleep 3
 
-yum -y install mariadb-server mariadb-devel 
+dnf -y install mariadb-server mariadb mariadb-devel 
 systemctl enable mariadb.service
 systemctl start mariadb.service
+systemctl status mariadb.service
 
 sleep 3
 
@@ -75,6 +77,7 @@ dnf -y install sngrep
 
 dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
 dnf config-manager --set-enabled crb
+
 yum -y install libsrtp-devel 
 yum -y install elfutils-libelf-devel
 
@@ -110,7 +113,7 @@ systemctl restart httpd
 sleep 3
 
 yum -y install chkconfig atop mytop
-yum -y install libedit-devel speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install speex* postfix dovecot s-nail roundcubemail inxi
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -258,7 +261,6 @@ make shared_library && sudo make install
 ldconfig
 
 # Install Dahdi
-#Install Dahdi
 echo "Install Dahdi"
 ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
 cd /etc/include
