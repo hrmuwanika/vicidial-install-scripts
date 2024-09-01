@@ -1002,6 +1002,14 @@ systemctl stop firewalld
 systemctl start firewalld 
 systemctl enable firewalld
 
+# Firewall configuration
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
+
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
