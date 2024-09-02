@@ -206,6 +206,69 @@ systemctl restart mariadb.service
 echo "Install Perl"
 yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
 
+# Install Perl Modules
+cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local \
+RPM::Specfile Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes \
+Net::Server Mail::Sendmail Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel \
+Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS \
+Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message \
+IO::Socket::SSL readline 
+
+cd /usr/bin/
+curl -LOk http://xrl.us/cpanm
+chmod +x cpanm
+cpanm -f File::HomeDir
+cpanm -f File::Which
+cpanm CPAN::Meta::Requirements
+cpanm -f CPAN
+cpanm YAML
+cpanm MD5
+cpanm Digest::MD5
+cpanm Digest::SHA1
+cpanm readline --force
+
+cpanm Bundle::CPAN
+cpanm DBI
+cpanm -f DBD::mysql
+cpanm Net::Telnet
+cpanm Time::HiRes
+cpanm Net::Server
+cpanm Switch
+cpanm Mail::Sendmail --force
+cpanm Unicode::Map
+cpanm Jcode
+cpanm Spreadsheet::WriteExcel
+cpanm OLE::Storage_Lite
+cpanm Proc::ProcessTable
+cpanm IO::Scalar
+cpanm Spreadsheet::ParseExcel
+cpanm Curses
+cpanm Getopt::Long
+cpanm Net::Domain
+cpanm Term::ReadKey
+cpanm Term::ANSIColor
+cpanm Spreadsheet::XLSX
+cpanm Spreadsheet::Read
+cpanm LWP::UserAgent
+cpanm HTML::Entities
+cpanm HTML::Strip
+cpanm HTML::FormatText
+cpanm HTML::TreeBuilder
+cpanm Time::Local
+cpanm MIME::Decoder
+cpanm Mail::POP3Client
+cpanm Mail::IMAPClient
+cpanm Mail::Message
+cpanm IO::Socket::SSL
+cpanm MIME::Base64
+cpanm MIME::QuotedPrint
+cpanm Crypt::Eksblowfish::Bcrypt
+cpanm Crypt::RC4
+cpanm Text::CSV
+cpanm Text::CSV_XS
+
+cpan install Crypt::Eksblowfish::Bcrypt
+
 # CPM install
 cd /usr/src/vicidial-install-scripts
 curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
