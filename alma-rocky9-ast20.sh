@@ -720,14 +720,24 @@ chmod +x /etc/rc.d/rc.local
 systemctl enable rc-local
 systemctl start rc-local
 
-##Install CyburPhone
+## Install CyburPhone
 cd /var/www/html
 git clone https://github.com/carpenox/CyburPhone.git
 chmod -R 744 CyburPhone
 chown -R apache:apache CyburPhone
 
-##Install Dynportal
+## Install Dynportal
 yum install -y firewalld
+
+# Firewall configuration
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=8089/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
+
 cd /home
 wget https://dialer.one/dynportal.zip
 wget https://dialer.one/firewall.zip
@@ -868,11 +878,11 @@ sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
 
 
 tee -a /etc/ssh/sshd_banner <<EOF
-Thank you for choosing CyburDial and carpenox's auto installer!
+Thank you for choosing CyburDial and Henry Robert Muwanika's auto installer!
 
-Visit our Knowledge Base at https://www.dialer.one
+Visit our Knowledge Base at https://www.asmtech.co.rw
 
-Support: info@dialer.one
+Support: info@asmtech.co.rw
 Skype Live Chat Support: https://join.skype.com/ujkQ7i5lV78O
 EOF
 
@@ -908,7 +918,7 @@ WELCOME
 
 cd /usr/src/
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
-#chmod +x confbridges.sh
+chmod +x confbridges.sh
 ./confbridges.sh
 
 chkconfig asterisk off
@@ -927,14 +937,6 @@ systemctl stop firewalld
 
 systemctl start firewalld 
 systemctl enable firewalld
-
-# Firewall configuration
-firewall-cmd --zone=public --add-port=80/tcp --permanent
-firewall-cmd --zone=public --add-port=443/tcp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
-firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
-firewall-cmd --reload
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
