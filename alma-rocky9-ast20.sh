@@ -428,9 +428,7 @@ systemctl enable asterisk.service
 systemctl start asterisk
 systemctl status asterisk
 
-read -p 'Press Enter to continue: '
-
-echo 'Continuing...'
+sleep 5
 
 #--------------------------------------------------
 # Install astguiclient
@@ -468,9 +466,6 @@ MYSQLCREOF
 
 # update the timezone
 cp /usr/share/zoneinfo/Africa/Kigali /etc/localtime
-
-read -p 'Press Enter to continue: '
-echo 'Continuing...'
 
 # Get astguiclient.conf file
 cat > /etc/astguiclient.conf <<ASTGUI
@@ -554,10 +549,10 @@ sed -i s/SERVERIP/"$serveripadd"/g /etc/astguiclient.conf
 echo "Install VICIDIAL"
 perl install.pl --no-prompt --copy_sample_conf_files=Y
 
-#Secure Manager 
+# Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
-#Add chan_sip to Asterisk 18
+# Add chan_sip to Asterisk 18
 
 
 echo "Populate AREA CODES"
