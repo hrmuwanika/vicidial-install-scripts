@@ -50,7 +50,6 @@ dnf -y install dnf-plugins-core
 yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
 yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
 yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
-yum -y install lame-devel
 
 sleep 3
 
@@ -61,7 +60,7 @@ systemctl status httpd.service
 
 sleep 3
 
-dnf -y install mariadb-server mariadb mariadb-devel 
+dnf -y install mariadb-server mariadb 
 systemctl enable mariadb.service
 systemctl start mariadb.service
 systemctl status mariadb.service
