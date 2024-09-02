@@ -204,7 +204,6 @@ systemctl restart mariadb.service
 
 # Install Perl Modules
 echo "Install Perl"
-
 yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
 
 # CPM install
@@ -303,12 +302,7 @@ yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
 
 sleep 5
 
-# Install and compile libpri
-read -p 'Press Enter to continue: '
-
-echo 'Continuing...'
-
-#Install Asterisk and LibPRI
+# Install Asterisk and LibPRI
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
