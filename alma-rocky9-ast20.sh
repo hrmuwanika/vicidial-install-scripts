@@ -781,19 +781,7 @@ git clone https://github.com/carpenox/CyburPhone.git
 chmod -R 744 CyburPhone
 chown -R apache:apache CyburPhone
 
-## Install Dynportal
-yum install -y firewalld
-
-# Firewall configuration
-firewall-cmd --zone=public --add-port=80/tcp --permanent
-firewall-cmd --zone=public --add-port=443/tcp --permanent
-firewall-cmd --zone=public --add-port=8089/tcp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
-firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
-firewall-cmd --reload
-
-cd /home
+cd /usr/src
 wget https://dialer.one/dynportal.zip
 wget https://dialer.one/firewall.zip
 wget https://dialer.one/aggregate
@@ -854,7 +842,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-##Install Sounds
+## Install Sounds
 
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -867,7 +855,7 @@ wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-#Place the audio files in their proper places:
+# Place the audio files in their proper places:
 cd /var/lib/asterisk/sounds
 tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
 tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -978,9 +966,23 @@ chmod +x confbridges.sh
 
 chkconfig asterisk off
 
+## Install Dynportal
+yum -y install firewalld
+systemctl start firewalld 
+systemctl enable firewalld
+
+# Firewall configuration
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=8089/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
+
 ## mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
 
-yum in certbot -y
+yum -y install certbot 
 systemctl enable certbot-renew.timer
 systemctl start certbot-renew.timer
 
@@ -989,9 +991,6 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x vicidial-enable-webrtc.sh
 systemctl stop firewalld 
 ./vicidial-enable-webrtc.sh
-
-systemctl start firewalld 
-systemctl enable firewalld
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
