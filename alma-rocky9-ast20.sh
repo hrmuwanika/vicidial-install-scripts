@@ -788,8 +788,8 @@ wget https://dialer.one/aggregate
 wget https://dialer.one/VB-firewall
 
 mkdir -p /var/www/vhosts/dynportal
-mv /home/dynportal.zip /var/www/vhosts/dynportal/
-mv /home/firewall.zip /etc/firewalld/
+mv /usr/src/dynportal.zip /var/www/vhosts/dynportal/
+mv /usr/src/firewall.zip /etc/firewalld/
 cd /var/www/vhosts/dynportal/
 unzip dynportal.zip
 chmod -R 755 *
@@ -802,7 +802,7 @@ cd zones/
 rm -rf public.xml trusted.xml
 cd /etc/firewalld/
 mv -bf public.xml trusted.xml /etc/firewalld/zones/
-mv /home/aggregate /usr/bin/
+mv /usr/src/aggregate /usr/bin/
 chmod +x /usr/bin/aggregate
 mv /home/VB-firewall /usr/bin/
 chmod +x /usr/bin/VB-firewall
@@ -886,7 +886,7 @@ rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
 
-yum -y in sox
+yum -y install sox
 
 cd /var/lib/asterisk/quiet-mp3
 sox ../mohmp3/macroform-cold_day.wav macroform-cold_day.wav vol 0.25
