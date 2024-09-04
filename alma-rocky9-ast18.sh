@@ -512,7 +512,7 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.21.0';
+update servers set asterisk_version='18.18.0';
 quit
 MYSQLCREOF
 
@@ -604,22 +604,17 @@ perl install.pl --no-prompt --copy_sample_conf_files=Y
 # Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
-# Add chan_sip to Asterisk 18
-
-
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
 
-
 perl install.pl --no-prompt
 
-
-#Install Crontab
+# Install Crontab
 cat <<CRONTAB>> /root/crontab-file
 
-###Audio Sync hourly
+### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
 
 ### Daily Backups ###
@@ -807,7 +802,7 @@ cd /etc/firewalld/
 mv -bf public.xml trusted.xml /etc/firewalld/zones/
 mv /usr/src/aggregate /usr/bin/
 chmod +x /usr/bin/aggregate
-mv /home/VB-firewall /usr/bin/
+mv /usr/src/VB-firewall /usr/bin/
 chmod +x /usr/bin/VB-firewall
 
 sed -i s/DOMAINNAME/"$hostname"/g /var/www/vhosts/dynportal/inc/defaults.inc.php
