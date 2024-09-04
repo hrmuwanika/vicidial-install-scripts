@@ -280,6 +280,9 @@ cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
 cd lame-3.99.5
+# wget http://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+# tar -zxf lame-3.100.tar.gz
+# cd lame-3.100
 ./configure
 make
 make install
