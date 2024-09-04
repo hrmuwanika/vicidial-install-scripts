@@ -794,6 +794,7 @@ chmod -R 755 *
 chown -R apache:apache *
 cd etc/httpd/conf.d/
 mv viciportal.conf /etc/httpd/conf.d/
+mv viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf
 cd /etc/firewalld/
 unzip -o firewall.zip
 cd zones/
@@ -808,12 +809,7 @@ chmod +x /usr/bin/VB-firewall
 sed -i s/DOMAINNAME/"$hostname"/g /var/www/vhosts/dynportal/inc/defaults.inc.php
 sed -i s/DOMAINNAME/"$hostname"/g /home/viciportal-ssl.conf
 
-## mv -f /root/defaults.inc.php /var/www/vhosts/dynportal/inc/defaults.inc.php
-mv -f /home/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf
-
-firewall-offline-cmd --add-port=446/tcp --zone=public
-
-##Fix ip_relay
+## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
 unzip ip_relay_1.1.112705.zip
 cd ip_relay_1.1/src/unix/
@@ -827,21 +823,7 @@ wget http://asterisk.hosting.lv/bin/codec_g729-ast160-gcc4-glibc-x86_64-core2-ss
 mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
 chmod 777 codec_g729.so
 
-tee -a /etc/httpd/conf/httpd.conf <<EOF
-
-CustomLog /dev/null common
-
-Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
-<Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options Indexes MultiViews
-    AllowOverride None
-    Require all granted
-</Directory>
-EOF
-
 ## Install Sounds
-
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
@@ -914,17 +896,15 @@ tee -a ~/.bashrc <<EOF
 /usr/sbin/asterisk -V
 EOF
 
-
 sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
-
 
 tee -a /etc/ssh/sshd_banner <<EOF
 Thank you for choosing CyburDial and Henry Robert Muwanika's auto installer!
 
-Visit our Knowledge Base at https://www.asmtech.co.rw
+Visit our website at https://asmtech.co.rw
 
 Support: info@asmtech.co.rw
-Skype Live Chat Support: https://join.skype.com/ujkQ7i5lV78O
+Phone number +250789231226 / +256788464060
 EOF
 
 #add rc-local as a service - thx to ras
@@ -943,7 +923,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 
-##fstab entry
+## fstab entry
 tee -a /etc/fstab <<EOF
 none /var/spool/asterisk/monitor tmpfs nodev,nosuid,noexec,nodiratime,size=2G 0 0
 EOF
@@ -972,13 +952,12 @@ systemctl enable firewalld
 # Firewall configuration
 firewall-cmd --zone=public --add-port=80/tcp --permanent
 firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=446/tcp --permanent
 firewall-cmd --zone=public --add-port=8089/tcp --permanent
 firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
 firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
 firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
 firewall-cmd --reload
-
-## mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
 
 yum -y install certbot 
 systemctl enable certbot-renew.timer
@@ -993,8 +972,7 @@ systemctl stop firewalld
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
-read -p 'Press Enter to Reboot: '
-
+read -p 'Press Enter to Reboot:'
 echo "Restarting AlmaLinux"
 
 reboot
