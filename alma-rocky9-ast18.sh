@@ -889,11 +889,8 @@ tee -a ~/.bashrc <<EOF
 
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
-/usr/bin/systemctl status httpd --no-pager
-/usr/bin/systemctl status firewalld --no-pager
+/usr/share/astguiclient/AST_VDhopper.pl -q
 /usr/bin/screen -ls
-/usr/sbin/dahdi_cfg -v
-/usr/sbin/asterisk -V
 EOF
 
 sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
