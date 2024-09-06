@@ -1,6 +1,31 @@
 #!/bin/sh
 
 echo "Vicidial installation Debian 12 with WebPhone(WebRTC/SIP.js)"
+
+#--------------------------------------------------
+# Update Server
+#--------------------------------------------------
+echo -e "\n============= Update Server ================"
+sudo apt update && sudo apt -y upgrade 
+sudo apt autoremove -y
+
+# Install linux headers
+sudo apt -y install linux-headers-$(uname -r)
+
+#--------------------------------------------------
+# Set up the timezones
+#--------------------------------------------------
+# set the correct timezone on Debian
+timedatectl set-timezone Africa/Kigali
+
+#----------------------------------------------------
+# Disable password authentication
+#----------------------------------------------------
+sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo service sshd restart
+
 apt install build-essential
 apt install flex git python3-pip yum
 ##yum groupinstall "Development Tools" -y
