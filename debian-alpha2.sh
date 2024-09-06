@@ -320,42 +320,86 @@ menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 #enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
 make -j ${JOBS} all
+
+# Install Asterisk by running the command:
 make install
+
+# Install configs and samples
 make samples
+make config
+make basic-pbx
 
+adduser asterisk --disabled-password --gecos "Asterisk User"
 
-read -p 'Press Enter to continue: '
-echo 'Continuing...'
-#Install astguiclient
+# Create a separate user and group to run asterisk services, and assign correct permissions:
+sudo groupadd asterisk
+sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
+sudo usermod -aG audio,dialout asterisk
+chown -R asterisk:asterisk /etc/asterisk
+chown -R asterisk:asterisk /var/lib/asterisk
+chown -R asterisk:asterisk /var/log/asterisk
+chown -R asterisk:asterisk /var/spool/asterisk
+chown -R asterisk:asterisk /usr/lib64/asterisk
+
+#Set Asterisk default user to asterisk:
+sed -i 's|#AST_USER|AST_USER|' /etc/default/asterisk
+sed -i 's|#AST_GROUP|AST_GROUP|' /etc/default/asterisk
+
+sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
+sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
+
+echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+sudo ldconfig
+
+# Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
+# radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
+# Solution
+sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
+sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+
+sudo systemctl enable asterisk
+sudo systemctl start asterisk
+
+rm /etc/localtime
+ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
+systemctl restart ntpd
+
+sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/7.4/cli/php.ini
+
+#--------------------------------------------------
+# Install astguiclient
+#--------------------------------------------------
+# Install astguiclient
 echo "Installing astguiclient"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
 cd /usr/src/astguiclient/trunk
-#Add mysql users and Databases
-echo "%%%%%%%%%%%%%%%Please Enter Mysql Password Or Just Press Enter if you Dont have Password%%%%%%%%%%%%%%%%%%%%%%%%%%"
-mysql -u root -p << MYSQLCREOF
-CREATE DATABASE asterisk DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@'%' IDENTIFIED BY '1234';
-CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO cron@localhost IDENTIFIED BY '1234';
-GRANT SELECT,INSERT,UPDATE,DELETE,LOCK TABLES on asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';
-GRANT RELOAD ON *.* TO cron@'%';
-GRANT RELOAD ON *.* TO cron@localhost;
-GRANT RELOAD ON *.* TO custom@'%';
-GRANT RELOAD ON *.* TO custom@localhost;
-flush privileges;
-use asterisk;
-\. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
-\. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='13.29.2';
-quit
-MYSQLCREOF
-read -p 'Press Enter to continue: '
-echo 'Continuing...'
-#Get astguiclient.conf file
+
+# Add mysql users and Databases
+echo "%%%%%%%%%%%%%%% Please Enter Mysql Password Or Just Press Enter if you Dont have Password %%%%%%%%%%%%%%%%%%%%%%%%%%"
+mariadb --user="root" --password="" -h localhost -e "CREATE DATABASE asterisk;"
+mariadb --user="root" --password="" -h localhost -e "CREATE USER 'cron'@'localhost' IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO cron@'%' IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO cron@localhost IDENTIFIED BY '1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@'%';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cron@localhost;"
+mariadb --user="root" --password="" -h localhost -e "CREATE USER 'custom'@'localhost' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO custom@'%' IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT ALL ON asterisk.* TO custom@localhost IDENTIFIED BY 'custom1234';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@'%';"
+mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
+mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
+mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
+mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='20.7';"
+sudo systemctl restart mariadb 
+
+sleep 5
+
+# Get astguiclient.conf file
 echo "" > /etc/astguiclient.conf
 wget -O /etc/astguiclient.conf https://raw.githubusercontent.com/jaganthoutam/vicidial-install-scripts/main/astguiclient.conf
 echo "Replace IP address in Default"
