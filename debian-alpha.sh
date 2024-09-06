@@ -21,6 +21,7 @@ timedatectl set-timezone Africa/Kigali
 #----------------------------------------------------
 # Disable password authentication
 #----------------------------------------------------
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -28,30 +29,42 @@ sudo service sshd restart
 
 export LC_ALL=C
 
-apt install build-essential
-apt install flex git python3-pip yum
-##yum groupinstall "Development Tools" -y
+# Install mariadb databases
+curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
+sudo apt update 
+sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev libmariadbclient-dev
 
-apt install -y apt-transport-https lsb-release ca-certificates wget
+sudo systemctl restart mariadb.service
+sudo systemctl enable mariadb.service 
+
+# sudo mysql_secure_installation
+
+# Install PHP7.4
+sudo apt install -y ca-certificates apt-transport-https software-properties-common 
 wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
 sudo apt update
-apt install -y php7.4 
-apt install -y mariadb-server
- 
-apt install libjansson* libedit* -y
-apt -y install dnf-plugins-core
-sudo apt install sqlite3 libsqlite3-dev -y
-apt-get install linux-headers-generic -y
 
-apt install -y php7.4 php7.4-opcache screen php7.4-mcrypt php-pear libmcrypt-dev mcrypt byobu screenie iselect db5.3-util libapache2-mod-svn subversion-tools subversion php7.4-cli php7.4-gd php7.4-curl php7.4-mysql php7.4-ldap php7.4-zip php7.4-common
-apt install -y wget unzip make patch subversion php7.4-mbstring apache2
-apt install -y php7.4-imap php7.4-ldap php7.4-mysqli php7.4-odbc php-pear php7.4-xml php7.4-xmlrpc curlk 
-##apt install -y newt-devel libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail lame-devel htop iftop perl-File-Which
-##apt install -y php-opcache libss7 mariadb-devel libss7* libopen* 
-##apt install -y sqlite-devel httpd mod_ssl nano chkconfig htop atop mytop iftop
 apt install -y uuid* libxml2*
 
+sudo apt install -y php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
+php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache php7.4-ldap php7.4-json \
+php7.4-mysqli php7.4-odbc php-pear php7.4-xmlrpc php7.4-mcrypt
+
+# install apache and subversion
+sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
+systemctl enable apache2
+systemctl start apache2
+
+# Other dependencies
+sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
+git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 make \
+build-essential libjansson-dev autoconf automake libxml2-dev libsqlite3-dev pkg-config sqlite3 ntp 
+
+sudo a2enmod dav
+sudo a2enmod dav_svn
+
+# Install perl
 cpan> install Bundle::CPAN
 cpan> reload cpan
 cpan> install YAML
@@ -97,7 +110,6 @@ cpan> install MIME::QuotedPrint
 cpan> install Crypt::Eksblowfish::Bcrypt
 cpan> quit 
 
-
 apt install libsrtp* -y
 
 ### up to this point
@@ -115,8 +127,6 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
 tee -a /etc/php/7.4/apache2/php.ini <<EOF
 
 error_reporting  =  E_ALL & ~E_NOTICE
@@ -130,17 +140,7 @@ default_socket_timeout = 3360
 date.timezone = America/New_York
 EOF
 
-
 systemctl restart apache2
-
-
-apt install -y mysql*
-
-apt-get install dnf-plugins-core -y
-#dnf config-manager --set-enabled powertools
-
-
-systemctl enable mysql
 
 cp /etc/my.cnf /etc/my.cnf.original
 echo "" > /etc/my.cnf
