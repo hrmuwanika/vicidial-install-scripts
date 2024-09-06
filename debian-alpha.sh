@@ -2,6 +2,30 @@
 
 echo "Vicidial installation Debian 12 with CyburPhone and Dynamic portal"
 
+#--------------------------------------------------
+# Update Server
+#--------------------------------------------------
+echo -e "\n============= Update Server ================"
+sudo apt update && sudo apt -y upgrade 
+sudo apt autoremove -y
+
+# Install linux headers
+sudo apt -y install linux-headers-$(uname -r)
+
+#--------------------------------------------------
+# Set up the timezones
+#--------------------------------------------------
+# set the correct timezone on Debian
+timedatectl set-timezone Africa/Kigali
+
+#----------------------------------------------------
+# Disable password authentication
+#----------------------------------------------------
+sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo service sshd restart
+
 export LC_ALL=C
 
 apt install build-essential
