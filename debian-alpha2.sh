@@ -64,7 +64,10 @@ build-essential libjansson-dev autoconf automake libxml2-dev libsqlite3-dev pkg-
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
-# install perl
+# Install Perl Modules
+echo "Install Perl"
+apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+
 cpan> install Bundle::CPAN
 cpan> reload cpan
 cpan> install YAML
@@ -230,25 +233,10 @@ systemctl enable mariadb.service
 systemctl restart apache2.service
 systemctl restart mariadb.service
 
-#Install Perl Modules
+# Special package for ASTblind and ASTloop(ip_relay need this package)
+apt-get install libc6-i386 -y
 
-echo "Install Perl"
-
-apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
-
-sudo add-apt-repository ppa:ondrej/php  -y
-sudo apt-get update
-sudo apt-get install build-essential linux-headers-`uname -r` subversion unzip libjansson-dev sqlite autoconf automake  libxml2-dev libncurses5-dev libsqlite3-dev  -y 
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C
-sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu bionic main'
-sudo apt update 
-sudo apt-get install apache2 apache2-bin apache2-data libapache2-mod-php7.4 php7.4 php7.4-xcache php7.4-dev php7.4-mbstring php7.4-cli php7.4-common php7.4-json php7.4-mysql php7.4-readline sox lame screen libnet-telnet-perl php5.6-mysqli libasterisk-agi-perl mariadb-server mariadb-client libelf-dev autogen libtool shtool libdbd-mysql-perl libmysqlclient-dev libsrtp-dev uuid-dev libssl-dev git curl wget -y
-#Special package for ASTblind and ASTloop(ip_relay need this package)
-apt-get install libc6-i386
-
-
-#Install Jansson
+# Install Jansson
 cd /usr/src/
 wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
 tar -zxf jansson-2.5.tar.gz
@@ -260,7 +248,7 @@ make
 make install 
 ldconfig
 
-#Install CPAMN
+# Install CPAMN
 cd /usr/bin/
 apt install cpanminus -y
 curl -LOk http://xrl.us/cpanm
@@ -278,7 +266,7 @@ cpanm Digest::MD5
 cpanm Digest::SHA1
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm -f DBD::mysql
+cpanm -f DBD::MariaDB
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -316,28 +304,132 @@ cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
 
-#If the DBD::MYSQL Fail Run below Command
-apt install libdbd-mysql-perl
+cpan install Crypt::Eksblowfish::Bcrypt
+
+# If the DBD::MYSQL Fail Run below Command
+sudo apt install -y libdbd-mysql-perl libdbd-mariadb-perl
+
+# Install Perl Asterisk Extension
+cd /usr/src
+wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
+tar xzf asterisk-perl-0.08.tar.gz
+cd asterisk-perl-0.08
+perl Makefile.PL
+make all
+make install 
+
+# Install Lame
+cd /usr/src
+wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+tar -zxf lame-3.99.5.tar.gz
+cd lame-3.99.5
+./configure
+make
+make install
+
+# Install Jansson
+cd /usr/src/
+wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
+tar xvzf jansson*
+cd jansson-2.13
+./configure
+make clean
+make
+make install 
+ldconfig
+
+cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
 
 
-
-read -p 'Press Enter to continue And Install Dahdi: '
-#Install dahdi
-apt-get install dahdi-* dahdi
+# Install dahdi
+echo "Install Dahdi"
+apt-get -y install dahdi-* dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+sleep 5
 
-read -p 'Press Enter to continue And Install LibPRI and Asterisk: '
+ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
+cd /etc/include
+wget https://dialer.one/newt.h
 
-#Install Asterisk 
+cd /usr/src/
+## wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.4.0+3.4.0.tar.gz
+mkdir dahdi-linux-complete-3.4.0+3.4.0
+## tar -xzvf dahdi-linux-complete-3.4.0+3.4.0.tar.gz
+cd dahdi-linux-complete-3.4.0+3.4.0
+wget https://cybur-dial.com/dahdi-9.4-fix.zip
+unzip dahdi-9.4-fix.zip
+apt install 
+
+## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.4.0+3.4.0/linux/drivers/dahdi/wctc4xxp/base.c
+## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+
+make clean
+make
+make install
+make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
+
+cd tools
+make clean
+make
+make install
+make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
+
+cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+modprobe dahdi
+modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
+
+#Install Asterisk and LibPRI
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
-wget http://download.vicidial.com/required-apps/asterisk-13.29.2-vici.tar.gz  
-tar -xvf asterisk-13.29.2-vici.tar.gz
-cd asterisk-13.29.2
+wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
+wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18.18.1.tar.gz
+tar -xvzf asterisk-*
+tar -xvzf libpri-*
+
+cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
+
+cd /usr/src/asterisk/asterisk-18.18.1/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
+cd apps/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
+yes | cp -rf enter.h.1 enter.h
+yes | cp -rf leave.h.1 leave.h
+
+cd /usr/src/asterisk/asterisk-18.18.1/
+patch < amd_stats-18.patch apps/app_amd.c
+patch < iax_peer_status-18.patch channels/chan_iax2.c
+patch < sip_peer_status-18.patch channels/chan_sip.c
+patch < timeout_reset_dial_app-18.patch apps/app_dial.c
+patch < timeout_reset_dial_core-18.patch main/dial.c
+
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --without-ogg
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+
 make menuselect/menuselect menuselect-tree menuselect.makeopts
 #enable app_meetme
 menuselect/menuselect --enable app_meetme menuselect.makeopts
@@ -345,6 +437,8 @@ menuselect/menuselect --enable app_meetme menuselect.makeopts
 menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 #enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
 make -j ${JOBS} all
 
 # Install Asterisk by running the command:
