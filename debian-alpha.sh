@@ -66,53 +66,62 @@ sudo a2enmod dav_svn
 
 # Install perl
 echo "Install Perl"
-apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+#apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
 
-cpan> install Bundle::CPAN
-cpan> reload cpan
-cpan> install YAML
-cpan> install MD5
-cpan> install Digest::MD5
-cpan> install Digest::SHA1
-cpan> install readline
-cpan> reload cpan
-cpan> install DBI
-cpan> force install DBD::mysql
-cpan> install Net::Telnet
-cpan> install Time::HiRes
-cpan> install Net::Server
-cpan> install Switch
-cpan> install Mail::Sendmail
-cpan> install Unicode::Map
-cpan> install Jcode
-cpan> install Spreadsheet::WriteExcel
-cpan> install OLE::Storage_Lite
-cpan> install Proc::ProcessTable
-cpan> install IO::Scalar
-cpan> install Spreadsheet::ParseExcel
-cpan> install Curses
-cpan> install Getopt::Long
-cpan> install Net::Domain
-cpan> install Term::ReadKey
-cpan> install Term::ANSIColor
-cpan> install Spreadsheet::XLSX
-cpan> install Spreadsheet::Read
-cpan> install LWP::UserAgent
-cpan> install HTML::Entities
-cpan> install HTML::Strip
-cpan> install HTML::FormatText
-cpan> install HTML::TreeBuilder
-cpan> install Time::Local
-cpan> install MIME::Decoder
-cpan> install Mail::POP3Client
-cpan> install Mail::IMAPClient
-cpan> install Mail::Message
-cpan> install IO::Socket::SSL
-cpan> install MIME::Base64
-cpan> install MIME::QuotedPrint
-cpan> install Crypt::Eksblowfish::Bcrypt
-cpan> quit 
+cd /usr/bin/
+curl -LOk http://xrl.us/cpanm
+chmod +x cpanm
+cpanm -f File::HomeDir
+cpanm -f File::Which
+cpanm CPAN::Meta::Requirements
+cpanm -f CPAN
+cpanm YAML
+cpanm MD5
+cpanm Digest::MD5
+cpanm Digest::SHA1
+cpanm readline --force
 
+cpanm Bundle::CPAN
+cpanm DBI
+cpanm -f DBD::mysql
+cpanm Net::Telnet
+cpanm Time::HiRes
+cpanm Net::Server
+cpanm Switch
+cpanm Mail::Sendmail --force
+cpanm Unicode::Map
+cpanm Jcode
+cpanm Spreadsheet::WriteExcel
+cpanm OLE::Storage_Lite
+cpanm Proc::ProcessTable
+cpanm IO::Scalar
+cpanm Spreadsheet::ParseExcel
+cpanm Curses
+cpanm Getopt::Long
+cpanm Net::Domain
+cpanm Term::ReadKey
+cpanm Term::ANSIColor
+cpanm Spreadsheet::XLSX
+cpanm Spreadsheet::Read
+cpanm LWP::UserAgent
+cpanm HTML::Entities
+cpanm HTML::Strip
+cpanm HTML::FormatText
+cpanm HTML::TreeBuilder
+cpanm Time::Local
+cpanm MIME::Decoder
+cpanm Mail::POP3Client
+cpanm Mail::IMAPClient
+cpanm Mail::Message
+cpanm IO::Socket::SSL
+cpanm MIME::Base64
+cpanm MIME::QuotedPrint
+cpanm Crypt::Eksblowfish::Bcrypt
+cpanm Crypt::RC4
+cpanm Text::CSV
+cpanm Text::CSV_XS
+
+cpan install Crypt::Eksblowfish::Bcrypt
 apt install libsrtp* -y
 
 ### up to this point
