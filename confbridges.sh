@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Upgrade Asterisk 20 to use ConfBridges"
+echo "Upgrade Asterisk 18 to use ConfBridges"
 
 cd /usr/src/
 rm -rf vicidial-install-scripts
