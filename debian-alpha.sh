@@ -735,7 +735,7 @@ systemctl start mariadb.service
 
 ### start up the apache web server
 
-systemctl start httpd.service
+systemctl start apache2.service
 
 
 ### roll the Asterisk logs upon reboot
@@ -758,7 +758,7 @@ modprobe dahdi_dummy
 
 ### sleep for 20 seconds before launching Asterisk
 
-sleep 20
+sleep 5
 
 
 ### start up asterisk
@@ -945,18 +945,95 @@ WELCOME
 chmod 777 /var/spool/asterisk/monitorDONE
 chkconfig asterisk off
 
-yum in certbot -y
-systemctl enable certbot-renew.timer
-systemctl start certbot-renew.timer
-cd /usr/src/vicidial-install-scripts
+cd /usr/src/
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
+chmod +x confbridges.sh
+./confbridges.sh
+
+apt install -y certbot python3-certbot-apache
+systemctl enable certbot.timer
+systemctl start certbot.timer
+
+cd /usr/src/
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/vicidial-enable-webrtc.sh
 chmod +x vicidial-enable-webrtc.sh
-service firewalld stop
 ./vicidial-enable-webrtc.sh
-service firewalld start
+
+apt install firewalld -y
 systemctl enable firewalld
-systemctl enable rc-local
+systemctl start firewalld 
+
+# Firewall configuration
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=443/tcp --permanent
+firewall-cmd --zone=public --add-port=446/tcp --permanent
+firewall-cmd --zone=public --add-port=8089/tcp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
+firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
+firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --reload
 
 mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
+
+## Install Sounds
+cd /var/lib/asterisk/sounds
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
+
+# Place the audio files in their proper places:
+tar -zxf asterisk-core-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-core-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-core-sounds-en-wav-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-wav-current.tar.gz
+
+# Remove tar files:
+rm asterisk-core-sounds-en-gsm-current.tar.gz
+rm asterisk-core-sounds-en-ulaw-current.tar.gz
+rm asterisk-core-sounds-en-wav-current.tar.gz
+rm asterisk-extra-sounds-en-gsm-current.tar.gz
+rm asterisk-extra-sounds-en-ulaw-current.tar.gz
+rm asterisk-extra-sounds-en-wav-current.tar.gz
+
+cd /var/lib/asterisk/quiet-mp3
+sox ../mohmp3/macroform-cold_day.wav macroform-cold_day.wav vol 0.25
+sox ../mohmp3/macroform-cold_day.gsm macroform-cold_day.gsm vol 0.25
+sox -t ul -r 8000 -c 1 ../mohmp3/macroform-cold_day.ulaw -t ul macroform-cold_day.ulaw vol 0.25
+sox ../mohmp3/macroform-robot_dity.wav macroform-robot_dity.wav vol 0.25
+sox ../mohmp3/macroform-robot_dity.gsm macroform-robot_dity.gsm vol 0.25
+sox -t ul -r 8000 -c 1 ../mohmp3/macroform-robot_dity.ulaw -t ul macroform-robot_dity.ulaw vol 0.25
+sox ../mohmp3/macroform-the_simplicity.wav macroform-the_simplicity.wav vol 0.25
+sox ../mohmp3/macroform-the_simplicity.gsm macroform-the_simplicity.gsm vol 0.25
+sox -t ul -r 8000 -c 1 ../mohmp3/macroform-the_simplicity.ulaw -t ul macroform-the_simplicity.ulaw vol 0.25
+sox ../mohmp3/reno_project-system.wav reno_project-system.wav vol 0.25
+sox ../mohmp3/reno_project-system.gsm reno_project-system.gsm vol 0.25
+sox -t ul -r 8000 -c 1 ../mohmp3/reno_project-system.ulaw -t ul reno_project-system.ulaw vol 0.25
+sox ../mohmp3/manolo_camp-morning_coffee.wav manolo_camp-morning_coffee.wav vol 0.25
+sox ../mohmp3/manolo_camp-morning_coffee.gsm manolo_camp-morning_coffee.gsm vol 0.25
+sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_camp-morning_coffee.ulaw vol 0.25
+
+tee -a ~/.bashrc <<EOF
+
+# Commands
+/usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
+/usr/share/astguiclient/AST_VDhopper.pl -q
+EOF
+
+chmod -R 777 /var/spool/asterisk/monitorDONE
+chown -R apache:apache /var/spool/asterisk/monitorDONE
+
+cat > /var/www/html/index.html <<WELCOME
+<META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
+Please Hold while I redirect you!
+WELCOME
 
 read -p 'Press Enter to Reboot: '
 
