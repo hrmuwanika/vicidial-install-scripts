@@ -12,7 +12,7 @@ if [ -f /etc/redhat-release ]; then
 fi
 if [ -f /etc/lsb-release ]; then
 	sudo add-apt-repository ppa:certbot/certbot
-	sudo apt -y install python-certbot-apache
+	sudo apt install python-certbot-apache
 fi
 
 echo "Enter the DOMAIN NAME HERE. ***********IF YOU DONT HAVE ONE PLEASE DONT CONTINUE: "
@@ -41,7 +41,7 @@ mysql -e "use asterisk; update servers set web_socket_url='wss://$DOMAINNAME:808
 
 echo "Add DOMAINAME system_settings webphone_url"
 echo "%%%%%%%%%%%%%%%This Wont work if you SET root Password%%%%%%%%%%%%%%%"
-mysql -e "use asterisk; update system_settings set webphone_url='https://$DOMAINNAM/CyburPhone/cyburphone.php';"
+mysql -e "use asterisk; update system_settings set webphone_url='https://$DOMAINNAME/CyburPhone/cyburphone.php';"
 
 echo "update the SIP_generic"
 mysql -e "use asterisk; update vicidial_conf_templates set template_contents='type=friend 
