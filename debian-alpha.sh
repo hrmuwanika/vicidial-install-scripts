@@ -65,6 +65,9 @@ sudo a2enmod dav
 sudo a2enmod dav_svn
 
 # Install perl
+echo "Install Perl"
+apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+
 cpan> install Bundle::CPAN
 cpan> reload cpan
 cpan> install YAML
@@ -137,7 +140,7 @@ max_input_time = 3360
 post_max_size = 448M
 upload_max_filesize = 442M
 default_socket_timeout = 3360
-date.timezone = America/New_York
+date.timezone = Africa/Kigali
 EOF
 
 systemctl restart apache2
@@ -231,18 +234,68 @@ systemctl enable mariadb.service
 systemctl restart apache2.service
 systemctl restart mariadb.service
 
-#Install Perl Modules
+# Install CPAMN
+cd /usr/bin/
+apt install cpanminus -y
+curl -LOk http://xrl.us/cpanm
+chmod +x cpanm
+cpanm readline --force
+read -p 'Press Enter to continue Install perl modules: '
 
-echo "Install Perl"
+cpanm -f File::HomeDir
+cpanm -f File::Which
+cpanm CPAN::Meta::Requirements
+cpanm -f CPAN
+cpanm YAML
+cpanm MD5
+cpanm Digest::MD5
+cpanm Digest::SHA1
+cpanm Bundle::CPAN
+cpanm DBI
+cpanm -f DBD::MariaDB
+cpanm Net::Telnet
+cpanm Time::HiRes
+cpanm Net::Server
+cpanm Switch
+cpanm Mail::Sendmail
+cpanm Unicode::Map
+cpanm Jcode
+cpanm Spreadsheet::WriteExcel
+cpanm OLE::Storage_Lite
+cpanm Proc::ProcessTable
+cpanm IO::Scalar
+cpanm Spreadsheet::ParseExcel
+cpanm Curses
+cpanm Getopt::Long
+cpanm Net::Domain
+cpanm Term::ReadKey
+cpanm Term::ANSIColor
+cpanm Spreadsheet::XLSX
+cpanm Spreadsheet::Read
+cpanm LWP::UserAgent
+cpanm HTML::Entities
+cpanm HTML::Strip
+cpanm HTML::FormatText
+cpanm HTML::TreeBuilder
+cpanm Time::Local
+cpanm MIME::Decoder
+cpanm Mail::POP3Client
+cpanm Mail::IMAPClient
+cpanm Mail::Message
+cpanm IO::Socket::SSL
+cpanm MIME::Base64
+cpanm MIME::QuotedPrint
+cpanm Crypt::Eksblowfish::Bcrypt
+cpanm Crypt::RC4
+cpanm Text::CSV
+cpanm Text::CSV_XS
 
-apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+cpan install Crypt::Eksblowfish::Bcrypt
 
-#CPM install
-#cd /usr/src/vicidial-install-scripts
-#curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
-#/usr/local/bin/cpm install -g
+# If the DBD::MYSQL Fail Run below Command
+sudo apt install -y libdbd-mysql-perl libdbd-mariadb-perl
 
-#Install Asterisk Perl
+# Install Perl Asterisk Extension
 cd /usr/src
 wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
@@ -251,8 +304,7 @@ perl Makefile.PL
 make all
 make install 
 
-
-#Install Lame
+# Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
@@ -261,8 +313,7 @@ cd lame-3.99.5
 make
 make install
 
-
-#Install Jansson
+# Install Jansson
 cd /usr/src/
 wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
 tar xvzf jansson*
@@ -273,50 +324,64 @@ make
 make install 
 ldconfig
 
-#Install Dahdi
-echo "Install Dahdi"
+cd /usr/src
+wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
+tar xfv v2.1.0.tar.gz
+cd libsrtp-2.1.0
+./configure --prefix=/usr --enable-openssl
+make shared_library && sudo make install
+ldconfig
 
+# Install Dahdi
+echo "Install Dahdi"
+apt-get -y install dahdi-* dahdi
+modprobe dahdi
+modprobe dahdi_dummy
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+sleep 5
+
+ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
 cd /etc/include
 wget https://dialer.one/newt.h
 
 cd /usr/src/
-mkdir dahdi-linux-complete-3.2.0+3.2.0
-cd dahdi-linux-complete-3.2.0+3.2.0
-wget https://dialer.one/dahdi-alma9.zip
-unzip dahdi-alma9.zip
-apt install newt* -y
+## wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.4.0+3.4.0.tar.gz
+mkdir dahdi-linux-complete-3.4.0+3.4.0
+## tar -xzvf dahdi-linux-complete-3.4.0+3.4.0.tar.gz
+cd dahdi-linux-complete-3.4.0+3.4.0
+wget https://cybur-dial.com/dahdi-9.4-fix.zip
+unzip dahdi-9.4-fix.zip
+apt install 
 
-sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/drivers/dahdi/wctc4xxp/base.c
-sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
+## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.4.0+3.4.0/linux/drivers/dahdi/wctc4xxp/base.c
+## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
 
 make clean
 make
 make install
 make install-config
-
-yum -y install dahdi-tools-libs
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
 
 cd tools
 make clean
 make
 make install
 make install-config
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
 
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 modprobe dahdi
 modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-
-read -p 'Press Enter to continue: '
-
-echo 'Continuing...'
+/usr/sbin/dahdi_cfg -vvvvvvvvvv
+sleep 5
 
 #Install Asterisk and LibPRI
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://download.vicidial.com/beta-apps/asterisk-16.17.0-vici.tar.gz
-
+wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18.18.1.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
@@ -328,7 +393,24 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
-cd /usr/src/asterisk/asterisk-16.17.0-vici
+cd /usr/src/asterisk/asterisk-18.18.1/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
+cd apps/
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
+wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
+yes | cp -rf enter.h.1 enter.h
+yes | cp -rf leave.h.1 leave.h
+
+cd /usr/src/asterisk/asterisk-18.18.1/
+patch < amd_stats-18.patch apps/app_amd.c
+patch < iax_peer_status-18.patch channels/chan_iax2.c
+patch < sip_peer_status-18.patch channels/chan_sip.c
+patch < timeout_reset_dial_app-18.patch apps/app_dial.c
+patch < timeout_reset_dial_core-18.patch main/dial.c
 
 yum in libuuid-devel libxml2-devel -y
 
@@ -342,6 +424,8 @@ menuselect/menuselect --enable app_meetme menuselect.makeopts
 menuselect/menuselect --enable res_http_websocket menuselect.makeopts
 #enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
+make samples
+sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
 make -j ${JOBS} all
 
 # Install Asterisk by running the command:
