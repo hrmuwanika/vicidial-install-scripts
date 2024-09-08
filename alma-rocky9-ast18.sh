@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation AlmaLinux/RockyLinux with CyburPhone and Dynamic portal"
+echo "Vicidial installation and Asterisk 18 on AlmaLinux/RockyLinux"
 echo "==================================================================================="
 
 # Set server hostname
@@ -757,42 +757,6 @@ chmod +x /etc/rc.d/rc.local
 systemctl enable rc-local
 systemctl start rc-local
 
-## Install CyburPhone
-cd /var/www/html
-git clone https://github.com/carpenox/CyburPhone.git
-chmod -R 744 CyburPhone
-chown -R apache:apache CyburPhone
-
-cd /usr/src
-wget https://dialer.one/dynportal.zip
-wget https://dialer.one/firewall.zip
-wget https://dialer.one/aggregate
-wget https://dialer.one/VB-firewall
-
-mkdir -p /var/www/vhosts/dynportal
-mv /usr/src/dynportal.zip /var/www/vhosts/dynportal/
-mv /usr/src/firewall.zip /etc/firewalld/
-cd /var/www/vhosts/dynportal/
-unzip dynportal.zip
-chmod -R 755 *
-chown -R apache:apache *
-cd etc/httpd/conf.d/
-mv viciportal.conf /etc/httpd/conf.d/
-mv viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf
-cd /etc/firewalld/
-unzip -o firewall.zip
-cd zones/
-rm -rf public.xml trusted.xml
-cd /etc/firewalld/
-mv -bf public.xml trusted.xml /etc/firewalld/zones/
-mv /usr/src/aggregate /usr/bin/
-chmod +x /usr/bin/aggregate
-mv /usr/src/VB-firewall /usr/bin/
-chmod +x /usr/bin/VB-firewall
-
-sed -i s/DOMAINNAME/"$hostname"/g /var/www/vhosts/dynportal/inc/defaults.inc.php
-sed -i s/DOMAINNAME/"$hostname"/g /home/viciportal-ssl.conf
-
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
 unzip ip_relay_1.1.112705.zip
@@ -925,7 +889,7 @@ chmod +x confbridges.sh
 
 chkconfig asterisk off
 
-## Install Dynportal
+## Install firewall
 yum -y install firewalld
 systemctl start firewalld 
 systemctl enable firewalld
@@ -941,15 +905,6 @@ firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
 firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
 firewall-cmd --reload
 
-yum -y install certbot 
-systemctl enable certbot-renew.timer
-systemctl start certbot-renew.timer
-
-cd /usr/src/
-wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/vicidial-enable-webrtc.sh
-chmod +x vicidial-enable-webrtc.sh
-systemctl stop firewalld 
-./vicidial-enable-webrtc.sh
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
