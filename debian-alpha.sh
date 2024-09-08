@@ -389,7 +389,7 @@ sleep 5
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18.18.1.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
@@ -401,24 +401,7 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
-cd /usr/src/asterisk/asterisk-18.18.1/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
-cd apps/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
-yes | cp -rf enter.h.1 enter.h
-yes | cp -rf leave.h.1 leave.h
-
-cd /usr/src/asterisk/asterisk-18.18.1/
-patch < amd_stats-18.patch apps/app_amd.c
-patch < iax_peer_status-18.patch channels/chan_iax2.c
-patch < sip_peer_status-18.patch channels/chan_sip.c
-patch < timeout_reset_dial_app-18.patch apps/app_dial.c
-patch < timeout_reset_dial_core-18.patch main/dial.c
+cd /usr/src/asterisk/asterisk-18.21.0-vici/
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
@@ -507,7 +490,7 @@ mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
-mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='20.7';"
+mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.21.0';"
 sudo systemctl restart mariadb 
 
 sleep 5
@@ -556,7 +539,7 @@ VARDB_port => 3306
 VARactive_keepalives => 12345689EC
 
 # Asterisk version VICIDIAL is installed for
-VARasterisk_version => 16.X
+VARasterisk_version => 18.X
 
 # FTP recording archive connection information
 VARFTP_host => 10.0.0.4
@@ -782,43 +765,7 @@ chmod +x /etc/rc.d/rc.local
 systemctl enable rc-local
 systemctl start rc-local
 
-##Install CyburPhone
-cd /var/www/html
-git clone https://github.com/carpenox/CyburPhone.git
-chmod -R 744 CyburPhone
-chown -R apache:apache CyburPhone
-
-##Install Dynportal
-yum install -y firewalld
-cd /home
-wget https://dialer.one/dynportal.zip
-wget https://dialer.one/firewall.zip
-wget https://dialer.one/aggregate
-wget https://dialer.one/VB-firewall
-
-mkdir -p /var/www/vhosts/dynportal
-mv /home/dynportal.zip /var/www/vhosts/dynportal/
-mv /home/firewall.zip /etc/firewalld/
-cd /var/www/vhosts/dynportal/
-unzip dynportal.zip
-chmod -R 755 *
-chown -R apache:apache *
-cd etc/httpd/conf.d/
-mv viciportal-ssl.conf viciportal.conf /etc/httpd/conf.d/
-cd /etc/firewalld/
-unzip -o firewall.zip
-cd zones/
-rm -rf public.xml trusted.xml
-cd /etc/firewalld/
-mv -bf public.xml trusted.xml /etc/firewalld/zones/
-mv /home/aggregate /usr/bin/
-chmod +x /usr/bin/aggregate
-mv /home/VB-firewall /usr/bin/
-chmod +x /usr/bin/VB-firewall
-
-firewall-offline-cmd --add-port=446/tcp --zone=public
-
-##Fix ip_relay
+## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
 unzip ip_relay_1.1.112705.zip
 cd ip_relay_1.1/src/unix/
@@ -841,7 +788,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-##Install Sounds
+## Install Sounds
 
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -910,6 +857,7 @@ tee -a ~/.bashrc <<EOF
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
 /usr/bin/systemctl status httpd --no-pager
 /usr/bin/systemctl status firewalld --no-pager
+/usr/share/astguiclient/AST_VDhopper.pl -q
 /usr/bin/screen -ls
 /usr/sbin/dahdi_cfg -v
 /usr/sbin/asterisk -V
@@ -952,27 +900,20 @@ Please Hold while I redirect you!
 WELCOME
 
 chmod 777 /var/spool/asterisk/monitorDONE
-chkconfig asterisk off
+# chkconfig asterisk off
 
 cd /usr/src/
 wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/confbridges.sh
 chmod +x confbridges.sh
 ./confbridges.sh
 
-apt install -y certbot python3-certbot-apache
-systemctl enable certbot.timer
-systemctl start certbot.timer
-
-cd /usr/src/
-wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/vicidial-enable-webrtc.sh
-chmod +x vicidial-enable-webrtc.sh
-./vicidial-enable-webrtc.sh
-
+apt autoremove ufw
 apt install firewalld -y
 systemctl enable firewalld
 systemctl start firewalld 
 
 # Firewall configuration
+firewall-cmd --zone=public --add-port=22/tcp --permanent
 firewall-cmd --zone=public --add-port=80/tcp --permanent
 firewall-cmd --zone=public --add-port=443/tcp --permanent
 firewall-cmd --zone=public --add-port=446/tcp --permanent
@@ -982,7 +923,6 @@ firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
 firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
 firewall-cmd --reload
 
-mv /etc/httpd/conf.d/viciportal-ssl.conf /etc/httpd/conf.d/viciportal-ssl.conf.off
 
 ## Install Sounds
 cd /var/lib/asterisk/sounds
@@ -1029,12 +969,6 @@ sox ../mohmp3/manolo_camp-morning_coffee.wav manolo_camp-morning_coffee.wav vol 
 sox ../mohmp3/manolo_camp-morning_coffee.gsm manolo_camp-morning_coffee.gsm vol 0.25
 sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_camp-morning_coffee.ulaw vol 0.25
 
-tee -a ~/.bashrc <<EOF
-
-# Commands
-/usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
-/usr/share/astguiclient/AST_VDhopper.pl -q
-EOF
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
@@ -1046,6 +980,6 @@ WELCOME
 
 read -p 'Press Enter to Reboot: '
 
-echo "Restarting AlmaLinux"
+echo "Restarting Debian"
 
 reboot
