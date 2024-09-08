@@ -887,7 +887,7 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x confbridges.sh
 ./confbridges.sh
 
-chkconfig asterisk off
+#chkconfig asterisk off
 
 ## Install firewall
 yum -y install firewalld
