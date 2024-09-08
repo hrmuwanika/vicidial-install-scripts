@@ -14,6 +14,8 @@ timedatectl set-timezone Africa/Kigali
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
 setenforce 0
 
+yum -y install openssh-server
+
 # Disable password authentication
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
@@ -99,11 +101,11 @@ tee -a /etc/php.ini <<EOF
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
-max_execution_time = 3330
-max_input_time = 3360
-post_max_size = 448M
-upload_max_filesize = 442M
-default_socket_timeout = 3360
+max_execution_time = 330
+max_input_time = 360
+post_max_size = 100M
+upload_max_filesize = 100M
+default_socket_timeout = 360
 date.timezone = Africa/Kigali
 max_input_vars = 20000
 EOF
@@ -276,14 +278,21 @@ perl Makefile.PL
 make all
 make install 
 
+# Install sipsak
+cd /usr/src
+wget http://download.vicidial.com/required-apps/sipsak-0.9.6-1.tar.gz
+tar -zxf sipsak-0.9.6-1.tar.gz
+cd sipsak-0.9.6
+./configure
+make
+make install
+/usr/local/bin/sipsak --version
+
 # Install Lame
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
 cd lame-3.99.5
-# wget http://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
-# tar -zxf lame-3.100.tar.gz
-# cd lame-3.100
 ./configure
 make
 make install
@@ -330,7 +339,7 @@ mkdir dahdi-linux-complete-3.4.0+3.4.0
 cd dahdi-linux-complete-3.4.0+3.4.0
 wget https://cybur-dial.com/dahdi-9.4-fix.zip
 unzip dahdi-9.4-fix.zip
-yum in newt* -y
+yum -y install newt* 
 
 ## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.4.0+3.4.0/linux/drivers/dahdi/wctc4xxp/base.c
 ## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
@@ -365,37 +374,11 @@ sleep 5
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18.18.1.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
-# Install Asterisk
-cd /usr/src
-wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
-tar xfv v2.1.0.tar.gz
-cd libsrtp-2.1.0
-./configure --prefix=/usr --enable-openssl
-make shared_library && sudo make install
-ldconfig
-
-cd /usr/src/asterisk/asterisk-18.18.1/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
-cd apps/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
-yes | cp -rf enter.h.1 enter.h
-yes | cp -rf leave.h.1 leave.h
-
-cd /usr/src/asterisk/asterisk-18.18.1/
-patch < amd_stats-18.patch apps/app_amd.c
-patch < iax_peer_status-18.patch channels/chan_iax2.c
-patch < sip_peer_status-18.patch channels/chan_sip.c
-patch < timeout_reset_dial_app-18.patch apps/app_dial.c
-patch < timeout_reset_dial_core-18.patch main/dial.c
+cd /usr/src/asterisk/asterisk-18.21.0-vici
 
 yum -y install libuuid-devel libxml2-devel 
 
