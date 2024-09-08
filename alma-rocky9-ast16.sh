@@ -496,7 +496,7 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.21.0';
+update servers set asterisk_version='16.30.1';
 quit
 MYSQLCREOF
 
@@ -547,7 +547,7 @@ VARDB_port => 3306
 VARactive_keepalives => 12345689EC
 
 # Asterisk version VICIDIAL is installed for
-VARasterisk_version => 18.X
+VARasterisk_version => 16.X
 
 # FTP recording archive connection information
 VARFTP_host => 10.0.0.4
