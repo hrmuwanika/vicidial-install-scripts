@@ -374,11 +374,11 @@ sleep 5
 mkdir /usr/src/asterisk
 cd /usr/src/asterisk
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-16.30.1-vici.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
-cd /usr/src/asterisk/asterisk-18.21.0-vici
+cd /usr/src/asterisk/asterisk-16.30.1-vici
 
 yum -y install libuuid-devel libxml2-devel 
 
