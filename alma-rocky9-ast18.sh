@@ -218,6 +218,7 @@ cpanm readline --force
 cpanm Bundle::CPAN
 cpanm DBI
 cpanm -f DBD::mysql
+cpanm -f DBD::MariaDB
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
