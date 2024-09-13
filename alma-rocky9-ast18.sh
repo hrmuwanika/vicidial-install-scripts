@@ -368,7 +368,7 @@ make install-config
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
 
 echo "Install Dahdi package"
-yum -y install kernel-devel
+yum -y install kernel-devel kernel-devel-$(uname -r)
 
 yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
 modprobe dahdi
