@@ -382,7 +382,7 @@ tar -xvzf libpri-1.6.1.tar.gz
 
 cd /usr/src/asterisk-18.21.0-vici
 ./contrib/scripts/install_prereq install
-./configure --libdir=/usr/lib64 --with-jansson-bundled
+./contrib/scripts/get_mp3_source.sh
 
 yum -y install libuuid-devel libxml2-devel 
 
