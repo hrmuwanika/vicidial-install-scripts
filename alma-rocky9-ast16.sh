@@ -218,7 +218,6 @@ cpanm readline --force
 cpanm Bundle::CPAN
 cpanm DBI
 cpanm -f DBD::mysql
-cpanm -f DBD::MariaDB
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -380,8 +379,8 @@ modprobe dahdi_dummy
 cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
 wget http://download.vicidial.com/required-apps/asterisk-16.30.1-vici.tar.gz
-tar -xvzf asterisk-*
-tar -xvzf libpri-*
+tar -xvzf asterisk-16.30.1-vici.tar.gz
+tar -xvzf libpri-1.6.1.tar.gz
 
 cd /usr/src/asterisk-16.30.1-vici
 ./contrib/scripts/install_prereq install
