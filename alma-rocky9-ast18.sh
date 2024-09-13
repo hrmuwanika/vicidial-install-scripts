@@ -380,8 +380,8 @@ modprobe dahdi_dummy
 cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
 wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
-tar -xvzf asterisk-*
-tar -xvzf libpri-*
+tar -xvzf asterisk-18.21.0-vici.tar.gz
+tar -xvzf libpri-1.6.1.tar.gz
 
 cd /usr/src/asterisk-18.21.0-vici
 ./contrib/scripts/install_prereq install
