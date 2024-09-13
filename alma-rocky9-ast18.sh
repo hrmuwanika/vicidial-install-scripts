@@ -31,17 +31,19 @@ EOF
 
 # Update Server
 yum check-update
-yum update -y
+yum -y update
 yum -y install epel-release
 yum update -y
 
 yum -y install nano tar
+yum -y groupinstall core
+yum -y groupinstall base
 yum -y groupinstall 'Development Tools'
 yum -y install kernel*
 
 # Updating YUM Repos
-yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install yum-utils
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 dnf -y module enable php:remi-7.4
@@ -52,26 +54,19 @@ dnf -y install dnf-plugins-core
 yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
 yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
 yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
-yum -y install initscripts
-
-sleep 3
 
 yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
 systemctl status httpd.service
 
-sleep 3
-
 dnf -y install mariadb-server mariadb 
 systemctl enable mariadb.service
 systemctl start mariadb.service
 systemctl status mariadb.service
 
-sleep 3
-
 yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ initscripts
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt  --skip-broken
+yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt 
 yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl uuid* gtk2-devel binutils-devel libedit-devel
 
 yum -y copr enable irontec/sngrep 
@@ -111,8 +106,6 @@ max_input_vars = 20000
 EOF
 
 systemctl restart httpd
-
-sleep 3
 
 yum -y install chkconfig atop mytop
 yum -y install speex* postfix dovecot s-nail roundcubemail inxi
@@ -308,6 +301,13 @@ make
 make install 
 ldconfig
 
+cd /usr/src/
+git clone https://github.com/akheron/jansson.git
+cd jansson
+autoreconf  -i
+./configure --prefix=/usr/
+make && make install
+
 # Installation of eaccelerator
 cd /usr/src/
 wget https://github.com/eaccelerator/eaccelerator/zipball/master -O eaccelerator.zip
@@ -317,6 +317,16 @@ export PHP_PREFIX=”/usr”
 $PHP_PREFIX/bin/phpize
 ./configure –enable-eaccelerator=shared –with-php-config=$PHP_PREFIX/bin/php-config
 make
+
+# Download and Install PJSIP
+cd /usr/src/ 
+git clone https://github.com/pjsip/pjproject.git
+cd pjproject
+./configure CFLAGS="-DNDEBUG -DPJ_HAS_IPV6=1" --prefix=/usr --libdir=/usr/lib64 --enable-shared --disable-video --disable-sound --disable-opencore-amr
+make dep
+make
+make install
+ldconfig
 
 cd /usr/src
 wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
@@ -349,8 +359,6 @@ make
 make install
 make install-config
 
-yum -y install dahdi-tools-libs
-
 cd tools
 make clean
 make
@@ -358,27 +366,25 @@ make install
 make install-config
 
 cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 echo "Install Dahdi package"
-yum -y install kernel-devel-$(uname -r)
+yum -y install kernel-devel
 
 yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
+modprobe dahdi
+modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
 
-sleep 5
-
 # Install Asterisk and LibPRI
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
+cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
 wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
 
-cd /usr/src/asterisk/asterisk-18.21.0-vici
+cd /usr/src/asterisk-18.21.0-vici
+./contrib/scripts/install_prereq install
+./configure --libdir=/usr/lib64 --with-jansson-bundled
 
 yum -y install libuuid-devel libxml2-devel 
 
@@ -400,7 +406,7 @@ make install
 #Install configs and samples
 sudo make samples
 
-adduser asterisk --disabled-password --gecos "Asterisk User"
+adduser asterisk -s /bin/bash -c "Asterisk User"
 
 # Create a separate user and group to run asterisk services, and assign correct permissions:
 groupadd asterisk
@@ -496,7 +502,7 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='18.21.0';
+update servers set asterisk_version='18.21.0-vici';
 quit
 MYSQLCREOF
 
@@ -895,20 +901,19 @@ chmod +x confbridges.sh
 
 ## Install firewall
 yum -y install firewalld
-systemctl start firewalld 
 systemctl enable firewalld
+systemctl start firewalld 
 
 # Firewall configuration
-firewall-cmd --zone=public --add-port=22/tcp --permanent
-firewall-cmd --zone=public --add-port=80/tcp --permanent
-firewall-cmd --zone=public --add-port=443/tcp --permanent
-firewall-cmd --zone=public --add-port=446/tcp --permanent
-firewall-cmd --zone=public --add-port=8089/tcp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/udp --permanent
-firewall-cmd --zone=public --add-port=5060-5061/tcp --permanent
-firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+firewall-cmd --permanent --zone=public --add-port=22/tcp
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+firewall-cmd --permanent --zone=public --add-port=443/tcp
+firewall-cmd --permanent --zone=public --add-port=446/tcp
+firewall-cmd --permanent --zone=public --add-port=8089/tcp
+firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
+firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
+firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
 firewall-cmd --reload
-
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
