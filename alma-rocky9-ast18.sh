@@ -36,8 +36,6 @@ yum -y install epel-release
 yum update -y
 
 yum -y install nano tar
-yum -y groupinstall core
-yum -y groupinstall base
 yum -y groupinstall 'Development Tools'
 yum -y install kernel*
 
