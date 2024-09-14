@@ -56,12 +56,10 @@ yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc
 yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
-systemctl status httpd.service
 
 dnf -y install mariadb-server mariadb 
 systemctl enable mariadb.service
 systemctl start mariadb.service
-systemctl status mariadb.service
 
 yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ initscripts
 yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt net-tools
@@ -466,9 +464,7 @@ EOF
 systemctl disable asterisk.service
 systemctl enable asterisk.service
 systemctl start asterisk
-systemctl status asterisk
 
-sleep 5
 
 #--------------------------------------------------
 # Install astguiclient
