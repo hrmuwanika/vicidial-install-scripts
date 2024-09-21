@@ -68,60 +68,6 @@ sudo a2enmod dav_svn
 echo "Install Perl"
 #apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
 
-cd /usr/bin/
-curl -LOk http://xrl.us/cpanm
-chmod +x cpanm
-cpanm -f File::HomeDir
-cpanm -f File::Which
-cpanm CPAN::Meta::Requirements
-cpanm -f CPAN
-cpanm YAML
-cpanm MD5
-cpanm Digest::MD5
-cpanm Digest::SHA1
-cpanm readline --force
-
-cpanm Bundle::CPAN
-cpanm DBI
-cpanm -f DBD::mysql
-cpanm Net::Telnet
-cpanm Time::HiRes
-cpanm Net::Server
-cpanm Switch
-cpanm Mail::Sendmail --force
-cpanm Unicode::Map
-cpanm Jcode
-cpanm Spreadsheet::WriteExcel
-cpanm OLE::Storage_Lite
-cpanm Proc::ProcessTable
-cpanm IO::Scalar
-cpanm Spreadsheet::ParseExcel
-cpanm Curses
-cpanm Getopt::Long
-cpanm Net::Domain
-cpanm Term::ReadKey
-cpanm Term::ANSIColor
-cpanm Spreadsheet::XLSX
-cpanm Spreadsheet::Read
-cpanm LWP::UserAgent
-cpanm HTML::Entities
-cpanm HTML::Strip
-cpanm HTML::FormatText
-cpanm HTML::TreeBuilder
-cpanm Time::Local
-cpanm MIME::Decoder
-cpanm Mail::POP3Client
-cpanm Mail::IMAPClient
-cpanm Mail::Message
-cpanm IO::Socket::SSL
-cpanm MIME::Base64
-cpanm MIME::QuotedPrint
-cpanm Crypt::Eksblowfish::Bcrypt
-cpanm Crypt::RC4
-cpanm Text::CSV
-cpanm Text::CSV_XS
-
-cpan install Crypt::Eksblowfish::Bcrypt
 apt install libsrtp* -y
 
 ### up to this point
@@ -386,8 +332,7 @@ modprobe dahdi_dummy
 sleep 5
 
 # Install Asterisk and LibPRI
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
+cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
 wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-*
@@ -401,7 +346,7 @@ cd libsrtp-2.1.0
 make shared_library && sudo make install
 ldconfig
 
-cd /usr/src/asterisk/asterisk-18.21.0-vici/
+cd /usr/src/asterisk-18.21.0-vici/
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
@@ -422,8 +367,6 @@ make install
 
 # Install configs and samples
 make samples
-make config
-make basic-pbx
 
 adduser asterisk --disabled-password --gecos "Asterisk User"
 
@@ -454,8 +397,7 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-sudo systemctl enable asterisk
-sudo systemctl start asterisk
+chkconfig asterisk off
 
 rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
@@ -744,17 +686,12 @@ systemctl start apache2.service
 
 modprobe dahdi
 modprobe dahdi_dummy
-
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-
 ### sleep for 20 seconds before launching Asterisk
-
 sleep 5
 
-
 ### start up asterisk
-
 /usr/share/astguiclient/start_asterisk_boot.pl
 
 exit 0
