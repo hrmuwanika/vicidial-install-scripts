@@ -431,41 +431,6 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-touch /usr/lib/systemd/system/asterisk.service
-cat > /usr/lib/systemd/system/asterisk.service << EOF
-[Unit]
-Description=Asterisk PBX and telephony daemon.
-#After=network.target
-#include these if asterisk need to bind to a specific IP (other than 0.0.0.0)
-Wants=network-online.target
-After=network-online.target network.target
-
-[Service]
-Type=simple
-Environment=HOME=/var/lib/asterisk
-WorkingDirectory=/var/lib/asterisk
-ExecStart=/usr/sbin/asterisk -mqf -C /etc/asterisk/asterisk.conf
-ExecReload=/usr/sbin/asterisk -rx 'core reload'
-ExecStop=/usr/sbin/asterisk -rx 'core stop now'
-
-LimitCORE=infinity
-Restart=always
-RestartSec=4
-
-# Prevent duplication of logs with color codes to /var/log/messages
-StandardOutput=null
-
-PrivateTmp=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl disable asterisk.service
-systemctl enable asterisk.service
-systemctl start asterisk
-
-
 #--------------------------------------------------
 # Install astguiclient
 #--------------------------------------------------
@@ -848,7 +813,7 @@ EOF
 sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
 
 tee -a /etc/ssh/sshd_banner <<EOF
-Thank you for choosing CyburDial and Henry Robert Muwanika's auto installer!
+Thank you for choosing ViciDial and Henry Robert Muwanika's auto installer!
 
 Visit our website at https://asmtech.co.rw
 
@@ -891,7 +856,7 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x confbridges.sh
 ./confbridges.sh
 
-#chkconfig asterisk off
+chkconfig asterisk off
 
 ## Install firewall
 yum -y install firewalld
