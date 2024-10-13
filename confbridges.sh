@@ -39,5 +39,5 @@ EOF
 
 sed -i 's|vicidial_conferences|vicidial_confbridges|g' /var/www/html/vicidial/non_agent_api.php
 
-systemctl restart asterisk.service
+asterisk -rx "core reload"
 
