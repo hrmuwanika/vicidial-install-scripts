@@ -44,7 +44,7 @@ yum -y install yum-utils
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
-dnf -y module enable php:remi-7.4
+dnf -y module enable php:remi-8.1
 dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
