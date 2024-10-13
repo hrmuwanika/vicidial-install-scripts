@@ -39,7 +39,7 @@ sudo systemctl enable mariadb.service
 
 # sudo mysql_secure_installation
 
-# Install PHP7.4
+# Install PHP8.1
 sudo apt install -y ca-certificates apt-transport-https software-properties-common 
 wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
@@ -47,9 +47,9 @@ sudo apt update
 
 apt install -y uuid* libxml2*
 
-sudo apt install -y php7.4 libapache2-mod-php7.4 php7.4-common php7.4-sqlite3 php7.4-curl php7.4-dev php7.4-readline php7.4-intl php7.4-mbstring \
-php7.4-mysql php7.4-ldap php7.4-gd php7.4-xml php7.4-cli php7.4-zip php7.4-soap php7.4-imap php7.4-bcmath php7.4-opcache php7.4-ldap php7.4-json \
-php7.4-mysqli php7.4-odbc php-pear php7.4-xmlrpc php7.4-mcrypt
+sudo apt install -y php8.1 libapache2-mod-php8.1 php8.1-common php8.1-sqlite3 php8.1-curl php8.1-dev php8.1-readline php8.1-intl php8.1-mbstring \
+php8.1-mysql php8.1-ldap php8.1-gd php8.1-xml php8.1-cli php8.1-zip php8.1-soap php8.1-imap php8.1-bcmath php8.1-opcache php8.1-ldap php8.1-json \
+php8.1-mysqli php8.1-odbc php-pear php8.1-xmlrpc php8.1-mcrypt
 
 # install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
