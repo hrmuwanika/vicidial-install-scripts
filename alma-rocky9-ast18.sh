@@ -61,8 +61,8 @@ dnf -y install mariadb-server mariadb
 systemctl enable mariadb.service
 systemctl start mariadb.service
 
-yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ initscripts
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt net-tools
+yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
+yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools
 yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl uuid* gtk2-devel binutils-devel libedit libedit-devel
 
 yum -y copr enable irontec/sngrep 
