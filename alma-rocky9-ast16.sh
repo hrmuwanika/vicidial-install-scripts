@@ -96,11 +96,12 @@ memory_limit = 448M
 short_open_tag = On
 max_execution_time = 330
 max_input_time = 360
-post_max_size = 100M
-upload_max_filesize = 100M
+post_max_size = 300M
+upload_max_filesize = 300M
 default_socket_timeout = 360
 date.timezone = Africa/Kigali
 max_input_vars = 20000
+upload_tmp_dir =/tmp
 EOF
 
 systemctl restart httpd
@@ -336,39 +337,7 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
-ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
-cd /etc/include
-wget https://dialer.one/newt.h
-
-cd /usr/src/
-## wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.4.0+3.4.0.tar.gz
-mkdir dahdi-linux-complete-3.4.0+3.4.0
-## tar -xzvf dahdi-linux-complete-3.4.0+3.4.0.tar.gz
-cd dahdi-linux-complete-3.4.0+3.4.0
-wget https://cybur-dial.com/dahdi-9.4-fix.zip
-unzip dahdi-9.4-fix.zip
-yum -y install newt* 
-
-## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.4.0+3.4.0/linux/drivers/dahdi/wctc4xxp/base.c
-## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
-
-make clean
-make
-make install
-make install-config
-
-cd tools
-make clean
-make
-make install
-make install-config
-
-cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
-
-echo "Install Dahdi package"
-yum -y install kernel-devel kernel-devel-$(uname -r)
-
-yum -y install dahdi* asterisk-dahdi dahdi-tools-libs
+cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
@@ -808,17 +777,6 @@ tee -a ~/.bashrc <<EOF
 /usr/bin/screen -ls
 /usr/sbin/dahdi_cfg -v
 /usr/sbin/asterisk -V
-EOF
-
-sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
-
-tee -a /etc/ssh/sshd_banner <<EOF
-Thank you for choosing ViciDial and Henry Robert Muwanika's auto installer!
-
-Visit our website at https://asmtech.co.rw
-
-Support: info@asmtech.co.rw
-Phone number +250789231226 / +256788464060
 EOF
 
 #add rc-local as a service - thx to ras
