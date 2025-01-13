@@ -94,11 +94,12 @@ memory_limit = 448M
 short_open_tag = On
 max_execution_time = 330
 max_input_time = 360
-post_max_size = 100M
-upload_max_filesize = 100M
+post_max_size = 300M
+upload_max_filesize = 300M
 default_socket_timeout = 360
 date.timezone = Africa/Kigali
 max_input_vars = 20000
+upload_tmp_dir =/tmp
 EOF
 
 systemctl restart httpd
