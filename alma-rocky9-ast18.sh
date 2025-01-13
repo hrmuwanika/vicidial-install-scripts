@@ -18,9 +18,9 @@ yum -y install openssh-server
 
 # Disable password authentication
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
-sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+#sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+#sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
+#sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo service sshd restart
 
 export LC_ALL=C
@@ -808,17 +808,6 @@ tee -a ~/.bashrc <<EOF
 /usr/bin/screen -ls
 /usr/sbin/dahdi_cfg -v
 /usr/sbin/asterisk -V
-EOF
-
-sed -i 's|#Banner none|Banner /etc/ssh/sshd_banner|g' /etc/ssh/sshd_config
-
-tee -a /etc/ssh/sshd_banner <<EOF
-Thank you for choosing ViciDial and Henry Robert Muwanika's auto installer!
-
-Visit our website at https://asmtech.co.rw
-
-Support: info@asmtech.co.rw
-Phone number +250789231226 / +256788464060
 EOF
 
 #add rc-local as a service - thx to ras
