@@ -335,6 +335,7 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
+sudo dnf -y install dahdi-tools 
 cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
