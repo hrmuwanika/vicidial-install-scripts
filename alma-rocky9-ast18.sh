@@ -63,7 +63,11 @@ systemctl start mariadb.service
 
 yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
 yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
-yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl uuid* gtk2-devel binutils-devel libedit libedit-devel
+yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
+
+sudo dnf remove certbot
+yum -y install certbot python3-certbot-apache mod_ssl
+# sudo certbot --apache -d
 
 yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
