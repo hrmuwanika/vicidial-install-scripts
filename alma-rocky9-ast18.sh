@@ -68,8 +68,9 @@ gpgcheck=1
 EOF
 
 sudo dnf update -y
+sudo dnf module reset mariadb -y
 
-sudo dnf install MariaDB-server MariaDB-client
+sudo dnf -y install MariaDB-server MariaDB-client MariaDB-backup
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 
