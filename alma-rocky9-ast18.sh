@@ -49,13 +49,13 @@ dnf -y module enable php:remi-8.1
 
 dnf -y install dnf-plugins-core
 
-yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
-yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
-yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+sudo yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
+sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
+sudo yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
 
-yum -y install httpd
-systemctl enable httpd.service
-systemctl start httpd.service
+sudo yum -y install httpd
+sudo systemctl enable httpd.service
+sudo systemctl start httpd.service
 
 sudo cat <<EOF > /etc/yum.repos.d/mariadb.repo
 
@@ -69,19 +69,19 @@ EOF
 
 sudo dnf update -y
 
-dnf -y install mariadb-server mariadb 
-systemctl enable mariadb.service
-systemctl start mariadb.service
+sudo dnf install MariaDB-server MariaDB-client
+sudo systemctl enable mariadb.service
+sudo systemctl start mariadb.service
 
-yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
-yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
-yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
+sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
+sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
+sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
 
 # Install certbot
-yum -y install certbot python3-certbot-apache mod_ssl
+sudo yum -y install certbot python3-certbot-apache mod_ssl
 # sudo certbot --apache 
 
-yum -y copr enable irontec/sngrep 
+sudo yum -y copr enable irontec/sngrep 
 dnf -y install sngrep 
 
 dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
