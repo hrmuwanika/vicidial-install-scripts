@@ -45,7 +45,7 @@ yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarc
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 dnf -y module enable php:remi-8.1
-dnf -y module enable mariadb:10.5 
+# dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
 
@@ -56,6 +56,18 @@ yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc
 yum -y install httpd
 systemctl enable httpd.service
 systemctl start httpd.service
+
+sudo cat <<EOF > /etc/yum.repos.d/mariadb.repo
+
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.11/rhel9-amd64
+module_hotfixes=1
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1 
+EOF
+
+sudo dnf update -y
 
 dnf -y install mariadb-server mariadb 
 systemctl enable mariadb.service
