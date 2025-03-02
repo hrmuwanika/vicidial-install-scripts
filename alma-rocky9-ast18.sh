@@ -79,7 +79,7 @@ sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net
 sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
 
 # Install certbot
-sudo yum -y install certbot python3-certbot-apache mod_ssl
+sudo dnf install certbot python3-certbot-apache mod_ssl
 # sudo certbot --apache 
 
 sudo yum -y copr enable irontec/sngrep 
@@ -92,7 +92,6 @@ yum -y install libsrtp-devel
 yum -y install elfutils-libelf-devel
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
-
 CustomLog /dev/null common
 
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
@@ -105,7 +104,6 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 EOF
 
 tee -a /etc/php.ini <<EOF
-
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
