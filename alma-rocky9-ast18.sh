@@ -16,11 +16,8 @@ setenforce 0
 
 yum -y install openssh-server
 
-# Disable password authentication
+# Enable root access to ssh
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-#sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-#sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
-#sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo service sshd restart
 
 export LC_ALL=C
@@ -33,25 +30,25 @@ EOF
 yum check-update
 yum -y update
 yum -y install epel-release
-yum update -y
+yum -y update
 
-yum -y install nano tar
+yum -y install nano tar openssh-server
 yum -y groupinstall 'Development Tools'
-yum -y install kernel*
+yum -y install kernel* --exclude=kernel-debug* 
 
 # Updating YUM Repos
 yum -y install yum-utils
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
-dnf -y module enable php:remi-8.3
+dnf -y module enable php:remi-8.2
 # dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
 
-sudo yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
-sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
-sudo yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl php-imagick 
+sudo yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache 
+sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt 
+sudo yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
 
 sudo yum -y install httpd
 sudo systemctl enable httpd.service
@@ -70,26 +67,28 @@ EOF
 sudo dnf update -y
 sudo dnf module reset mariadb -y
 
-sudo dnf -y install MariaDB-server MariaDB-client MariaDB-backup
+sudo dnf -y install  mariadb-server mariadb
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
+
+yum -y install sox lame-devel php-opcache libss7 libss7* 
 
 sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
 sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
 sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
 
 # Install certbot
-sudo dnf install certbot python3-certbot-apache mod_ssl
-# sudo certbot --apache 
+sudo dnf -y install certbot python3-certbot-apache mod_ssl
 
+sudo yum -y install initscripts
 sudo yum -y copr enable irontec/sngrep 
-dnf -y install sngrep 
+sudo dnf -y install sngrep -y
 
-dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
-dnf config-manager --set-enabled crb
+sudo dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
+sudo dnf config-manager --set-enabled crb
 
-yum -y install libsrtp-devel 
-yum -y install elfutils-libelf-devel
+sudo yum -y install libsrtp-devel 
+sudo yum -y install elfutils-libelf-devel
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
 CustomLog /dev/null common
@@ -119,8 +118,8 @@ EOF
 
 systemctl restart httpd
 
-yum -y install chkconfig atop mytop
-yum -y install speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install chkconfig atop mytop htop
+yum -y install libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -270,7 +269,7 @@ cpanm Text::CSV_XS
 cpan install Crypt::Eksblowfish::Bcrypt
 
 # CPM install
-cd /usr/src/vicidial-install-scripts
+cd /usr/src
 curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
 /usr/local/bin/cpm install -g
 
@@ -355,6 +354,10 @@ cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x p
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
+
+sudo systemctl enable dahdi
+sudo systemctl start dahdi
+sudo systemctl status dahdi
 
 # Install Asterisk and LibPRI
 cd /usr/src/
@@ -722,6 +725,7 @@ mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
 chmod 777 codec_g729.so
 
 ## Install Sounds
+
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
@@ -733,7 +737,7 @@ wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-# Place the audio files in their proper places:
+#Place the audio files in their proper places:
 cd /var/lib/asterisk/sounds
 tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
 tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -854,10 +858,10 @@ chown -R apache:apache /var/spool/asterisk/monitorDONE
 
 read -p 'Press Enter to Reboot:'
 echo "Restarting AlmaLinux"
+echo "Admin Interface:"
+echo "Access http://yourserverip/vicidial/admin.php (username:6666, password:1234)"
+
+echo "Agent Interface:"
+echo "http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
 
 reboot
-# Admin Interface:
-# http://yourserverip/vicidial/admin.php (username:6666, password:1234)
-
-# Agent Interface:
-# http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
