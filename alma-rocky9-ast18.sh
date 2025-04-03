@@ -106,11 +106,11 @@ tee -a /etc/php.ini <<EOF
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
-max_execution_time = 330
-max_input_time = 360
-post_max_size = 300M
-upload_max_filesize = 300M
-default_socket_timeout = 360
+max_execution_time = 3330
+max_input_time = 3360
+post_max_size = 448M
+upload_max_filesize = 442M
+default_socket_timeout = 3360
 date.timezone = Africa/Kigali
 max_input_vars = 20000
 upload_tmp_dir =/tmp
@@ -119,7 +119,10 @@ EOF
 systemctl restart httpd
 
 yum -y install chkconfig atop mytop htop
-yum -y install libedit-devel uuid* libxml2* speex-devel speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install libedit-devel uuid* libxml2* speex-devel speex* dovecot s-nail roundcubemail inxi
+yum -y install sendmail postfix
+systemctl enable postfix
+systemctl start postfix
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -160,7 +163,7 @@ long_query_time = 1
 tmp_table_size = 128M
 table_cache = 1024
 
-join_buffer_size = 1M
+join_buffer_size = 33M
 key_buffer = 512M
 sort_buffer_size = 6M
 read_buffer_size = 4M
@@ -212,6 +215,12 @@ systemctl restart mariadb.service
 # Install Perl Modules
 echo "Install Perl"
 yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+
+cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile \
+Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail \
+Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX \
+Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText \
+HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message IO::Socket::SSL readline
 
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
@@ -624,7 +633,6 @@ cat <<CRONTAB>> /root/crontab-file
 #25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 
-
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
 
@@ -838,6 +846,7 @@ chkconfig asterisk off
 
 ## Install firewall
 yum -y install firewalld
+
 systemctl enable firewalld
 systemctl start firewalld 
 
@@ -853,15 +862,17 @@ firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
 firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
 firewall-cmd --reload
 
+systemctl restart firrewalld
+
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
-read -p 'Press Enter to Reboot:'
-echo "Restarting AlmaLinux"
 echo "Admin Interface:"
 echo "Access http://yourserverip/vicidial/admin.php (username:6666, password:1234)"
 
 echo "Agent Interface:"
 echo "http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
 
+read -p 'Press Enter to Reboot:'
+echo "Restarting AlmaLinux"
 reboot
