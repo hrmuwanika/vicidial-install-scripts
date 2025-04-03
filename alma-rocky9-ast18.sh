@@ -842,6 +842,9 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x confbridges.sh
 ./confbridges.sh
 
+sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
+sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
+
 chkconfig asterisk off
 
 ## Install firewall
