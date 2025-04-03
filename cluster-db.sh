@@ -1,24 +1,31 @@
 #!/bin/sh
-wget https://cybur-dial.com/downloads/cluster-db
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/refs/heads/main/cluster-db.sql
+
 echo "Enter the database IP:"
 read DB
 mysql -u root asterisk < cluster-db
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.1 --server_ip=$DB
+
 echo "Enter dialer 1 IP:"
 read DIALER1
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.2 --server_ip=$DIALER1
+
 echo "Enter dialer 2 IP:"
 read DIALER2
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.3 --server_ip=$DIALER2
+
 echo "Enter dialer 3 IP:"
 read DIALER3
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.4 --server_ip=$DIALER3
+
 echo "Enter dialer 4 IP:"
 read DIALER4
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.5 --server_ip=$DIALER4
+
 echo "Enter dialer 5 IP:"
 read DIALER5
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.6 --server_ip=$DIALER5
+
 echo "Enter dialer 6 IP:"
 read DIALER6
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=192.168.1.7 --server_ip=$DIALER6
