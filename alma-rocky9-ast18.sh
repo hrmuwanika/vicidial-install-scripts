@@ -4,8 +4,30 @@ echo "==========================================================================
 echo "Vicidial installation and Asterisk 18 on AlmaLinux/RockyLinux"
 echo "==================================================================================="
 
-# Set server hostname
-hostnamectl set-hostname vicidial.rw
+# Function to prompt user for input
+prompt() {
+    local varname=$1
+    local prompt_text=$2
+    local default_value=$3
+    read -p "$prompt_text [$default_value]: " input
+    export $varname="${input:-$default_value}"
+}
+
+echo "Getting Machine info - No hostname? Enter the IP Address"
+echo "**************************************************************************"
+prompt hostname "Enter the hostname:" "$hostname"
+echo "Press Enter to continue"
+read
+hostnamectl set-hostname $hostname
+# Retrieve the Hostname
+hostname=$(hostname | awk '{print $1}')
+echo "Hostname\t: $hostname"
+# Retrieve the IP address
+ip_address=$(hostname -I | awk '{print $1}')
+echo "IP Address\t: $ip_address"
+echo "**************************************************************************"
+echo "Enter to continue..."
+read	
 
 # Set the timezone
 timedatectl set-timezone Africa/Kigali
@@ -540,9 +562,9 @@ ExpectedDBSchema => 1645
 ASTGUI
 
 echo "Replace IP address in Default"
-echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
-read serveripadd
-sed -i s/SERVERIP/"$serveripadd"/g /etc/astguiclient.conf
+#echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
+#read serveripadd
+sed -i s/SERVERIP/"$ip_address"/g /etc/astguiclient.conf
 
 echo "Install VICIDIAL"
 perl install.pl --no-prompt --copy_sample_conf_files=Y
@@ -553,7 +575,7 @@ sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
 echo "Replace OLD IP. You need to Enter your Current IP here"
-/usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
+/usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15 --server_ip=$ip_address --auto
 
 perl install.pl --no-prompt
 
@@ -871,10 +893,10 @@ chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
 echo "Admin Interface:"
-echo "Access http://yourserverip/vicidial/admin.php (username:6666, password:1234)"
+echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:1234)"
 
 echo "Agent Interface:"
-echo "http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
+echo "http://$ip_address/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
 
 read -p 'Press Enter to Reboot:'
 echo "Restarting AlmaLinux"
