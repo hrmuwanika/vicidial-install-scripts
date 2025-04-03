@@ -73,7 +73,7 @@ sudo systemctl start mariadb.service
 
 yum -y install sox lame-devel php-opcache libss7 libss7* 
 
-sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sendmail perl-File-Which dmidecode gcc-c++ initscripts
+sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel perl-File-Which dmidecode gcc-c++ initscripts
 sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
 sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
 
