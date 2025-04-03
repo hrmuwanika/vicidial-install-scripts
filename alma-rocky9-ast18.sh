@@ -40,7 +40,7 @@ yum -y install openssh-server
 
 # Enable root access to ssh
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-sudo service sshd restart
+sudo systemctl restart sshd
 
 export LC_ALL=C
 
@@ -69,8 +69,9 @@ dnf -y module enable php:remi-8.2
 dnf -y install dnf-plugins-core
 
 sudo yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache 
-sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt 
-sudo yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-devel
+sudo yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+sudo yum -y install initscripts python3-pip libxcrypt-compat
 
 sudo yum -y install httpd
 sudo systemctl enable httpd.service
@@ -95,19 +96,23 @@ sudo systemctl start mariadb.service
 
 yum -y install sox lame-devel php-opcache libss7 libss7* 
 
-sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel perl-File-Which dmidecode gcc-c++ initscripts
-sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate
+sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel perl-File-Which dmidecode gcc-c++ 
+sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate htop gd-devel make patch 
 sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
+
+### Install cockpit
+sudo yum -y install cockpit cockpit-storaged cockpit-navigator
+sed -i s/root/"#root"/g /etc/cockpit/disallowed-users
+sudo systemctl enable cockpit.socket
 
 # Install certbot
 sudo dnf -y install certbot python3-certbot-apache mod_ssl
 
-sudo yum -y install initscripts
 sudo yum -y copr enable irontec/sngrep 
-sudo dnf -y install sngrep -y
+sudo dnf -y install sngrep 
 
-sudo dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
-sudo dnf config-manager --set-enabled crb
+dnf --enablerepo=crb install libsrtp-devel -y
+dnf config-manager --set-enabled crb
 
 sudo yum -y install libsrtp-devel 
 sudo yum -y install elfutils-libelf-devel
@@ -134,11 +139,11 @@ post_max_size = 448M
 upload_max_filesize = 442M
 default_socket_timeout = 3360
 date.timezone = Africa/Kigali
-max_input_vars = 20000
+max_input_vars = 50000
 upload_tmp_dir =/tmp
 EOF
 
-systemctl restart httpd
+sudo systemctl restart httpd
 
 yum -y install chkconfig atop mytop htop
 yum -y install libedit-devel uuid* libxml2* speex-devel speex* dovecot s-nail roundcubemail inxi
