@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Vicidial installation Debian 12 with CyburPhone and Dynamic portal"
+echo "Vicidial installation Ubuntu 24.04"
 
 #--------------------------------------------------
 # Update Server
