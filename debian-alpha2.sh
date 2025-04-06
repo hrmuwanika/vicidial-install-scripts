@@ -368,41 +368,12 @@ modprobe dahdi_dummy
 sudo systemctl enable dahdi
 sudo systemctl start dahdi
 sudo systemctl status dahdi
-
-#Install Asterisk and LibPRI
-mkdir /usr/src/asterisk
-cd /usr/src/asterisk
+# Install Asterisk and LibPRI
+cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget https://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-18.18.1.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-*
 tar -xvzf libpri-*
-
-cd /usr/src
-wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
-tar xfv v2.1.0.tar.gz
-cd libsrtp-2.1.0
-./configure --prefix=/usr --enable-openssl
-make shared_library && sudo make install
-ldconfig
-
-cd /usr/src/asterisk/asterisk-18.18.1/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/amd_stats-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/iax_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/sip_peer_status-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_app-18.patch
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/timeout_reset_dial_core-18.patch
-cd apps/
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/enter.h
-wget http://download.vicidial.com/asterisk-patches/Asterisk-18/leave.h
-yes | cp -rf enter.h.1 enter.h
-yes | cp -rf leave.h.1 leave.h
-
-cd /usr/src/asterisk/asterisk-18.18.1/
-patch < amd_stats-18.patch apps/app_amd.c
-patch < iax_peer_status-18.patch channels/chan_iax2.c
-patch < sip_peer_status-18.patch channels/chan_sip.c
-patch < timeout_reset_dial_app-18.patch apps/app_dial.c
-patch < timeout_reset_dial_core-18.patch main/dial.c
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
