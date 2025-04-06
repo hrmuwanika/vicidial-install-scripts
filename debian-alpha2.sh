@@ -43,15 +43,6 @@ wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list 
 sudo apt update
 
-apt install -y uuid* libxml2*
-
-sudo apt install -y php8.1 libapache2-mod-php8.1 php8.1-common php8.1-sqlite3 php8.1-curl php8.1-dev php8.1-readline php8.1-intl php8.1-mbstring \
-php8.1-mysql php8.1-ldap php8.1-gd php8.1-xml php8.1-cli php8.1-zip php8.1-soap php8.1-imap php8.1-bcmath php8.1-opcache php8.1-ldap php8.1-json \
-php8.1-mysqli php8.1-odbc php-pear php8.1-xmlrpc php8.1-mcrypt
-
-##apt install -y sqlite-devel httpd mod_ssl nano chkconfig htop atop mytop iftop
-apt install -y uuid* libxml2*
-
 # install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
 systemctl enable apache2
@@ -61,6 +52,9 @@ systemctl start apache2
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid libssl-dev \
 git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop sngrep libcurl4 make \
 build-essential libjansson-dev autoconf automake libxml2-dev libsqlite3-dev pkg-config sqlite3 ntp 
+
+##apt install -y sqlite-devel httpd mod_ssl nano chkconfig htop atop mytop iftop
+sudo apt install -y uuid* libxml2*
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
