@@ -357,50 +357,17 @@ make shared_library && sudo make install
 ldconfig
 
 
-# Install dahdi
+# Install Dahdi
 echo "Install Dahdi"
-apt-get -y install dahdi-* dahdi
-modprobe dahdi
-modprobe dahdi_dummy
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-sleep 5
-
-ln -sf /usr/lib/modules/$(uname -r)/vmlinux.xz /boot/
-cd /etc/include
-wget https://dialer.one/newt.h
-
-cd /usr/src/
-## wget https://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-3.4.0+3.4.0.tar.gz
-mkdir dahdi-linux-complete-3.4.0+3.4.0
-## tar -xzvf dahdi-linux-complete-3.4.0+3.4.0.tar.gz
-cd dahdi-linux-complete-3.4.0+3.4.0
-wget https://cybur-dial.com/dahdi-9.4-fix.zip
-unzip dahdi-9.4-fix.zip
-apt install 
-
-## sudo sed -i 's|(netdev, \&wc->napi, \&wctc4xxp_poll, 64);|(netdev, \&wc->napi, \&wctc4xxp_poll);|g' /usr/src/dahdi-linux-complete-3.4.0+3.4.0/linux/drivers/dahdi/wctc4xxp/base.c
-## sudo sed -i 's|<linux/pci-aspm.h>|<linux/pci.h>|g' /usr/src/dahdi-linux-complete-3.2.0+3.2.0/linux/include/dahdi/kernel.h
-
-make clean
-make
-make install
-make install-config
-/usr/sbin/dahdi_cfg -vvvvvvvvvv
-sleep 5
-
-cd tools
-make clean
-make
-make install
-make install-config
-/usr/sbin/dahdi_cfg -vvvvvvvvvv
-sleep 5
-
-cp /etc/dahdi/system.conf.sample /etc/dahdi/system.conf
+sudo apt install -y dahdi-tools 
+cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
-sleep 5
+
+sudo systemctl enable dahdi
+sudo systemctl start dahdi
+sudo systemctl status dahdi
 
 #Install Asterisk and LibPRI
 mkdir /usr/src/asterisk
