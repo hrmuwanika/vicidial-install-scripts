@@ -32,7 +32,7 @@ export LC_ALL=C
 # Install mariadb databases
 curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=11.2
 sudo apt update 
-sudo apt install -y mariadb-server mariadb-client libmariadb-dev libmysqlclient-dev libmariadbclient-dev
+sudo apt install -y mariadb-server mariadb-client libmysqlclient-dev libmariadbclient-dev
 
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
@@ -47,9 +47,9 @@ sudo apt update
 
 apt install -y uuid* libxml2*
 
-sudo apt install -y php8.1 libapache2-mod-php8.1 php8.1-common php8.1-sqlite3 php8.1-curl php8.1-dev php8.1-readline php8.1-intl php8.1-mbstring \
-php8.1-mysql php8.1-ldap php8.1-gd php8.1-xml php8.1-cli php8.1-zip php8.1-soap php8.1-imap php8.1-bcmath php8.1-opcache php8.1-ldap php8.1-json \
-php8.1-mysqli php8.1-odbc php-pear php8.1-xmlrpc php8.1-mcrypt
+sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
+php8.3-mysql php8.3-ldap php8.3-gd php8.3-xml php8.3-cli php8.3-zip php8.3-soap php8.3-imap php8.3-bcmath php8.3-opcache php8.3-ldap php8.3-odbc \
+php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt
 
 # install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
@@ -85,7 +85,7 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-tee -a /etc/php/7.4/apache2/php.ini <<EOF
+tee -a /etc/php/8.3/apache2/php.ini <<EOF
 
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
