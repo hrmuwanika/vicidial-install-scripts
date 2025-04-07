@@ -966,10 +966,8 @@ cat <<CRONTAB > /root/crontab-file
 * * * * * sleep 30; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 40; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
-
-
 CRONTAB
-crontab /root/crontab-file
+
 crontab -l
 
 # Install rc.local
