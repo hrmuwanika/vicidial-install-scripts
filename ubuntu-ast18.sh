@@ -1010,14 +1010,19 @@ EOF
 
 sudo cat <<EOF > /etc/systemd/system/rc-local.service
 [Unit]
-Description=Local Startup Script
+ Description=/etc/rc.local Compatibility
+ ConditionPathExists=/etc/rc.local
 
 [Service]
-Type=simple
-ExecStart=/etc/rc.local
+ Type=forking
+ ExecStart=/etc/rc.local start
+ TimeoutSec=0
+ StandardOutput=tty
+ RemainAfterExit=yes
+ SysVStartPriority=99
 
 [Install]
-WantedBy=multi-user.target
+ WantedBy=multi-user.target
 EOF
 
 sudo chmod +x /etc/rc.local
