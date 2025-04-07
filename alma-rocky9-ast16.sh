@@ -1065,6 +1065,7 @@ EOF
 sudo chmod +x /etc/rc.local
 sudo chmod 644 /etc/systemd/system/rc-local.service
 
+sudo systemctl daemon-reload
 sudo systemctl enable rc-local.service
 sudo systemctl start rc-local.service
 
