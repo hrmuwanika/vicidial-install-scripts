@@ -888,7 +888,7 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 perl install.pl --no-prompt
 
 # Install Crontab
-cat <<CRONTAB>> /root/crontab-file
+sudo cat <<CRONTAB > /root/crontab-file
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -997,11 +997,9 @@ cat <<CRONTAB>> /root/crontab-file
 * * * * * sleep 30; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 40; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
-
-
 CRONTAB
 
-crontab /root/crontab-file
+
 crontab -l
 
 # Install rc.local
