@@ -1157,30 +1157,10 @@ tee -a ~/.bashrc <<EOF
 /usr/sbin/asterisk -V
 EOF
 
-#add rc-local as a service - thx to ras
-tee -a /etc/systemd/system/rc-local.service <<EOF
-[Unit]
-Description=/etc/rc.local Compatibility
-
-[Service]
-Type=oneshot
-ExecStart=/etc/rc.local
-TimeoutSec=0
-StandardInput=tty
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 ## fstab entry
 tee -a /etc/fstab <<EOF
 none /var/spool/asterisk/monitor tmpfs nodev,nosuid,noexec,nodiratime,size=2G 0 0
 EOF
-
-systemctl daemon-reload
-sudo systemctl enable rc-local.service
-sudo systemctl start rc-local.service
 
 cat <<WELCOME>> /var/www/html/index.html
 <META HTTP-EQUIV=REFRESH CONTENT="1; URL=/vicidial/welcome.php">
