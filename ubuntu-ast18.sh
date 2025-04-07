@@ -202,6 +202,7 @@ interactive-timeout
 [mysqld_safe]
 #log-error = /var/log/mysqld/mysqld.log
 #pid-file = /var/run/mysqld/mysqld.pid
+default_time_zone = 'Africa/Kigali'
 MYSQLCONF
 
 mkdir /var/log/mysqld
@@ -972,7 +973,7 @@ crontab /root/crontab-file
 crontab -l
 
 # Install rc.local
-cat > /etc/rc.d/rc.local <<EOF
+sudo cat <<EOF > /etc/rc.local 
 #!/bin/sh
 #
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
@@ -1007,9 +1008,23 @@ modprobe dahdi_dummy
 exit 0
 EOF
 
-chmod +x /etc/rc.d/rc.local
-systemctl enable rc-local
-systemctl start rc-local
+sudo cat <<EOF > /etc/systemd/system/rc-local.service
+[Unit]
+Description=Local Startup Script
+
+[Service]
+Type=simple
+ExecStart=/etc/rc.local
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo chmod +x /etc/rc.local
+sudo chmod 644 /etc/systemd/system/rc-local.service
+
+sudo systemctl enable rc-local.service
+sudo systemctl start rc-local.service
 
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
@@ -1092,7 +1107,7 @@ tee -a ~/.bashrc <<EOF
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
 /usr/bin/systemctl status apache2 --no-pager
-/usr/bin/systemctl status firewalld --no-pager
+/usr/bin/systemctl status ufw --no-pager
 /usr/share/astguiclient/AST_VDhopper.pl -q
 /usr/bin/screen -ls
 /usr/sbin/dahdi_cfg -v
