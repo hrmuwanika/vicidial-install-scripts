@@ -1003,7 +1003,7 @@ CRONTAB
 crontab -l
 
 # Install rc.local
-cat > /etc/rc.d/rc.local <<EOF
+cat <<EOF > /etc/rc.local
 #!/bin/sh
 #
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
@@ -1042,9 +1042,28 @@ sleep 20
 exit 0
 EOF
 
-chmod +x /etc/rc.d/rc.local
-systemctl enable rc-local
-systemctl start rc-local
+sudo cat <<EOF > /etc/systemd/system/rc-local.service
+[Unit]
+ Description=/etc/rc.local Compatibility
+ ConditionPathExists=/etc/rc.local
+
+[Service]
+ Type=forking
+ ExecStart=/etc/rc.local start
+ TimeoutSec=0
+ StandardOutput=tty
+ RemainAfterExit=yes
+ SysVStartPriority=99
+
+[Install]
+ WantedBy=multi-user.target
+EOF
+
+sudo chmod +x /etc/rc.local
+sudo chmod 644 /etc/systemd/system/rc-local.service
+
+sudo systemctl enable rc-local.service
+sudo systemctl start rc-local.service
 
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
