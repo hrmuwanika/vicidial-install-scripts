@@ -230,6 +230,7 @@ interactive-timeout
 [mysqld_safe]
 #log-error = /var/log/mysqld/mysqld.log
 #pid-file = /var/run/mysqld/mysqld.pid
+default_time_zone = 'Africa/Kigali'
 MYSQLCONF
 
 mkdir /var/log/mysqld
