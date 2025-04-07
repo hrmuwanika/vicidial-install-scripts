@@ -1,11 +1,33 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 16 on AlmaLinux/RockyLinux"
+echo "Vicidial installation and Asterisk 18 on AlmaLinux/RockyLinux"
 echo "==================================================================================="
 
-# Set server hostname
-hostnamectl set-hostname vicidial.rw
+# Function to prompt user for input
+prompt() {
+    local varname=$1
+    local prompt_text=$2
+    local default_value=$3
+    read -p "$prompt_text [$default_value]: " input
+    export $varname="${input:-$default_value}"
+}
+
+echo "Getting Machine info - No hostname? Enter the IP Address"
+echo "**************************************************************************"
+prompt hostname "Enter the hostname:" "$hostname"
+echo "Press Enter to continue"
+read
+hostnamectl set-hostname $hostname
+# Retrieve the Hostname
+hostname=$(hostname | awk '{print $1}')
+echo "Hostname\t: $hostname"
+# Retrieve the IP address
+ip_address=$(hostname -I | awk '{print $1}')
+echo "IP Address\t: $ip_address"
+echo "**************************************************************************"
+echo "Enter to continue..."
+read	
 
 # Set the timezone
 timedatectl set-timezone Africa/Kigali
@@ -16,12 +38,9 @@ setenforce 0
 
 yum -y install openssh-server
 
-# Disable password authentication
+# Enable root access to ssh
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-sudo sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config 
-sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-sudo service sshd restart
+sudo systemctl restart sshd
 
 export LC_ALL=C
 
@@ -33,31 +52,30 @@ EOF
 yum check-update
 yum -y update
 yum -y install epel-release
-yum update -y
+yum -y update
 
-yum -y install nano tar
-yum -y groupinstall core
-yum -y groupinstall base
+yum -y install nano tar openssh-server
 yum -y groupinstall 'Development Tools'
-yum -y install kernel*
+yum -y install kernel* --exclude=kernel-debug* 
 
 # Updating YUM Repos
 yum -y install yum-utils
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
-dnf -y module enable php:remi-8.1
-#dnf -y module enable mariadb:10.5 
+dnf -y module enable php:remi-8.2
+# dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
 
-yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache  
-yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-mcrypt
-yum -y install php-imap php-ldap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick 
+sudo yum -y install php screen php-mcrypt subversion php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-opcache php-fpm php-mysqlnd
+sudo yum -y install wget unzip make patch gcc gcc-c++ subversion php php-devel php-gd gd-devel readline-devel php-mbstring php-devel
+sudo yum -y install php-imap php-mysqli php-odbc php-pear php-xml php-xmlrpc curl curl-devel perl-libwww-perl ImageMagick php-bcmath php-json
+sudo yum -y install initscripts python3-pip libxcrypt-compat
 
-yum -y install httpd
-systemctl enable httpd.service
-systemctl start httpd.service
+sudo yum -y install httpd
+sudo systemctl enable httpd.service
+sudo systemctl start httpd.service
 
 sudo cat <<EOF > /etc/yum.repos.d/mariadb.repo
 
@@ -72,25 +90,34 @@ EOF
 sudo dnf update -y
 sudo dnf module reset mariadb -y
 
-sudo dnf -y install MariaDB-server MariaDB-client MariaDB-backup
-systemctl enable mariadb.service
-systemctl start mariadb.service
+sudo dnf -y install  mariadb-server mariadb
+sudo systemctl enable mariadb.service
+sudo systemctl start mariadb.service
 
-yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel sox sendmail htop iftop perl-File-Which dmidecode gcc-c++ initscripts
-yum -y install libss7 libss7* libopen* unzip perl-Term-ReadLine-Gnu libpcap libpcap-devel libnet ncurses ncurses-devel mutt net-tools logrotate
-yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf mod_ssl uuid* gtk2-devel binutils-devel libedit libedit-devel
+yum -y install sox lame-devel php-opcache libss7 libss7* 
 
-yum -y copr enable irontec/sngrep 
-dnf -y install sngrep 
+sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel perl-File-Which dmidecode gcc-c++ 
+sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate htop gd-devel make patch 
+sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
 
-dnf --enablerepo=crb install libsrtp libsrtp-devel libsrtp-devel -y
+### Install cockpit
+sudo yum -y install cockpit cockpit-storaged cockpit-navigator
+sed -i s/root/"#root"/g /etc/cockpit/disallowed-users
+sudo systemctl enable cockpit.socket
+
+# Install certbot
+sudo dnf -y install certbot python3-certbot-apache mod_ssl
+
+sudo yum -y copr enable irontec/sngrep 
+sudo dnf -y install sngrep 
+
+dnf --enablerepo=crb install libsrtp-devel -y
 dnf config-manager --set-enabled crb
 
-yum -y install libsrtp-devel 
-yum -y install elfutils-libelf-devel
+sudo yum -y install libsrtp-devel 
+sudo yum -y install elfutils-libelf-devel
 
 tee -a /etc/httpd/conf/httpd.conf <<EOF
-
 CustomLog /dev/null common
 
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
@@ -103,24 +130,26 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 EOF
 
 tee -a /etc/php.ini <<EOF
-
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
-max_execution_time = 330
-max_input_time = 360
-post_max_size = 300M
-upload_max_filesize = 300M
-default_socket_timeout = 360
+max_execution_time = 3330
+max_input_time = 3360
+post_max_size = 448M
+upload_max_filesize = 442M
+default_socket_timeout = 3360
 date.timezone = Africa/Kigali
-max_input_vars = 20000
+max_input_vars = 50000
 upload_tmp_dir =/tmp
 EOF
 
-systemctl restart httpd
+sudo systemctl restart httpd
 
-yum -y install chkconfig atop mytop
-yum -y install speex* postfix dovecot s-nail roundcubemail inxi
+yum -y install chkconfig atop mytop htop
+yum -y install libedit-devel uuid* libxml2* speex-devel speex* dovecot s-nail roundcubemail inxi
+yum -y install sendmail postfix
+systemctl enable postfix
+systemctl start postfix
 
 dnf -y install dnf-plugins-core
 dnf config-manager --set-enabled powertools
@@ -161,7 +190,7 @@ long_query_time = 1
 tmp_table_size = 128M
 table_cache = 1024
 
-join_buffer_size = 1M
+join_buffer_size = 33M
 key_buffer = 512M
 sort_buffer_size = 6M
 read_buffer_size = 4M
@@ -214,6 +243,12 @@ systemctl restart mariadb.service
 echo "Install Perl"
 yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
 
+cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile \
+Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail \
+Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX \
+Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText \
+HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message IO::Socket::SSL readline
+
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
@@ -229,7 +264,7 @@ cpanm readline --force
 
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm -f DBD::mysql
+cpanm DBD::mysql --force
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
@@ -270,7 +305,7 @@ cpanm Text::CSV_XS
 cpan install Crypt::Eksblowfish::Bcrypt
 
 # CPM install
-cd /usr/src/vicidial-install-scripts
+cd /usr/src
 curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
 /usr/local/bin/cpm install -g
 
@@ -350,22 +385,26 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
-dnf -y install dahdi-tools
+sudo dnf -y install dahdi-tools 
 cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
 
+sudo systemctl enable dahdi
+sudo systemctl start dahdi
+sudo systemctl status dahdi
+
 # Install Asterisk and LibPRI
 cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.1.tar.gz
-wget http://download.vicidial.com/required-apps/asterisk-16.30.1-vici.tar.gz
-tar -xvzf asterisk-16.30.1-vici.tar.gz
+wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
+tar -xvzf asterisk-18.21.0-vici.tar.gz
 tar -xvzf libpri-1.6.1.tar.gz
 
-cd /usr/src/asterisk-16.30.1-vici
+cd /usr/src/asterisk-18.21.0-vici
 ./contrib/scripts/install_prereq install
-./configure --libdir=/usr/lib64 --with-jansson-bundled
+./contrib/scripts/get_mp3_source.sh
 
 yum -y install libuuid-devel libxml2-devel 
 
@@ -446,7 +485,7 @@ SET GLOBAL connect_timeout=60;
 use asterisk;
 \. /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 \. /usr/src/astguiclient/trunk/extras/first_server_install.sql
-update servers set asterisk_version='16.30.1-vici';
+update servers set asterisk_version='18.21.0-vici';
 quit
 MYSQLCREOF
 
@@ -497,7 +536,7 @@ VARDB_port => 3306
 VARactive_keepalives => 12345689EC
 
 # Asterisk version VICIDIAL is installed for
-VARasterisk_version => 16.X
+VARasterisk_version => 18.X
 
 # FTP recording archive connection information
 VARFTP_host => 10.0.0.4
@@ -528,9 +567,9 @@ ExpectedDBSchema => 1645
 ASTGUI
 
 echo "Replace IP address in Default"
-echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
-read serveripadd
-sed -i s/SERVERIP/"$serveripadd"/g /etc/astguiclient.conf
+#echo "%%%%%%%%%Please Enter This Server IP ADD%%%%%%%%%%%%"
+#read serveripadd
+sed -i s/SERVERIP/"$ip_address"/g /etc/astguiclient.conf
 
 echo "Install VICIDIAL"
 perl install.pl --no-prompt --copy_sample_conf_files=Y
@@ -538,15 +577,318 @@ perl install.pl --no-prompt --copy_sample_conf_files=Y
 # Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
+#Add confbridge conferences to asterisk DB
+mysql -u root -e "use asterisk; INSERT INTO `vicidial_confbridges` VALUES 
+(9600000,'$ip_address','','0',NULL),
+(9600001,'$ip_address','','0',NULL),
+(9600002,'$ip_address','','0',NULL),
+(9600003,'$ip_address','','0',NULL),
+(9600004,'$ip_address','','0',NULL),
+(9600005,'$ip_address','','0',NULL),
+(9600006,'$ip_address','','0',NULL),
+(9600007,'$ip_address','','0',NULL),
+(9600008,'$ip_address','','0',NULL),
+(9600009,'$ip_address','','0',NULL),
+(9600010,'$ip_address','','0',NULL),
+(9600011,'$ip_address','','0',NULL),
+(9600012,'$ip_address','','0',NULL),
+(9600013,'$ip_address','','0',NULL),
+(9600014,'$ip_address','','0',NULL),
+(9600015,'$ip_address','','0',NULL),
+(9600016,'$ip_address','','0',NULL),
+(9600017,'$ip_address','','0',NULL),
+(9600018,'$ip_address','','0',NULL),
+(9600019,'$ip_address','','0',NULL),
+(9600020,'$ip_address','','0',NULL),
+(9600021,'$ip_address','','0',NULL),
+(9600022,'$ip_address','','0',NULL),
+(9600023,'$ip_address','','0',NULL),
+(9600024,'$ip_address','','0',NULL),
+(9600025,'$ip_address','','0',NULL),
+(9600026,'$ip_address','','0',NULL),
+(9600027,'$ip_address','','0',NULL),
+(9600028,'$ip_address','','0',NULL),
+(9600029,'$ip_address','','0',NULL),
+(9600030,'$ip_address','','0',NULL),
+(9600031,'$ip_address','','0',NULL),
+(9600032,'$ip_address','','0',NULL),
+(9600033,'$ip_address','','0',NULL),
+(9600034,'$ip_address','','0',NULL),
+(9600035,'$ip_address','','0',NULL),
+(9600036,'$ip_address','','0',NULL),
+(9600037,'$ip_address','','0',NULL),
+(9600038,'$ip_address','','0',NULL),
+(9600039,'$ip_address','','0',NULL),
+(9600040,'$ip_address','','0',NULL),
+(9600041,'$ip_address','','0',NULL),
+(9600042,'$ip_address','','0',NULL),
+(9600043,'$ip_address','','0',NULL),
+(9600044,'$ip_address','','0',NULL),
+(9600045,'$ip_address','','0',NULL),
+(9600046,'$ip_address','','0',NULL),
+(9600047,'$ip_address','','0',NULL),
+(9600048,'$ip_address','','0',NULL),
+(9600049,'$ip_address','','0',NULL),
+(9600050,'$ip_address','','0',NULL),
+(9600051,'$ip_address','','0',NULL),
+(9600052,'$ip_address','','0',NULL),
+(9600053,'$ip_address','','0',NULL),
+(9600054,'$ip_address','','0',NULL),
+(9600055,'$ip_address','','0',NULL),
+(9600056,'$ip_address','','0',NULL),
+(9600057,'$ip_address','','0',NULL),
+(9600058,'$ip_address','','0',NULL),
+(9600059,'$ip_address','','0',NULL),
+(9600060,'$ip_address','','0',NULL),
+(9600061,'$ip_address','','0',NULL),
+(9600062,'$ip_address','','0',NULL),
+(9600063,'$ip_address','','0',NULL),
+(9600064,'$ip_address','','0',NULL),
+(9600065,'$ip_address','','0',NULL),
+(9600066,'$ip_address','','0',NULL),
+(9600067,'$ip_address','','0',NULL),
+(9600068,'$ip_address','','0',NULL),
+(9600069,'$ip_address','','0',NULL),
+(9600070,'$ip_address','','0',NULL),
+(9600071,'$ip_address','','0',NULL),
+(9600072,'$ip_address','','0',NULL),
+(9600073,'$ip_address','','0',NULL),
+(9600074,'$ip_address','','0',NULL),
+(9600075,'$ip_address','','0',NULL),
+(9600076,'$ip_address','','0',NULL),
+(9600077,'$ip_address','','0',NULL),
+(9600078,'$ip_address','','0',NULL),
+(9600079,'$ip_address','','0',NULL),
+(9600080,'$ip_address','','0',NULL),
+(9600081,'$ip_address','','0',NULL),
+(9600082,'$ip_address','','0',NULL),
+(9600083,'$ip_address','','0',NULL),
+(9600084,'$ip_address','','0',NULL),
+(9600085,'$ip_address','','0',NULL),
+(9600086,'$ip_address','','0',NULL),
+(9600087,'$ip_address','','0',NULL),
+(9600088,'$ip_address','','0',NULL),
+(9600089,'$ip_address','','0',NULL),
+(9600090,'$ip_address','','0',NULL),
+(9600091,'$ip_address','','0',NULL),
+(9600092,'$ip_address','','0',NULL),
+(9600093,'$ip_address','','0',NULL),
+(9600094,'$ip_address','','0',NULL),
+(9600095,'$ip_address','','0',NULL),
+(9600096,'$ip_address','','0',NULL),
+(9600097,'$ip_address','','0',NULL),
+(9600098,'$ip_address','','0',NULL),
+(9600099,'$ip_address','','0',NULL),
+(9600100,'$ip_address','','0',NULL),
+(9600101,'$ip_address','','0',NULL),
+(9600102,'$ip_address','','0',NULL),
+(9600103,'$ip_address','','0',NULL),
+(9600104,'$ip_address','','0',NULL),
+(9600105,'$ip_address','','0',NULL),
+(9600106,'$ip_address','','0',NULL),
+(9600107,'$ip_address','','0',NULL),
+(9600108,'$ip_address','','0',NULL),
+(9600109,'$ip_address','','0',NULL),
+(9600110,'$ip_address','','0',NULL),
+(9600111,'$ip_address','','0',NULL),
+(9600112,'$ip_address','','0',NULL),
+(9600113,'$ip_address','','0',NULL),
+(9600114,'$ip_address','','0',NULL),
+(9600115,'$ip_address','','0',NULL),
+(9600116,'$ip_address','','0',NULL),
+(9600117,'$ip_address','','0',NULL),
+(9600118,'$ip_address','','0',NULL),
+(9600119,'$ip_address','','0',NULL),
+(9600120,'$ip_address','','0',NULL),
+(9600121,'$ip_address','','0',NULL),
+(9600122,'$ip_address','','0',NULL),
+(9600123,'$ip_address','','0',NULL),
+(9600124,'$ip_address','','0',NULL),
+(9600125,'$ip_address','','0',NULL),
+(9600126,'$ip_address','','0',NULL),
+(9600127,'$ip_address','','0',NULL),
+(9600128,'$ip_address','','0',NULL),
+(9600129,'$ip_address','','0',NULL),
+(9600130,'$ip_address','','0',NULL),
+(9600131,'$ip_address','','0',NULL),
+(9600132,'$ip_address','','0',NULL),
+(9600133,'$ip_address','','0',NULL),
+(9600134,'$ip_address','','0',NULL),
+(9600135,'$ip_address','','0',NULL),
+(9600136,'$ip_address','','0',NULL),
+(9600137,'$ip_address','','0',NULL),
+(9600138,'$ip_address','','0',NULL),
+(9600139,'$ip_address','','0',NULL),
+(9600140,'$ip_address','','0',NULL),
+(9600141,'$ip_address','','0',NULL),
+(9600142,'$ip_address','','0',NULL),
+(9600143,'$ip_address','','0',NULL),
+(9600144,'$ip_address','','0',NULL),
+(9600145,'$ip_address','','0',NULL),
+(9600146,'$ip_address','','0',NULL),
+(9600147,'$ip_address','','0',NULL),
+(9600148,'$ip_address','','0',NULL),
+(9600149,'$ip_address','','0',NULL),
+(9600150,'$ip_address','','0',NULL),
+(9600151,'$ip_address','','0',NULL),
+(9600152,'$ip_address','','0',NULL),
+(9600153,'$ip_address','','0',NULL),
+(9600154,'$ip_address','','0',NULL),
+(9600155,'$ip_address','','0',NULL),
+(9600156,'$ip_address','','0',NULL),
+(9600157,'$ip_address','','0',NULL),
+(9600158,'$ip_address','','0',NULL),
+(9600159,'$ip_address','','0',NULL),
+(9600160,'$ip_address','','0',NULL),
+(9600161,'$ip_address','','0',NULL),
+(9600162,'$ip_address','','0',NULL),
+(9600163,'$ip_address','','0',NULL),
+(9600164,'$ip_address','','0',NULL),
+(9600165,'$ip_address','','0',NULL),
+(9600166,'$ip_address','','0',NULL),
+(9600167,'$ip_address','','0',NULL),
+(9600168,'$ip_address','','0',NULL),
+(9600169,'$ip_address','','0',NULL),
+(9600170,'$ip_address','','0',NULL),
+(9600171,'$ip_address','','0',NULL),
+(9600172,'$ip_address','','0',NULL),
+(9600173,'$ip_address','','0',NULL),
+(9600174,'$ip_address','','0',NULL),
+(9600175,'$ip_address','','0',NULL),
+(9600176,'$ip_address','','0',NULL),
+(9600177,'$ip_address','','0',NULL),
+(9600178,'$ip_address','','0',NULL),
+(9600179,'$ip_address','','0',NULL),
+(9600180,'$ip_address','','0',NULL),
+(9600181,'$ip_address','','0',NULL),
+(9600182,'$ip_address','','0',NULL),
+(9600183,'$ip_address','','0',NULL),
+(9600184,'$ip_address','','0',NULL),
+(9600185,'$ip_address','','0',NULL),
+(9600186,'$ip_address','','0',NULL),
+(9600187,'$ip_address','','0',NULL),
+(9600188,'$ip_address','','0',NULL),
+(9600189,'$ip_address','','0',NULL),
+(9600190,'$ip_address','','0',NULL),
+(9600191,'$ip_address','','0',NULL),
+(9600192,'$ip_address','','0',NULL),
+(9600193,'$ip_address','','0',NULL),
+(9600194,'$ip_address','','0',NULL),
+(9600195,'$ip_address','','0',NULL),
+(9600196,'$ip_address','','0',NULL),
+(9600197,'$ip_address','','0',NULL),
+(9600198,'$ip_address','','0',NULL),
+(9600199,'$ip_address','','0',NULL),
+(9600200,'$ip_address','','0',NULL),
+(9600201,'$ip_address','','0',NULL),
+(9600202,'$ip_address','','0',NULL),
+(9600203,'$ip_address','','0',NULL),
+(9600204,'$ip_address','','0',NULL),
+(9600205,'$ip_address','','0',NULL),
+(9600206,'$ip_address','','0',NULL),
+(9600207,'$ip_address','','0',NULL),
+(9600208,'$ip_address','','0',NULL),
+(9600209,'$ip_address','','0',NULL),
+(9600210,'$ip_address','','0',NULL),
+(9600211,'$ip_address','','0',NULL),
+(9600212,'$ip_address','','0',NULL),
+(9600213,'$ip_address','','0',NULL),
+(9600214,'$ip_address','','0',NULL),
+(9600215,'$ip_address','','0',NULL),
+(9600216,'$ip_address','','0',NULL),
+(9600217,'$ip_address','','0',NULL),
+(9600218,'$ip_address','','0',NULL),
+(9600219,'$ip_address','','0',NULL),
+(9600220,'$ip_address','','0',NULL),
+(9600221,'$ip_address','','0',NULL),
+(9600222,'$ip_address','','0',NULL),
+(9600223,'$ip_address','','0',NULL),
+(9600224,'$ip_address','','0',NULL),
+(9600225,'$ip_address','','0',NULL),
+(9600226,'$ip_address','','0',NULL),
+(9600227,'$ip_address','','0',NULL),
+(9600228,'$ip_address','','0',NULL),
+(9600229,'$ip_address','','0',NULL),
+(9600230,'$ip_address','','0',NULL),
+(9600231,'$ip_address','','0',NULL),
+(9600232,'$ip_address','','0',NULL),
+(9600233,'$ip_address','','0',NULL),
+(9600234,'$ip_address','','0',NULL),
+(9600235,'$ip_address','','0',NULL),
+(9600236,'$ip_address','','0',NULL),
+(9600237,'$ip_address','','0',NULL),
+(9600238,'$ip_address','','0',NULL),
+(9600239,'$ip_address','','0',NULL),
+(9600240,'$ip_address','','0',NULL),
+(9600241,'$ip_address','','0',NULL),
+(9600242,'$ip_address','','0',NULL),
+(9600243,'$ip_address','','0',NULL),
+(9600244,'$ip_address','','0',NULL),
+(9600245,'$ip_address','','0',NULL),
+(9600246,'$ip_address','','0',NULL),
+(9600247,'$ip_address','','0',NULL),
+(9600248,'$ip_address','','0',NULL),
+(9600249,'$ip_address','','0',NULL),
+(9600250,'$ip_address','','0',NULL),
+(9600251,'$ip_address','','0',NULL),
+(9600252,'$ip_address','','0',NULL),
+(9600253,'$ip_address','','0',NULL),
+(9600254,'$ip_address','','0',NULL),
+(9600255,'$ip_address','','0',NULL),
+(9600256,'$ip_address','','0',NULL),
+(9600257,'$ip_address','','0',NULL),
+(9600258,'$ip_address','','0',NULL),
+(9600259,'$ip_address','','0',NULL),
+(9600260,'$ip_address','','0',NULL),
+(9600261,'$ip_address','','0',NULL),
+(9600262,'$ip_address','','0',NULL),
+(9600263,'$ip_address','','0',NULL),
+(9600264,'$ip_address','','0',NULL),
+(9600265,'$ip_address','','0',NULL),
+(9600266,'$ip_address','','0',NULL),
+(9600267,'$ip_address','','0',NULL),
+(9600268,'$ip_address','','0',NULL),
+(9600269,'$ip_address','','0',NULL),
+(9600270,'$ip_address','','0',NULL),
+(9600271,'$ip_address','','0',NULL),
+(9600272,'$ip_address','','0',NULL),
+(9600273,'$ip_address','','0',NULL),
+(9600274,'$ip_address','','0',NULL),
+(9600275,'$ip_address','','0',NULL),
+(9600276,'$ip_address','','0',NULL),
+(9600277,'$ip_address','','0',NULL),
+(9600278,'$ip_address','','0',NULL),
+(9600279,'$ip_address','','0',NULL),
+(9600280,'$ip_address','','0',NULL),
+(9600281,'$ip_address','','0',NULL),
+(9600282,'$ip_address','','0',NULL),
+(9600283,'$ip_address','','0',NULL),
+(9600284,'$ip_address','','0',NULL),
+(9600285,'$ip_address','','0',NULL),
+(9600286,'$ip_address','','0',NULL),
+(9600287,'$ip_address','','0',NULL),
+(9600288,'$ip_address','','0',NULL),
+(9600289,'$ip_address','','0',NULL),
+(9600290,'$ip_address','','0',NULL),
+(9600291,'$ip_address','','0',NULL),
+(9600292,'$ip_address','','0',NULL),
+(9600293,'$ip_address','','0',NULL),
+(9600294,'$ip_address','','0',NULL),
+(9600295,'$ip_address','','0',NULL),
+(9600296,'$ip_address','','0',NULL),
+(9600297,'$ip_address','','0',NULL),
+(9600298,'$ip_address','','0',NULL),
+(9600299,'$ip_address','','0',NULL);"
+
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
 echo "Replace OLD IP. You need to Enter your Current IP here"
-/usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15
+/usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15 --server_ip=$ip_address --auto
 
 perl install.pl --no-prompt
 
 # Install Crontab
-cat <<CRONTAB>> /root/crontab-file
+sudo cat <<CRONTAB > /root/crontab-file
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -621,7 +963,6 @@ cat <<CRONTAB>> /root/crontab-file
 #25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 
-
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
 
@@ -656,15 +997,13 @@ cat <<CRONTAB>> /root/crontab-file
 * * * * * sleep 30; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 40; /usr/bin/VB-firewall --white --dynamic --quiet
 * * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
-
-
 CRONTAB
 
-crontab /root/crontab-file
+
 crontab -l
 
 # Install rc.local
-cat > /etc/rc.d/rc.local <<EOF
+cat <<EOF > /etc/rc.local
 #!/bin/sh
 #
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
@@ -703,9 +1042,28 @@ sleep 20
 exit 0
 EOF
 
-chmod +x /etc/rc.d/rc.local
-systemctl enable rc-local
-systemctl start rc-local
+sudo cat <<EOF > /etc/systemd/system/rc-local.service
+[Unit]
+ Description=/etc/rc.local Compatibility
+ ConditionPathExists=/etc/rc.local
+
+[Service]
+ Type=forking
+ ExecStart=/etc/rc.local start
+ TimeoutSec=0
+ StandardOutput=tty
+ RemainAfterExit=yes
+ SysVStartPriority=99
+
+[Install]
+ WantedBy=multi-user.target
+EOF
+
+sudo chmod +x /etc/rc.local
+sudo chmod 644 /etc/systemd/system/rc-local.service
+
+sudo systemctl enable rc-local.service
+sudo systemctl start rc-local.service
 
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
@@ -722,6 +1080,7 @@ mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
 chmod 777 codec_g729.so
 
 ## Install Sounds
+
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
@@ -733,7 +1092,7 @@ wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-# Place the audio files in their proper places:
+#Place the audio files in their proper places:
 cd /var/lib/asterisk/sounds
 tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
 tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
@@ -787,6 +1146,8 @@ tee -a ~/.bashrc <<EOF
 
 # Commands
 /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
+/usr/bin/systemctl status httpd --no-pager
+/usr/bin/systemctl status firewalld --no-pager
 /usr/share/astguiclient/AST_VDhopper.pl -q
 /usr/bin/screen -ls
 /usr/sbin/dahdi_cfg -v
@@ -828,10 +1189,14 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x confbridges.sh
 ./confbridges.sh
 
+sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
+sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
+
 chkconfig asterisk off
 
 ## Install firewall
 yum -y install firewalld
+
 systemctl enable firewalld
 systemctl start firewalld 
 
@@ -841,20 +1206,23 @@ firewall-cmd --permanent --zone=public --add-port=80/tcp
 firewall-cmd --permanent --zone=public --add-port=443/tcp
 firewall-cmd --permanent --zone=public --add-port=446/tcp
 firewall-cmd --permanent --zone=public --add-port=8089/tcp
+firewall-cmd --permanent --zone=public --add-port=8088/tcp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
 firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
 firewall-cmd --reload
 
+systemctl restart firrewalld
+
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
+echo "Admin Interface:"
+echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:1234)"
+
+echo "Agent Interface:"
+echo "http://$ip_address/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
+
 read -p 'Press Enter to Reboot:'
 echo "Restarting AlmaLinux"
-
 reboot
-# Admin Interface:
-# http://yourserverip/vicidial/admin.php (username:6666, password:1234)
-
-# Agent Interface:
-# http://yourserverip/agc/vicidial.php (enter agent username and password which you have created through admin interface)
