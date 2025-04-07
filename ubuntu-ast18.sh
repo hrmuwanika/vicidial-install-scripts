@@ -462,7 +462,7 @@ mariadb --user="root" --password="" asterisk -h localhost -e "update servers set
 sudo systemctl restart mariadb 
 
 # Get astguiclient.conf file
-cat > /etc/astguiclient.conf <<ASTGUI
+cat <<ASTGUI > /etc/astguiclient.conf 
 # astguiclient.conf - configuration elements for the astguiclient package
 # this is the astguiclient configuration file
 # all comments will be lost if you run install.pl again
@@ -857,7 +857,7 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 perl install.pl --no-prompt
 
 # Install Crontab
-cat <<CRONTAB>> /root/crontab-file
+cat <<CRONTAB > /root/crontab-file
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
