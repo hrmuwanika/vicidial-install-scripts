@@ -67,6 +67,11 @@ sudo systemctl enable mariadb.service
 # sudo mysql_secure_installation
 
 # Install PHP 8.3
+sudo apt install -y lsb-release apt-transport-https ca-certificates
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt update -y
+
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
 php8.3-mysql php8.3-ldap php8.3-gd php8.3-xml php8.3-cli php8.3-zip php8.3-soap php8.3-imap php8.3-bcmath php8.3-opcache php8.3-ldap php8.3-odbc \
 php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt
@@ -546,8 +551,8 @@ perl install.pl --no-prompt --copy_sample_conf_files=Y
 # Secure Manager 
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
-#Add confbridge conferences to asterisk DB
-mariadb --user="root" --password="" -e "use asterisk; INSERT INTO `vicidial_confbridges` VALUES 
+# Add confbridge conferences to asterisk DB
+mariadb --user="root" --password="" -e "use asterisk; INSERT INTO 'vicidial_confbridges' VALUES 
 (9600000,'$ip_address','','0',NULL),
 (9600001,'$ip_address','','0',NULL),
 (9600002,'$ip_address','','0',NULL),
@@ -1151,7 +1156,7 @@ sudo ufw allow 8088/tcp
 sudo ufw allow 5060:5061/tcp
 sudo ufw allow 5060:5061/udp
 sudo ufw allow 10000:20000/udp
-sudo ufw enable -y
+sudo ufw enable 
 sudo ufw reload
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
