@@ -1006,7 +1006,7 @@ modprobe dahdi_dummy
 exit 0
 EOF
 
-sudo cat <<EOF > /etc/systemd/system/rc-local.service
+sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
  Description=/etc/rc.local Compatibility
  ConditionPathExists=/etc/rc.local
@@ -1024,7 +1024,7 @@ sudo cat <<EOF > /etc/systemd/system/rc-local.service
 EOF
 
 sudo chmod +x /etc/rc.local
-sudo chmod 644 /etc/systemd/system/rc-local.service
+sudo chmod 644 /lib/systemd/system/rc-local.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable rc-local.service
