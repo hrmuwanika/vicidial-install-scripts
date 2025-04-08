@@ -1049,6 +1049,7 @@ sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
  Description=/etc/rc.local Compatibility
  ConditionPathExists=/etc/rc.local
+ After=multi-user.target
 
 [Service]
  Type=forking
