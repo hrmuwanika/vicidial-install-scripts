@@ -394,7 +394,6 @@ modprobe dahdi_dummy
 
 sudo systemctl enable dahdi
 sudo systemctl start dahdi
-sudo systemctl status dahdi
 
 # Install Asterisk and LibPRI
 cd /usr/src/
@@ -888,10 +887,52 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 
 perl install.pl --no-prompt
 
+# Install rc.local
+sudo mkdir /etc/rc.d/
+sudo cat <<EOF > /etc/rc.d/rc.local
+
+# OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
+/usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
+
+# Disable console blanking and powersaving
+/usr/bin/setterm -blank
+/usr/bin/setterm -powersave off
+/usr/bin/setterm -powerdown
+
+### start up the MySQL server
+systemctl start mariadb.service
+
+### start up the apache web server
+systemctl start httpd.service
+
+### roll the Asterisk logs upon reboot
+/usr/share/astguiclient/ADMIN_restart_roll_logs.pl
+
+### clear the server-related records from the database
+/usr/share/astguiclient/AST_reset_mysql_vars.pl
+
+### load dahdi drivers
+modprobe dahdi
+modprobe dahdi_dummy
+
+/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+
+### sleep for 20 seconds before launching Asterisk
+
+sleep 20
+
+### start up asterisk
+/usr/share/astguiclient/start_asterisk_boot.pl
+
+exit 0
+EOF
+
+sudo chmod +x /etc/rc.d/rc.local
+
 # Install Crontab
 sudo cat <<CRONTAB > /root/crontab-file
 ## Asterisk start fix
-@reboot sleep 15 && /usr/share/astguiclient/start_asterisk_boot.pl
+@reboot sleep 60 && /etc/rc.d/rc.local
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -1002,69 +1043,7 @@ sudo cat <<CRONTAB > /root/crontab-file
 * * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
 CRONTAB
 
-
 crontab -l
-
-# Install rc.local
-sudo cat <<EOF > /etc/rc.d/rc.local
-#
-# OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
-/usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
-
-# Disable console blanking and powersaving
-/usr/bin/setterm -blank
-/usr/bin/setterm -powersave off
-/usr/bin/setterm -powerdown
-
-### start up the MySQL server
-systemctl start mariadb.service
-
-### start up the apache web server
-systemctl start httpd.service
-
-### roll the Asterisk logs upon reboot
-/usr/share/astguiclient/ADMIN_restart_roll_logs.pl
-
-### clear the server-related records from the database
-/usr/share/astguiclient/AST_reset_mysql_vars.pl
-
-### load dahdi drivers
-modprobe dahdi
-modprobe dahdi_dummy
-
-/usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
-
-### sleep for 20 seconds before launching Asterisk
-
-sleep 20
-
-### start up asterisk
-/usr/share/astguiclient/start_asterisk_boot.pl
-
-exit 0
-EOF
-
-sudo cat <<EOF > /lib/systemd/system/rc-local.service
-[Unit]
-Description=/etc/rc.d/rc.local Compatibility
-
-[Service]
-Type=oneshot
-ExecStart=/etc/rc.d/rc.local start
-TimeoutSec=0
-StandardInput=tty
-RemainAfterExit=yes
-
-[Install]
- WantedBy=multi-user.target
-EOF
-
-sudo chmod +x /etc/rc.d/rc.local
-sudo chmod 644 /lib/systemd/system/rc-local.service
-
-sudo systemctl daemon-reload
-sudo systemctl enable rc-local.service
-sudo systemctl start rc-local.service
 
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
