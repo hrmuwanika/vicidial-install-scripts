@@ -1046,7 +1046,7 @@ EOF
 
 sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
-Description=/etc/rc.local Compatibility
+Description=/etc/rc.d/rc.local Compatibility
 
 [Service]
 Type=oneshot
