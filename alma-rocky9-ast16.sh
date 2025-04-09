@@ -892,6 +892,7 @@ perl install.pl --no-prompt
 
 # Install Crontab
 sudo cat <<CRONTAB > /root/crontab-file
+
 ## Asterisk start fix
 @reboot sleep 10; /usr/share/astguiclient/start_asterisk_boot.pl
 
