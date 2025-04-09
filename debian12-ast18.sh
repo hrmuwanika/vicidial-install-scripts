@@ -865,7 +865,7 @@ perl install.pl --no-prompt
 cat <<CRONTAB > /root/crontab-file
 
 ## Asterisk start fix
-@reboot sleep 15 && /usr/share/astguiclient/start_asterisk_boot.pl
+@reboot sleep 120 && /etc/rc.d/rc.local
 
 ## Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -980,6 +980,7 @@ CRONTAB
 crontab -l
 
 # Install rc.local
+sudo mkdir /etc/rc.d/
 sudo cat <<EOF > /etc/rc.d/rc.local 
 #!/bin/sh
 #
@@ -1015,27 +1016,7 @@ modprobe dahdi_dummy
 exit 0
 EOF
 
-sudo cat <<EOF > /lib/systemd/system/rc-local.service
-[Unit]
-Description=/etc/rc.d/rc.local Compatibility
-
-[Service]
-Type=oneshot
-ExecStart=/etc/rc.d/rc.local start
-TimeoutSec=0
-StandardInput=tty
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 sudo chmod +x /etc/rc.d/rc.local
-sudo chmod 644 /lib/systemd/system/rc-local.service
-
-sudo systemctl daemon-reload
-sudo systemctl enable rc-local.service
-sudo systemctl start rc-local.service
 
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
