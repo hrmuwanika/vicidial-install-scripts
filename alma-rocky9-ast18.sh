@@ -890,6 +890,8 @@ perl install.pl --no-prompt
 
 # Install Crontab
 sudo cat <<CRONTAB > /root/crontab-file
+## Asterisk start fix
+@reboot sleep 10; /usr/share/astguiclient/start_asterisk_boot.pl
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -1044,16 +1046,14 @@ EOF
 
 sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
- Description=/etc/rc.d/rc.local Compatibility
- ConditionPathExists=/etc/rc.d/rc.local
+Description=/etc/rc.local Compatibility
 
 [Service]
- Type=forking
- ExecStart=/etc/rc.d/rc.local start
- TimeoutSec=0
- StandardOutput=tty
- RemainAfterExit=yes
- SysVStartPriority=99
+Type=oneshot
+ExecStart=/etc/rc.d/rc.local start
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
 
 [Install]
  WantedBy=multi-user.target
