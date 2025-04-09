@@ -1006,7 +1006,7 @@ CRONTAB
 crontab -l
 
 # Install rc.local
-cat <<EOF > /etc/rc.local
+cat <<EOF > /etc/rc.d/rc.local
 #!/bin/sh
 #
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
@@ -1047,13 +1047,13 @@ EOF
 
 sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
- Description=/etc/rc.local Compatibility
- ConditionPathExists=/etc/rc.local
+ Description=/etc/rc.d/rc.local Compatibility
+ ConditionPathExists=/etc/rc.d/rc.local
  After=multi-user.target
 
 [Service]
  Type=forking
- ExecStart=/etc/rc.local start
+ ExecStart=/etc/rc.d/rc.local start
  TimeoutSec=0
  StandardOutput=tty
  RemainAfterExit=yes
@@ -1063,7 +1063,7 @@ sudo cat <<EOF > /lib/systemd/system/rc-local.service
  WantedBy=multi-user.target
 EOF
 
-sudo chmod +x /etc/rc.local
+sudo chmod +x /etc/rc.d/rc.local
 sudo chmod 644 /lib/systemd/system/rc-local.service
 
 sudo systemctl daemon-reload
