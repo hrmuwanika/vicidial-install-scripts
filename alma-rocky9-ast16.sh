@@ -891,9 +891,9 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 perl install.pl --no-prompt
 
 # Install rc.local
+sudo mkdir /etc/rc.d/
 cat <<EOF > /etc/rc.d/rc.local
 #!/bin/sh
-#
 # OPTIONAL enable ip_relay(for same-machine trunking and blind monitoring)
 /usr/share/astguiclient/ip_relay/relay_control start 2>/dev/null 1>&2
 
