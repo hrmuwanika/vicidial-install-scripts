@@ -578,7 +578,7 @@ perl install.pl --no-prompt --copy_sample_conf_files=Y
 sed -i s/0.0.0.0/127.0.0.1/g /etc/asterisk/manager.conf
 
 #Add confbridge conferences to asterisk DB
-mysql -u root -e "use asterisk; INSERT INTO `vicidial_confbridges` VALUES 
+mysql -u root asterisk -h localhost -e  "INSERT INTO 'vicidial_confbridges' VALUES  
 (9600000,'$ip_address','','0',NULL),
 (9600001,'$ip_address','','0',NULL),
 (9600002,'$ip_address','','0',NULL),
