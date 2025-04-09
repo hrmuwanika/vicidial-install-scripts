@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 18 on Ubuntu 24.04"
+echo "Vicidial installation and Asterisk 18 on Debian 12"
 echo "==================================================================================="
 
 # Function to prompt user for input
@@ -1017,7 +1017,7 @@ EOF
 
 sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
-Description=/etc/rc.local Compatibility
+Description=/etc/rc.d/rc.local Compatibility
 
 [Service]
 Type=oneshot
