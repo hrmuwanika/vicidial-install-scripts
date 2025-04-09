@@ -864,17 +864,20 @@ perl install.pl --no-prompt
 # Install Crontab
 cat <<CRONTAB > /root/crontab-file
 
-### Audio Sync hourly
+## Asterisk start fix
+@reboot sleep 10; /usr/share/astguiclient/start_asterisk_boot.pl
+
+## Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
 
-### Daily Backups ###
+## Daily Backups ###
 0 2 * * * /usr/share/astguiclient/ADMIN_backup.pl
 
 ###certbot renew
-51 23 1 * * /usr/bin/systemctl stop firewalld
+51 23 1 * * /usr/bin/systemctl stop ufw
 52 23 1 * * /usr/bin/certbot renew
-53 23 1 * * /usr/bin/systemctl start firewalld
-54 23 1 * * /usr/bin/systemctl restart httpd
+53 23 1 * * /usr/bin/systemctl start ufw
+54 23 1 * * /usr/bin/systemctl restart apache2
 
 ### recording mixing/compressing/ftping scripts
 #0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57 * * * * /usr/share/astguiclient/AST_CRON_audio_1_move_mix.pl
@@ -936,6 +939,7 @@ cat <<CRONTAB > /root/crontab-file
 #26 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/MP3 -maxdepth 2 -type f -mtime +65 -print | xargs rm -f
 #25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
 24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
+
 
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
@@ -1013,19 +1017,17 @@ EOF
 
 sudo cat <<EOF > /lib/systemd/system/rc-local.service
 [Unit]
- Description=/etc/rc.d/rc.local Compatibility
- ConditionPathExists=/etc/rc.d/rc.local
+Description=/etc/rc.local Compatibility
 
 [Service]
- Type=forking
- ExecStart=/etc/rc.d/rc.local start
- TimeoutSec=0
- StandardOutput=tty
- RemainAfterExit=yes
- SysVStartPriority=99
+Type=oneshot
+ExecStart=/etc/rc.d/rc.local start
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
 
 [Install]
- WantedBy=multi-user.target
+WantedBy=multi-user.target
 EOF
 
 sudo chmod +x /etc/rc.d/rc.local
