@@ -1028,7 +1028,7 @@ sudo cat <<EOF > /lib/systemd/system/rc-local.service
  WantedBy=multi-user.target
 EOF
 
-sudo chmod +x /etc/rc.local
+sudo chmod +x /etc/rc.d/rc.local
 sudo chmod 644 /lib/systemd/system/rc-local.service
 
 sudo systemctl daemon-reload
