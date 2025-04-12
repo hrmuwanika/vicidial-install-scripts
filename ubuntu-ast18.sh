@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 18 on Debian 12"
+echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04, 22.04, 24.04"
 echo "==================================================================================="
 
 # Function to prompt user for input
@@ -67,9 +67,9 @@ sudo systemctl enable mariadb.service
 # sudo mysql_secure_installation
 
 # Install PHP 8.3
-sudo apt install -y lsb-release apt-transport-https ca-certificates
-wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt install -y ca-certificates apt-transport-https software-properties-common lsb-release 
+apt -y install software-properties-common
+add-apt-repository ppa:ondrej/php
 sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
