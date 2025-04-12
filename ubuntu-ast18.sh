@@ -1018,6 +1018,26 @@ EOF
 
 sudo chmod +x /etc/rc.d/rc.local
 
+# Add rc-local as a service - thx to ras
+sudo cat <<EOF > /etc/systemd/system/rc-local.service
+[Unit]
+Description=/etc/rc.local Compatibility
+
+[Service]
+Type=oneshot
+ExecStart=/etc/rc.d/rc.local
+TimeoutSec=0
+StandardInput=tty
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable rc-local
+sudo systemctl start rc-local
+
 ## Fix ip_relay
 cd /usr/src/astguiclient/trunk/extras/ip_relay/
 unzip ip_relay_1.1.112705.zip
