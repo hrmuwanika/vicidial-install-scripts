@@ -59,6 +59,10 @@ sudo service sshd restart
 export LC_ALL=C
 
 # Install mariadb databases
+sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.11/ubuntu focal main'
+sudo update
+ 
 sudo apt install -y mariadb-server mariadb-client 
 
 sudo systemctl restart mariadb.service
