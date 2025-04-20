@@ -1169,7 +1169,7 @@ firewall-cmd --permanent --zone=public --add-port=80/tcp
 firewall-cmd --permanent --zone=public --add-port=443/tcp
 firewall-cmd --permanent --zone=public --add-port=446/tcp
 firewall-cmd --permanent --zone=public --add-port=8089/tcp
-firewall-cmd --permanent --zone=public --add-port=8088/tcp
+firewall-cmd --permanent --zone=public --add-port=4569/udp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
 firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
