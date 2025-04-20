@@ -4,30 +4,8 @@ echo "==========================================================================
 echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04, 22.04, 24.04"
 echo "==================================================================================="
 
-# Function to prompt user for input
-prompt() {
-    local varname=$1
-    local prompt_text=$2
-    local default_value=$3
-    read -p "$prompt_text [$default_value]: " input
-    export $varname="${input:-$default_value}"
-}
-
-echo "Getting Machine info - No hostname? Enter the IP Address"
-echo "**************************************************************************"
-prompt hostname "Enter the hostname:" "$hostname"
-echo "Press Enter to continue"
-read
-hostnamectl set-hostname $hostname
-# Retrieve the Hostname
-hostname=$(hostname | awk '{print $1}')
-echo "Hostname\t: $hostname"
 # Retrieve the IP address
-ip_address=$(hostname -I | awk '{print $1}')
-echo "IP Address\t: $ip_address"
-echo "**************************************************************************"
-echo "Enter to continue..."
-read	
+ip_address=192.168.1.1
 
 echo "
 #--------------------------------------------------
