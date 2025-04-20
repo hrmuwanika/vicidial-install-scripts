@@ -870,7 +870,7 @@ perl install.pl --no-prompt
 cat <<CRONTAB > /root/crontab-file
 
 ## Asterisk start fix
-@reboot sleep 60 && /etc/rc.d/rc.local
+@reboot sleep 30 && /etc/rc.d/rc.local
 
 ## Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
