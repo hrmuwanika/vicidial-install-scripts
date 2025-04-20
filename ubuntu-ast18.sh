@@ -1139,7 +1139,7 @@ sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw allow 446/tcp
 sudo ufw allow 8089/tcp
-sudo ufw allow 8088/tcp
+sudo ufw allow 4569/udp
 sudo ufw allow 5060:5061/tcp
 sudo ufw allow 5060:5061/udp
 sudo ufw allow 10000:20000/udp
