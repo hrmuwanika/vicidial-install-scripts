@@ -111,7 +111,7 @@ CustomLog /dev/null common
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options Indexes MultiViews
+    Options -Indexes +FollowSymLinks
     AllowOverride None
     Require all granted
 </Directory>
@@ -151,6 +151,7 @@ socket = /var/lib/mysql/mysql.sock
 datadir = /var/lib/mysql
 #tmpdir = /home/mysql_tmp
 socket = /var/lib/mysql/mysql.sock
+bind-address = 127.0.0.1
 user = mysql
 old_passwords = 0
 ft_min_word_len = 3
