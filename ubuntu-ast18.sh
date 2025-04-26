@@ -95,20 +95,29 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 </Directory>
 EOF
 
-tee -a /etc/php/8.3/apache2/php.ini <<EOF
-
-error_reporting  =  E_ALL & ~E_NOTICE
-memory_limit = 448M
-short_open_tag = On
-max_execution_time = 3330
-max_input_time = 3360
-post_max_size = 448M
-upload_max_filesize = 442M
-default_socket_timeout = 3360
-date.timezone = Africa/Kigali
-max_input_vars = 50000
-upload_tmp_dir =/tmp
-EOF
+sed -i "s/\;date\.timezone\ =/date\.timezone\ =\ Africa\/Kigali/g" /etc/php/8.3/apache2/php.ini
+sed -i "s/max_execution_time = 30/max_execution_time = 3360/" /etc/php/8.3/apache2/php.ini
+sed -i "s/max_input_time = 60/max_input_time = 3360/" /etc/php/8.3/apache2/php.ini
+sed -i "s/; max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/apache2/php.ini
+sed -i "s/error_reporting = E_ALL \& \~E_DEPRECATED/error_reporting = E_ALL \& \~E_NOTICE \& \~E_DEPRECATED/" /etc/php/8.3/apache2/php.ini
+sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php/8.3/apache2/php.ini
+sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 448M/" /etc/php/8.3/apache2/php.ini
+sed -i "s/post_max_size = 8M/post_max_size = 448M/" /etc/php/8.3/apache2/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 448M/" /etc/php/8.3/apache2/php.ini
+sed -i "s/\;date\.timezone\ =/date\.timezone\ =\ Africa\/Kigali/g" /etc/php/8.3/cli/php.ini
+sed -i "s/max_execution_time = 30/max_execution_time = 3360/" /etc/php/8.3/cli/php.ini
+sed -i "s/max_input_time = 60/max_input_time = 3360/" /etc/php/8.3/cli/php.ini
+sed -i "s/; max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/cli/php.ini
+sed -i "s/error_reporting = E_ALL \& \~E_DEPRECATED/error_reporting = E_ALL \& \~E_NOTICE \& \~E_DEPRECATED/" /etc/php/8.3/cli/php.ini
+sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php/8.3/cli/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 448M/" /etc/php/8.3/cli/php.ini
+sed -i 's/;opcache.enable=1/opcache.enable=1/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=128/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.max_accelerated_files=10000/opcache.max_accelerated_files=20000/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.max_wasted_percentage=5/opcache.max_wasted_percentage=5/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.validate_timestamps=1/opcache.validate_timestamps=1/g' /etc/php/8.3/apache2/php.ini
+sed -i 's/;opcache.revalidate_freq=2/opcache.revalidate_freq=10/g' /etc/php/8.3/apache2/php.ini
 
 systemctl restart apache2
 
