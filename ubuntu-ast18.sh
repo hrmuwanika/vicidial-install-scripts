@@ -1165,6 +1165,7 @@ sudo ufw allow 4569/udp
 sudo ufw allow 5060:5061/tcp
 sudo ufw allow 5060:5061/udp
 sudo ufw allow 10000:20000/udp
+sudo ufw allow ntp
 sudo ufw enable 
 sudo ufw reload
 
