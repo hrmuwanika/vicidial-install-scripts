@@ -15,7 +15,7 @@ sudo apt update && sudo apt -y upgrade
 sudo apt autoremove -y
 
 # Install linux headers
-sudo apt -y install linux-headers-$(uname -r)
+sudo apt -y install linux-headers-`uname -r` ntp
 
 echo "
 #--------------------------------------------------
@@ -23,6 +23,9 @@ echo "
 #--------------------------------------------------"
 # set the correct timezone on Debian
 timedatectl set-timezone Africa/Kigali
+timedatectl set-ntp on
+timedatectl set-ntp true
+timedatectl status
 
 echo "
 #----------------------------------------------------
@@ -63,23 +66,59 @@ sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev li
 sudo systemctl enable apache2
 sudo systemctl start apache2
 
-# Other dependencies
-sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool libnewt-dev libssl-dev unzip uuid-dev uuid*  \
-git curl wget sipsak libploticus0-dev libsox-fmt-all mpg123 ploticus libelf-dev shtool patch libncurses5-dev libedit-dev htop libcurl4 make \
-build-essential libjansson-dev autoconf automake libxml2-dev libsqlite3-dev pkg-config sqlite3 ntp postfix sendmail sngrep perl-modules flex bison \
-gcc libelf-dev bc
+# Install Asterisk 18 dependencies
+sudo apt -y install linux-headers-`uname -r` \
+build-essential binutils-dev gcc git bison flex \
+default-libmysqlclient-dev \
+freetds-dev \
+libbluetooth-dev \
+libcodec2-dev \
+libcurl4-openssl-dev \
+libedit-dev \
+libfftw3-dev \
+libghc-postgresql-simple-dev \
+libgmime-3.0-dev \
+libical-dev \
+libjansson-dev \
+libneon27-dev \
+libosptk-dev \
+libnewt-dev \
+libradcli-dev \
+librust-backtrace-dev \
+libsndfile1-dev \
+libspandsp-dev \
+libspeexdsp-dev \
+libsqlite0-dev \
+libsqlite3-dev \
+libssl-dev \
+libunbound-dev \
+libvorbis-dev \
+libxml2-dev \
+unixodbc-dev \
+uuid-dev \
+xmlstarlet \
+libiksemel-dev \
+libtolua-dev \
+libsrtp2-dev \
+libldap2-dev \
+libsnmp-dev \
+libpopt-dev 
 
-sudo add-apt-repository universe
-sudo apt -y install linux-headers-generic 
+# Other dependencies
+sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid* curl sipsak libploticus0-dev libsox-fmt-all \
+mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sendmail sngrep libelf-dev bc fail2ban
+
+#sudo add-apt-repository universe
+#sudo apt -y install linux-headers-generic 
 
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
 # Install perl
 echo "Install Perl"
-#apt install -y perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
+sudo apt install -y perl-modules
 
-apt install libsrtp* -y
+sudo apt install libsrtp* -y
 
 ### up to this point
 
@@ -373,6 +412,7 @@ tar -xvzf libpri-1.6.1.tar.gz
 cd /usr/src/asterisk-18.21.0-vici
 ./contrib/scripts/install_prereq install
 ./contrib/scripts/get_mp3_source.sh
+./configure --with-jansson-bundled
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
