@@ -23,8 +23,6 @@ echo "
 #--------------------------------------------------"
 # set the correct timezone on Debian
 timedatectl set-timezone Africa/Kigali
-timedatectl set-ntp on
-timedatectl set-ntp true
 timedatectl status
 
 echo "
@@ -106,7 +104,7 @@ libpopt-dev
 
 # Other dependencies
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid* curl sipsak libploticus0-dev libsox-fmt-all \
-mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sendmail sngrep libelf-dev bc fail2ban
+mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sngrep libelf-dev bc fail2ban
 
 #sudo add-apt-repository universe
 #sudo apt -y install linux-headers-generic 
