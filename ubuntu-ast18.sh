@@ -106,16 +106,13 @@ libpopt-dev
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid* curl sipsak libploticus0-dev libsox-fmt-all \
 mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sngrep libelf-dev bc fail2ban
 
-#sudo add-apt-repository universe
-#sudo apt -y install linux-headers-generic 
-
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
 # Install perl
 echo "Install Perl"
 sudo apt install -y perl cpanminus
-sudo apt install -y libsrtp2-* 
+sudo apt install -y libsrtp2-dev
 
 ### up to this point
 
