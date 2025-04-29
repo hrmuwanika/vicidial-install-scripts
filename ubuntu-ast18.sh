@@ -114,9 +114,8 @@ sudo a2enmod dav_svn
 
 # Install perl
 echo "Install Perl"
-sudo apt install -y perl-modules
-
-sudo apt install libsrtp* -y
+sudo apt install -y perl cpanminus
+sudo apt install -y libsrtp2-* 
 
 ### up to this point
 
