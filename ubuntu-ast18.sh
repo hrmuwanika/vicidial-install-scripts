@@ -15,7 +15,7 @@ sudo apt update && sudo apt -y upgrade
 sudo apt autoremove -y
 
 # Install linux headers
-sudo apt -y install linux-headers-`uname -r` ntp
+sudo apt -y install linux-headers-`uname -r` ntp ntpdate
 
 echo "
 #--------------------------------------------------
