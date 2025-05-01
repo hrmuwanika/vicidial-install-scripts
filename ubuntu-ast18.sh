@@ -410,7 +410,7 @@ cd /usr/src/asterisk-18.21.0-vici
 ./configure --with-jansson-bundled
 
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
-./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
+./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp -–with-ogg=/usr/lib64/ --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
 make menuselect/menuselect menuselect-tree menuselect.makeopts
 #enable app_meetme
