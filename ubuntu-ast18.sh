@@ -456,13 +456,9 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-chkconfig asterisk off
-
 rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 sudo systemctl restart ntpd
-
-sudo sed -ie 's/;date.timezone =/date.timezone = Africa\/Kigali/g' /etc/php/8.3/cli/php.ini
 
 #--------------------------------------------------
 # Install astguiclient
@@ -884,11 +880,9 @@ mariadb --user="root" --password="" asterisk -h localhost -e  "INSERT INTO 'vici
 
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
-#/usr/src/astguiclient/trunk/bin/ADMIN_area_code_populate.pl
+
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15 --server_ip=$ip_address --auto
-
-perl install.pl --no-prompt
 
 # Install Crontab
 cat <<CRONTAB > /root/crontab-file
@@ -963,12 +957,11 @@ cat <<CRONTAB > /root/crontab-file
 #32 0 * * * /usr/share/astguiclient/AST_VDsales_export.pl
 #42 0 * * * /usr/share/astguiclient/AST_sourceID_summary_export.pl
 
-### remove old recordings
-60 6 * * * /usr/bin/find /var/spool/asterisk/monitorDONE -maxdepth 2 -type f -mtime +7 -print | xargs rm -f
-60 6 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/MP3 -maxdepth 2 -type f -mtime +65 -print | xargs rm -f
-60 6 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
-60 6 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
-
+### remove recordings older than 2 months
+24 0 * * * /usr/bin/find /var/spool/asterisk/monitorDONE -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+26 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/MP3 -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
 
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
@@ -996,20 +989,13 @@ cat <<CRONTAB > /root/crontab-file
 ######TILTIX GARBAGE FILES DELETE
 #00 22 * * * root cd /tmp/ && find . -name '*TILTXtmp*' -type f -delete
 
-### Dynportal
-@reboot /usr/bin/VB-firewall --whitelist=ViciWhite --dynamic --quiet
-* * * * * /usr/bin/VB-firewall --whitelist=ViciWhite --dynamic --quiet
-* * * * * sleep 10; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 20; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 30; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 40; /usr/bin/VB-firewall --white --dynamic --quiet
-* * * * * sleep 50; /usr/bin/VB-firewall --white --dynamic --quiet
 CRONTAB
 
 # crontab -l
 
 # Install rc.local
 sudo mkdir /etc/rc.d/
+
 sudo cat <<EOF > /etc/rc.d/rc.local 
 #!/bin/sh
 #
