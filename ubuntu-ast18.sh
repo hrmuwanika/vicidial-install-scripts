@@ -5,7 +5,7 @@ echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04, 22.04, 24.04"
 echo "==================================================================================="
 
 # Retrieve the IP address
-ip_address=192.168.1.1
+ip_address=192.168.150.100
 hostname=vici1
 
 hostnamectl set-hostname $hostname
@@ -463,10 +463,10 @@ rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 sudo systemctl restart ntpd
 
+echo "
 #--------------------------------------------------
-# Install astguiclient
-#--------------------------------------------------
-echo "Installing astguiclient"
+# Installing astguiclient
+#--------------------------------------------------"
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
@@ -906,11 +906,11 @@ cat <<CRONTAB > /root/crontab-file
 54 23 1 * * /usr/bin/systemctl restart apache2
 
 ### recording mixing/compressing/ftping scripts
-#0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57 * * * * /usr/share/astguiclient/AST_CRON_audio_1_move_mix.pl
+0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57 * * * * /usr/share/astguiclient/AST_CRON_audio_1_move_mix.pl
 0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57 * * * * /usr/share/astguiclient/AST_CRON_audio_1_move_mix.pl --MIX
 0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57 * * * * /usr/share/astguiclient/AST_CRON_audio_1_move_VDonly.pl
 1,4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58 * * * * /usr/share/astguiclient/AST_CRON_audio_2_compress.pl --MP3 --HTTPS
-#2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59 * * * * /usr/share/astguiclient/AST_CRON_audio_3_ftp.pl --MP3
+2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59 * * * * /usr/share/astguiclient/AST_CRON_audio_3_ftp.pl --MP3
 
 ### keepalive script for astguiclient processes
 * * * * * /usr/share/astguiclient/ADMIN_keepalive_ALL.pl --cu3way
@@ -950,15 +950,15 @@ cat <<CRONTAB > /root/crontab-file
 3 1 * * * /usr/share/astguiclient/AST_DB_optimize.pl
 
 ## adjust time on the server with ntp
-#30 * * * * /usr/sbin/ntpdate -u pool.ntp.org 2>/dev/null 1>&amp;2
+30 * * * * /usr/sbin/ntpdate -u pool.ntp.org 2>/dev/null 1>&amp;2
 
 ### VICIDIAL agent time log weekly and daily summary report generation
 2 0 * * 0 /usr/share/astguiclient/AST_agent_week.pl
 22 0 * * * /usr/share/astguiclient/AST_agent_day.pl
 
 ### VICIDIAL campaign export scripts (OPTIONAL)
-#32 0 * * * /usr/share/astguiclient/AST_VDsales_export.pl
-#42 0 * * * /usr/share/astguiclient/AST_sourceID_summary_export.pl
+32 0 * * * /usr/share/astguiclient/AST_VDsales_export.pl
+42 0 * * * /usr/share/astguiclient/AST_sourceID_summary_export.pl
 
 ### remove recordings older than 2 months
 24 0 * * * /usr/bin/find /var/spool/asterisk/monitorDONE -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
@@ -978,7 +978,7 @@ cat <<CRONTAB > /root/crontab-file
 25 0 * * * /usr/share/astguiclient/AST_DB_dead_cb_purge.pl --purge-non-cb -q
 
 ### GMT adjust script - uncomment to enable
-#45 0 * * * /usr/share/astguiclient/ADMIN_adjust_GMTnow_on_leads.pl --list-settings
+45 0 * * * /usr/share/astguiclient/ADMIN_adjust_GMTnow_on_leads.pl --list-settings
 
 ### Dialer Inventory Report
 1 7 * * * /usr/share/astguiclient/AST_dialer_inventory_snapshot.pl -q --override-24hours
@@ -990,7 +990,7 @@ cat <<CRONTAB > /root/crontab-file
 #30 6 * * * /sbin/reboot
 
 ######TILTIX GARBAGE FILES DELETE
-#00 22 * * * root cd /tmp/ && find . -name '*TILTXtmp*' -type f -delete
+00 22 * * * root cd /tmp/ && find . -name '*TILTXtmp*' -type f -delete
 
 CRONTAB
 
