@@ -923,9 +923,9 @@ modprobe dahdi_dummy
 
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-### sleep for 20 seconds before launching Asterisk
+### sleep for 30 seconds before launching Asterisk
 
-sleep 20
+sleep 30
 
 ### start up asterisk
 /usr/share/astguiclient/start_asterisk_boot.pl
@@ -938,7 +938,7 @@ sudo chmod +x /etc/rc.d/rc.local
 # Install Crontab
 sudo cat <<CRONTAB > /root/crontab-file
 ## Asterisk start fix
-@reboot sleep 60 && /etc/rc.d/rc.local
+@reboot /etc/rc.d/rc.local
 
 ### Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -1007,11 +1007,11 @@ sudo cat <<CRONTAB > /root/crontab-file
 #32 0 * * * /usr/share/astguiclient/AST_VDsales_export.pl
 #42 0 * * * /usr/share/astguiclient/AST_sourceID_summary_export.pl
 
-### remove old recordings
-#24 0 * * * /usr/bin/find /var/spool/asterisk/monitorDONE -maxdepth 2 -type f -mtime +7 -print | xargs rm -f
-#26 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/MP3 -maxdepth 2 -type f -mtime +65 -print | xargs rm -f
-#25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
-24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +1 -print | xargs rm -f
+### remove recordings older than 2 months
+24 0 * * * /usr/bin/find /var/spool/asterisk/monitorDONE -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+26 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/MP3 -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+25 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/FTP -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
+24 1 * * * /usr/bin/find /var/spool/asterisk/monitorDONE/ORIG -maxdepth 2 -type f -mtime +60 -print | xargs rm -f
 
 ### roll logs monthly on high-volume dialing systems
 30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --DAYS=45
