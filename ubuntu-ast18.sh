@@ -6,6 +6,9 @@ echo "==========================================================================
 
 # Retrieve the IP address
 ip_address=192.168.1.1
+hostname=vici1
+
+hostnamectl set-hostname $hostname
 
 echo "
 #--------------------------------------------------
