@@ -884,6 +884,7 @@ mariadb --user="root" --password="" asterisk -h localhost -e  "INSERT INTO 'vici
 
 echo "Populate AREA CODES"
 /usr/share/astguiclient/ADMIN_area_code_populate.pl
+#/usr/src/astguiclient/trunk/bin/ADMIN_area_code_populate.pl
 echo "Replace OLD IP. You need to Enter your Current IP here"
 /usr/share/astguiclient/ADMIN_update_server_ip.pl --old-server_ip=10.10.10.15 --server_ip=$ip_address --auto
 
@@ -893,7 +894,7 @@ perl install.pl --no-prompt
 cat <<CRONTAB > /root/crontab-file
 
 ## Asterisk start fix
-@reboot sleep 30 && /etc/rc.d/rc.local
+@reboot /etc/rc.d/rc.local
 
 ## Audio Sync hourly
 * 1 * * * /usr/share/astguiclient/ADMIN_audio_store_sync.pl --upload --quiet
@@ -1037,6 +1038,9 @@ modprobe dahdi
 modprobe dahdi_dummy
 
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
+
+### sleep for 30 seconds before launching Asterisk
+sleep 30
 
 ### start up asterisk
 /usr/share/astguiclient/start_asterisk_boot.pl
