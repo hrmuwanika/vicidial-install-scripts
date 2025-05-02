@@ -410,6 +410,9 @@ wget http://download.vicidial.com/required-apps/asterisk-18.21.0-vici.tar.gz
 tar -xvzf asterisk-18.21.0-vici.tar.gz
 tar -xvzf libpri-1.6.1.tar.gz
 
+rm -f asterisk-18.21.0-vici.tar.gz
+rm -f libpri-1.6.1.tar.gz
+
 cd /usr/src/asterisk-18.21.0-vici
 ./contrib/scripts/install_prereq install
 ./contrib/scripts/get_mp3_source.sh
