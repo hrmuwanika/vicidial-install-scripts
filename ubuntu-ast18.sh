@@ -61,7 +61,7 @@ sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
 php8.3-mysql php8.3-ldap php8.3-gd php8.3-xml php8.3-cli php8.3-zip php8.3-soap php8.3-imap php8.3-bcmath php8.3-opcache php8.3-ldap php8.3-odbc \
-php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt
+php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt curl
 
 # install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
@@ -104,7 +104,11 @@ libtolua-dev \
 libsrtp2-dev \
 libldap2-dev \
 libsnmp-dev \
-libpopt-dev libasound2-dev libcurl4-openssl-dev
+libpopt-dev \
+libasound2-dev \
+speex \
+libspeex-dev \
+libogg-dev
 
 # Other dependencies
 sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid curl sipsak libploticus0-dev libsox-fmt-all \
