@@ -1063,35 +1063,47 @@ mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
 chmod 777 codec_g729.so
 
 ## Install Sounds
-
-cd /usr/src
+cd /var/lib/asterisk/sounds
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-gsm-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-ulaw-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-wav-current.tar.gz
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-gsm-current.tar.gz
-wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm-current.tar.gz
-wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
-wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
 
-#Place the audio files in their proper places:
-cd /var/lib/asterisk/sounds
-tar -zxf /usr/src/asterisk-core-sounds-en-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-core-sounds-en-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-core-sounds-en-wav-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-extra-sounds-en-wav-current.tar.gz
+# Place the audio files in their proper places:
+tar -zxf asterisk-core-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-core-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-core-sounds-en-wav-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-gsm-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-ulaw-current.tar.gz
+tar -zxf asterisk-extra-sounds-en-wav-current.tar.gz
+
+# remove the audio files 
+rm -f asterisk-core-sounds-en-gsm-current.tar.gz
+rm -f asterisk-core-sounds-en-ulaw-current.tar.gz
+rm -f asterisk-core-sounds-en-wav-current.tar.gz
+rm -f asterisk-extra-sounds-en-gsm-current.tar.gz
+rm -f asterisk-extra-sounds-en-ulaw-current.tar.gz
+rm -f asterisk-extra-sounds-en-wav-current.tar.gz
 
 mkdir /var/lib/asterisk/mohmp3
 mkdir /var/lib/asterisk/quiet-mp3
 ln -s /var/lib/asterisk/mohmp3 /var/lib/asterisk/default
 
 cd /var/lib/asterisk/mohmp3
-tar -zxf /usr/src/asterisk-moh-opsound-gsm-current.tar.gz
-tar -zxf /usr/src/asterisk-moh-opsound-ulaw-current.tar.gz
-tar -zxf /usr/src/asterisk-moh-opsound-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-gsm-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-ulaw-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-moh-opsound-wav-current.tar.gz
+
+tar -zxf asterisk-moh-opsound-gsm-current.tar.gz
+tar -zxf asterisk-moh-opsound-ulaw-current.tar.gz
+tar -zxf asterisk-moh-opsound-wav-current.tar.gz
+
+rm -f asterisk-moh-opsound-gsm-current.tar.gz
+rm -f asterisk-moh-opsound-ulaw-current.tar.gz
+rm -f asterisk-moh-opsound-wav-current.tar.gz
+
 rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
