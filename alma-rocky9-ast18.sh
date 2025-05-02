@@ -426,6 +426,9 @@ sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.co
 make -j ${JOBS} all
 make install
 
+make config
+sudo ldconfig
+
 #Install configs and samples
 sudo make samples
 
@@ -449,7 +452,6 @@ sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
 sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
 
 echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
-sudo ldconfig
 
 # Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
 # radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
