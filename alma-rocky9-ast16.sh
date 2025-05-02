@@ -408,6 +408,9 @@ wget http://download.vicidial.com/required-apps/asterisk-16.30.1-vici.tar.gz
 tar -xvzf asterisk-16.30.1-vici.tar.gz
 tar -xvzf libpri-1.6.1.tar.gz
 
+rm -rf asterisk-16.30.1-vici.tar.gz
+rm -rf libpri-1.6.1.tar.gz
+
 cd /usr/src/asterisk-16.30.1-vici
 ./contrib/scripts/install_prereq install
 ./contrib/scripts/get_mp3_source.sh
@@ -429,11 +432,10 @@ sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.co
 make -j ${JOBS} all
 make install
 
-make config
-sudo ldconfig
-
 #Install configs and samples
-sudo make samples
+make samples
+
+make config
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
 
