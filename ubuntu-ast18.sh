@@ -104,10 +104,10 @@ libtolua-dev \
 libsrtp2-dev \
 libldap2-dev \
 libsnmp-dev \
-libpopt-dev 
+libpopt-dev libasound2-dev libcurl4-openssl-dev
 
 # Other dependencies
-sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid* curl sipsak libploticus0-dev libsox-fmt-all \
+sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid curl sipsak libploticus0-dev libsox-fmt-all \
 mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sngrep libelf-dev bc fail2ban
 
 sudo a2enmod dav
