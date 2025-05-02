@@ -419,18 +419,21 @@ cd /usr/src/asterisk-18.21.0-vici
 ./configure --libdir=/usr/lib64 --with-gsm=internal --enable-opus --enable-srtp -–with-ogg=/usr/lib64/ --with-ssl --enable-asteriskssl --with-pjproject-bundled --with-jansson-bundled
 
 make menuselect/menuselect menuselect-tree menuselect.makeopts
-#enable app_meetme
+# enable app_meetme
 menuselect/menuselect --enable app_meetme menuselect.makeopts
 #enable res_http_websocket
 menuselect/menuselect --enable res_http_websocket menuselect.makeopts
-#enable res_srtp
+# enable res_srtp
 menuselect/menuselect --enable res_srtp menuselect.makeopts
 make samples
 sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.conf
 make -j ${JOBS} all
 make install
 
-#Install configs and samples
+make config
+sudo ldconfig
+
+# Install configs and samples
 sudo make samples
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
@@ -453,7 +456,6 @@ sed -i 's|;runuser|runuser|' /etc/asterisk/asterisk.conf
 sed -i 's|;rungroup|rungroup|' /etc/asterisk/asterisk.conf
 
 echo "/usr/lib64" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
-sudo ldconfig
 
 # Problem: # *reference: https://www.clearhat.org/post/a-fix-for-apt-install-asterisk-on-ubuntu-18-04
 # radcli: rc_read_config: rc_read_config: can't open /etc/radiusclient-ng/radiusclient.conf: No such file or directory
