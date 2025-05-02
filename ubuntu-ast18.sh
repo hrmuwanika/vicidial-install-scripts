@@ -430,11 +430,10 @@ sed -i 's|noload = chan_sip.so|;noload = chan_sip.so|g' /etc/asterisk/modules.co
 make -j ${JOBS} all
 make install
 
-make config
-sudo ldconfig
-
 # Install configs and samples
 sudo make samples
+
+make config
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
 
