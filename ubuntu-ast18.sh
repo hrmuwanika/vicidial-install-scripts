@@ -434,8 +434,7 @@ make -j ${JOBS} all
 make install
 
 # Install configs and samples
-sudo make samples
-
+make samples
 make config
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
