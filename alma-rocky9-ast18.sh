@@ -433,6 +433,7 @@ make install
 make samples
 
 make config
+ldconfig
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
 
