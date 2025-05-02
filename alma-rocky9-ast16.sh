@@ -99,8 +99,11 @@ sudo systemctl start mariadb.service
 yum -y install sox lame-devel php-opcache libss7 libss7* 
 
 sudo yum -y install newt-devel libxml2* libxml2-devel kernel-devel sqlite-devel libuuid-devel perl-File-Which dmidecode gcc-c++ 
-sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate htop gd-devel make patch 
+sudo yum -y install libopen* unzip libpcap libnet ncurses ncurses-devel mutt net-tools logrotate htop gd-devel make patch ntp
 sudo yum -y install openssl openssl-devel unixODBC libtool-ltdl speex libtool automake autoconf uuid* gtk2-devel binutils-devel libedit libedit-devel
+
+sudo systemctl start ntpd
+sudo systemctl enable ntpd
 
 ### Install cockpit
 sudo yum -y install cockpit cockpit-storaged cockpit-navigator
@@ -1193,6 +1196,7 @@ firewall-cmd --permanent --zone=public --add-port=4569/udp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
 firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
 firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
+firewall-cmd --permanent --add-service=ntp
 firewall-cmd --reload
 
 systemctl restart firrewalld
