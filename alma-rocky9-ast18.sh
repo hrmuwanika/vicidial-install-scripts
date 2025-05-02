@@ -431,7 +431,6 @@ make install
 
 # Install configs and samples
 make samples
-
 make config
 ldconfig
 
