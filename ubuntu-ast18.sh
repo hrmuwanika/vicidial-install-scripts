@@ -504,7 +504,7 @@ mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extra
 # mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 # mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
 mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.21.0';"
-mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/upgrade_2.14.sql
+# mariadb --user="root" --password="" asterisk -e "\. /usr/src/astguiclient/trunk/extras/upgrade_2.14.sql;"
 
 sudo systemctl restart mariadb 
 
