@@ -56,7 +56,7 @@ sudo systemctl enable mariadb.service
 # Install PHP 8.3
 sudo apt install -y ca-certificates apt-transport-https software-properties-common lsb-release 
 apt -y install software-properties-common
-add-apt-repository ppa:ondrej/php
+add-apt-repository ppa:ondrej/php -y
 sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
@@ -124,7 +124,7 @@ CustomLog /dev/null common
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
 
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options -Indexes +FollowSymLinks
+    Options Indexes MultiViews
     AllowOverride None
     Require all granted
 </Directory>
@@ -248,9 +248,8 @@ systemctl restart apache2.service
 systemctl restart mariadb.service
 
 # Install CPAMN
-sudo apt install -y perl cpanminus
-
 cd /usr/bin/
+apt install -y perl cpanminus
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
 cpanm -f File::HomeDir
@@ -317,6 +316,7 @@ curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install
 cd /usr/src
 wget http://download.vicidial.com/required-apps/asterisk-perl-0.08.tar.gz
 tar xzf asterisk-perl-0.08.tar.gz
+rm asterisk-perl-0.08.tar.gz
 cd asterisk-perl-0.08
 perl Makefile.PL
 make all
@@ -326,6 +326,7 @@ make install
 cd /usr/src
 wget http://download.vicidial.com/required-apps/sipsak-0.9.6-1.tar.gz
 tar -zxf sipsak-0.9.6-1.tar.gz
+rm sipsak-0.9.6-1.tar.gz
 cd sipsak-0.9.6
 ./configure
 make
@@ -336,6 +337,7 @@ make install
 cd /usr/src
 wget http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
 tar -zxf lame-3.99.5.tar.gz
+rm lame-3.99.5.tar.gz
 cd lame-3.99.5
 ./configure
 make
@@ -344,7 +346,8 @@ make install
 # Install Jansson
 cd /usr/src/
 wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
-tar xvzf jansson*
+tar xvzf jansson-2.13.tar.gz
+rm jansson-2.13.tar.gz
 cd jansson-2.13
 ./configure
 make clean
@@ -363,6 +366,7 @@ make && make install
 cd /usr/src/
 wget https://github.com/eaccelerator/eaccelerator/zipball/master -O eaccelerator.zip
 unzip eaccelerator.zip
+rm eaccelerator.zip
 cd eaccelerator-*
 export PHP_PREFIX=”/usr”
 $PHP_PREFIX/bin/phpize
@@ -382,6 +386,7 @@ ldconfig
 cd /usr/src
 wget https://github.com/cisco/libsrtp/archive/v2.1.0.tar.gz
 tar xfv v2.1.0.tar.gz
+rm v2.1.0.tar.gz
 cd libsrtp-2.1.0
 ./configure --prefix=/usr --enable-openssl
 make shared_library && sudo make install
@@ -389,7 +394,7 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
-sudo dnf -y install dahdi-tools 
+sudo apt-get install -y dahdi-* dahdi 
 cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
@@ -397,7 +402,6 @@ modprobe dahdi_dummy
 
 sudo systemctl enable dahdi
 sudo systemctl start dahdi
-sudo systemctl status dahdi
 
 # Install Asterisk and LibPRI
 cd /usr/src/
