@@ -19,7 +19,7 @@ sudo apt autoremove -y
 
 # Install linux headers
 sudo apt -y install linux-headers-`uname -r` ntp ntpdate openssh-server
-sudo systemctl enable ntp
+sudo systemctl enable ntpd
 
 echo "
 #--------------------------------------------------
@@ -117,14 +117,8 @@ mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automak
 sudo a2enmod dav
 sudo a2enmod dav_svn
 
-# Install perl
-echo "Install Perl"
-sudo apt install -y perl cpanminus
-
 ### up to this point
-
 tee -a /etc/apache2/apache2.conf <<EOF
-
 CustomLog /dev/null common
 
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
@@ -254,6 +248,8 @@ systemctl restart apache2.service
 systemctl restart mariadb.service
 
 # Install CPAMN
+sudo apt install -y perl cpanminus
+
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
@@ -466,6 +462,9 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
+sudo systemctl enable asterisk
+sudo systemctl start asterisk
+
 rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 sudo systemctl restart ntpd
@@ -477,6 +476,9 @@ echo "
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
+
+cd /usr/src/astguiclient/trunk/extras
+wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/refs/heads/main/standard-db
 cd /usr/src/astguiclient/trunk
 
 # Add mysql users and Databases
@@ -494,9 +496,11 @@ mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cust
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
 mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
-mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
-mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/standard-db
+# mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
+# mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
 mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.21.0';"
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/upgrade_2.14.sql
 
 sudo systemctl restart mariadb 
 
@@ -1162,10 +1166,9 @@ wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/main/
 chmod +x confbridges.sh
 ./confbridges.sh
 
+# 
 sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
 sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
-
-chkconfig asterisk off
 
 ## Install firewall
 sudo apt install -y ufw
@@ -1187,7 +1190,7 @@ chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
 echo "Admin Interface:"
-echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:1234)"
+echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:CyburDial2024)"
 
 echo "Agent Interface:"
 echo "http://$ip_address/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
