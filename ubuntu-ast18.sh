@@ -480,9 +480,6 @@ echo "
 mkdir /usr/src/astguiclient
 cd /usr/src/astguiclient
 svn checkout svn://svn.eflo.net/agc_2-X/trunk
-
-cd /usr/src/astguiclient/trunk/extras
-wget https://raw.githubusercontent.com/hrmuwanika/vicidial-install-scripts/refs/heads/main/standard-db
 cd /usr/src/astguiclient/trunk
 
 # Add mysql users and Databases
@@ -501,10 +498,9 @@ mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cust
 mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/standard-db
-# mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
-# mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
+mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
 mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.21.0';"
-# mariadb --user="root" --password="" asterisk -e "\. /usr/src/astguiclient/trunk/extras/upgrade_2.14.sql;"
 
 sudo systemctl restart mariadb 
 
@@ -1064,9 +1060,18 @@ mv -f ip_relay /usr/bin/
 mv -f ip_relay2 /usr/local/bin/ip_relay
 
 cd /usr/lib64/asterisk/modules
+
+# Install g723.1 codec
+rm codec_g723.so
+wget http://asterisk.hosting.lv/bin/codec_g723-ast140-gcc4-glibc-x86_64-core2-sse4.so
+mv codec_g723-ast140-gcc4-glibc-x86_64-core2-sse4.so codec_g723.so
+chmod +x codec_g723.so
+
+# Install g729 codec
+rm codec_g729.so
 wget http://asterisk.hosting.lv/bin/codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so
 mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
-chmod 777 codec_g729.so
+chmod +x codec_g729.so
 
 ## Install Sounds
 cd /var/lib/asterisk/sounds
@@ -1194,7 +1199,7 @@ chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
 
 echo "Admin Interface:"
-echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:CyburDial2024)"
+echo "Access http://$ip_address/vicidial/admin.php (username:6666, password:1234)"
 
 echo "Agent Interface:"
 echo "http://$ip_address/agc/vicidial.php (enter agent username and password which you have created through admin interface)"
