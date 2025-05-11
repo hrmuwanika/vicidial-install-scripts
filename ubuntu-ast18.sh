@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04, 22.04, 24.04"
+echo "Vicidial installation and Asterisk 18 on Debian 12"
 echo "==================================================================================="
 
 # Retrieve the IP address
@@ -42,9 +42,10 @@ sudo service sshd restart
 export LC_ALL=C
 
 # Install mariadb databases
-sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
-sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.11/ubuntu focal main'
-sudo update
+sudo apt install -y lsb-release dirmngr ca-certificates software-properties-common apt-transport-https curl wget 
+curl -fsSL http://mirror.mariadb.org/PublicKey_v2 | sudo gpg --dearmor | sudo tee /usr/share/keyrings/mariadb.gpg > /dev/null
+echo "deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/mariadb.gpg] http://mirror.mariadb.org/repo/11.4/ubuntu/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/mariadb.list
+sudo apt update
  
 sudo apt install -y mariadb-server mariadb-client 
 
@@ -54,9 +55,9 @@ sudo systemctl enable mariadb.service
 # sudo mysql_secure_installation
 
 # Install PHP 8.3
-sudo apt install -y ca-certificates apt-transport-https software-properties-common lsb-release 
-apt -y install software-properties-common
-add-apt-repository ppa:ondrej/php -y
+sudo apt -y install  
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
 sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
@@ -133,7 +134,7 @@ EOF
 sed -i "s/\;date\.timezone\ =/date\.timezone\ =\ Africa\/Kigali/g" /etc/php/8.3/apache2/php.ini
 sed -i "s/max_execution_time = 30/max_execution_time = 3360/" /etc/php/8.3/apache2/php.ini
 sed -i "s/max_input_time = 60/max_input_time = 3360/" /etc/php/8.3/apache2/php.ini
-sed -i "s/; max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/apache2/php.ini
+sed -i "s/;max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/apache2/php.ini
 sed -i "s/error_reporting = E_ALL \& \~E_DEPRECATED/error_reporting = E_ALL \& \~E_NOTICE \& \~E_DEPRECATED/" /etc/php/8.3/apache2/php.ini
 sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php/8.3/apache2/php.ini
 sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 448M/" /etc/php/8.3/apache2/php.ini
@@ -142,7 +143,7 @@ sed -i "s/memory_limit = 128M/memory_limit = 448M/" /etc/php/8.3/apache2/php.ini
 sed -i "s/\;date\.timezone\ =/date\.timezone\ =\ Africa\/Kigali/g" /etc/php/8.3/cli/php.ini
 sed -i "s/max_execution_time = 30/max_execution_time = 3360/" /etc/php/8.3/cli/php.ini
 sed -i "s/max_input_time = 60/max_input_time = 3360/" /etc/php/8.3/cli/php.ini
-sed -i "s/; max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/cli/php.ini
+sed -i "s/;max_input_vars = 1000/max_input_vars = 7000/" /etc/php/8.3/cli/php.ini
 sed -i "s/error_reporting = E_ALL \& \~E_DEPRECATED/error_reporting = E_ALL \& \~E_NOTICE \& \~E_DEPRECATED/" /etc/php/8.3/cli/php.ini
 sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php/8.3/cli/php.ini
 sed -i "s/memory_limit = 128M/memory_limit = 448M/" /etc/php/8.3/cli/php.ini
@@ -466,9 +467,6 @@ sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
 sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
 
-sudo systemctl enable asterisk
-sudo systemctl start asterisk
-
 rm /etc/localtime
 ln -sf /usr/share/zoneinfo/Africa/Kigali /etc/localtime
 sudo systemctl restart ntpd
@@ -497,7 +495,6 @@ mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO cust
 mariadb --user="root" --password="" -h localhost -e "GRANT RELOAD ON *.* TO custom@localhost;"
 mariadb --user="root" --password="" -h localhost -e "FLUSH PRIVILEGES;"
 mariadb --user="root" --password="" -h localhost -e "SET GLOBAL connect_timeout=60;"
-mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/standard-db
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/MySQL_AST_CREATE_tables.sql
 mariadb --user="root" --password="" asterisk < /usr/src/astguiclient/trunk/extras/first_server_install.sql
 mariadb --user="root" --password="" asterisk -h localhost -e "update servers set asterisk_version='18.21.0';"
