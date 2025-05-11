@@ -14,12 +14,12 @@ echo "
 #--------------------------------------------------
 # Update Server
 #--------------------------------------------------"
-sudo apt update && sudo apt -y upgrade 
+sudo apt update && sudo apt -y full-upgrade
 sudo apt autoremove -y
 
 # Install linux headers
-sudo apt -y install linux-headers-`uname -r` ntp ntpdate openssh-server
-sudo systemctl enable ntpd
+sudo apt -y install linux-headers-`uname -r` ntp openssh-server
+sudo systemctl enable ntp
 
 echo "
 #--------------------------------------------------
@@ -43,26 +43,25 @@ export LC_ALL=C
 
 # Install mariadb databases
 sudo apt install -y lsb-release dirmngr ca-certificates software-properties-common apt-transport-https curl wget 
-curl -fsSL http://mirror.mariadb.org/PublicKey_v2 | sudo gpg --dearmor | sudo tee /usr/share/keyrings/mariadb.gpg > /dev/null
-echo "deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/mariadb.gpg] http://mirror.mariadb.org/repo/11.4/ubuntu/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/mariadb.list
+curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup 
+sudo bash mariadb_repo_setup --mariadb-server-version=11.7
 sudo apt update
  
-sudo apt install -y mariadb-server mariadb-client 
+sudo apt install -y mariadb-server mariadb-client mariadb-backup
 
 sudo systemctl restart mariadb.service
 sudo systemctl enable mariadb.service 
 
-# sudo mysql_secure_installation
+# sudo mariadb-secure-installation
 
 # Install PHP 8.3
-sudo apt -y install  
-wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg 
+sudo sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
 php8.3-mysql php8.3-ldap php8.3-gd php8.3-xml php8.3-cli php8.3-zip php8.3-soap php8.3-imap php8.3-bcmath php8.3-opcache php8.3-ldap php8.3-odbc \
-php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt curl
+php8.3-mysqli php-pear php8.3-xmlrpc php8.3-mcrypt 
 
 # install apache and subversion
 sudo apt install -y apache2 apache2-bin apache2-data apache2-utils libsvn-dev libapache2-mod-svn subversion subversion-tools  
