@@ -394,7 +394,7 @@ ldconfig
 
 # Install Dahdi
 echo "Install Dahdi"
-sudo apt-get install -y dahdi-* dahdi 
+sudo apt-get install -y dahdi-* asterisk-dahdi dahdi 
 cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
 modprobe dahdi
 modprobe dahdi_dummy
