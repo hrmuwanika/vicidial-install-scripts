@@ -81,7 +81,7 @@ sudo cat <<EOF > /etc/yum.repos.d/mariadb.repo
 
 [mariadb]
 name = MariaDB
-baseurl = http://yum.mariadb.org/10.11/rhel9-amd64
+baseurl = http://yum.mariadb.org/11.8/rhel9-amd64
 module_hotfixes=1
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1 
