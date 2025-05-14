@@ -1,4 +1,5 @@
 #!/bin/bash
+# sudo chmod +x backup_mysql.sh
 
 # Define the directory where backup files will be stored
 BACKUP_DIR="/var/backups/mysql"
