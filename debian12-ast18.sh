@@ -111,7 +111,7 @@ libspeex-dev \
 libogg-dev
 
 # Other dependencies
-sudo apt install -y sox lame screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid sipsak libploticus0-dev libsox-fmt-all libsrtp2-dev \
+sudo apt install -y sox screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid sipsak libploticus0-dev libsox-fmt-all libsrtp2-dev \
 mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sngrep libelf-dev bc fail2ban
 
 sudo a2enmod dav
