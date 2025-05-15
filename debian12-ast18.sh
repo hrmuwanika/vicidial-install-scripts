@@ -396,8 +396,6 @@ ldconfig
 echo "Install Dahdi"
 sudo apt-get install -y dahdi dahdi-linux dahdi-tools libdahdi-dev asterisk-dahdi dahdi-firmware-nonfree dahdi-dkms
 cd /usr/src && wget https://docs.phreaknet.org/script/phreaknet.sh && chmod +x phreaknet.sh && ./phreaknet.sh dahdi
-modprobe dahdi
-modprobe dahdi_dummy
 /usr/sbin/dahdi_cfg -vvvvvvvvvv
 
 sudo systemctl enable dahdi
@@ -1030,9 +1028,6 @@ sudo systemctl start apache2
 /usr/share/astguiclient/AST_reset_mysql_vars.pl
 
 ### load dahdi drivers
-modprobe dahdi
-modprobe dahdi_dummy
-
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
 ### sleep for 30 seconds before launching Asterisk
