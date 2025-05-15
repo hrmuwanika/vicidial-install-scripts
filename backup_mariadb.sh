@@ -1,21 +1,24 @@
 #!/bin/bash
-# sudo chmod +x backup_mysql.sh
+# sudo chmod +x backup_mariadb.sh
+# crontab -e
+# Backup vicidial every day at 7 PM
+# 0 19 * * * /usr/src/backup_mariadb.sh
 
 # Define the directory where backup files will be stored
-BACKUP_DIR="/var/backups/mysql"
+BACKUP_DIR="/opt/vicibkup"
 
 # Ensure the backup directory exists
 mkdir -p "$BACKUP_DIR"
 
 # Define the filename for the backup file (include date in the filename)
-BACKUP_FILE="$BACKUP_DIR/mysql_backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
+BACKUP_FILE="$BACKUP_DIR/vicidial_backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
 
 # Define the compressed filename
 COMPRESSED_FILE="$BACKUP_FILE.gz"
 
 # Define MySQL username and password (replace with your MySQL credentials)
-DB_USER="USERNAME"
-DB_PASS="PASSWORD"
+DB_USER="cron"
+DB_PASS="1234"
 
 # Dump all databases into a single SQL file
 mysqldump -u "$DB_USER" -p"$DB_PASS" --all-databases > "$BACKUP_FILE"
