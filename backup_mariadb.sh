@@ -28,4 +28,5 @@ chmod 600 "$BACKUP_FILE"
 
 # Compress the backup file
 gzip "$BACKUP_FILE"
+
 echo "Database backup completed. Backup stored in: $COMPRESSED_FILE"
