@@ -41,4 +41,6 @@ EOF
 sed -i 's|vicidial_conferences|vicidial_confbridges|g' /var/www/html/vicidial/non_agent_api.php
 
 asterisk -rx "core reload"
+asterisk -rx "module unload chan_dahdi.so"
+asterisk -rx "module load chan_dahdi.so"
 
