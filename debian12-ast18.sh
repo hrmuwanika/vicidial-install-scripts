@@ -44,7 +44,7 @@ export LC_ALL=C
 # Install mariadb databases
 sudo apt install -y lsb-release dirmngr ca-certificates software-properties-common apt-transport-https curl wget 
 curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup 
-sudo bash mariadb_repo_setup --mariadb-server-version=11.7
+sudo bash mariadb_repo_setup --mariadb-server-version=11.0
 sudo apt update
  
 sudo apt install -y mariadb-server mariadb-client mariadb-backup
@@ -895,6 +895,9 @@ echo "Replace OLD IP. You need to Enter your Current IP here"
 
 # Install Crontab
 cat <<CRONTAB > /root/crontab-file
+
+# vicidial database backup
+0 19 * * * /usr/src/backup_mariadb.sh
 
 ## Asterisk start fix
 @reboot /etc/rc.d/rc.local
