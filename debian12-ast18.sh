@@ -55,8 +55,9 @@ sudo systemctl enable mariadb.service
 # sudo mariadb-secure-installation
 
 # Install PHP 8.3
-sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg 
-sudo sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+sudo apt install -y ca-certificates apt-transport-https software-properties-common lsb-release gnupg2
+apt -y install software-properties-common
+add-apt-repository ppa:ondrej/php
 sudo apt update -y
 
 sudo apt install -y php8.3 libapache2-mod-php8.3 php8.3-common php8.3-sqlite3 php8.3-curl php8.3-dev php8.3-readline php8.3-intl php8.3-mbstring \
