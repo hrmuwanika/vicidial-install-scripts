@@ -483,6 +483,15 @@ cd lame-3.99.5
 make
 make install
 
+# Install sox
+cd /usr/src
+wget http://downloads.sourceforge.net/project/sox/sox/14.4.1/sox-14.4.1.tar.gz
+tar -zxf sox-14.4.1.tar.gz
+cd sox-14.4.1
+./configure
+make -s
+make install
+
 # Install Jansson
 cd /usr/src/
 wget https://digip.org/jansson/releases/jansson-2.13.tar.gz
