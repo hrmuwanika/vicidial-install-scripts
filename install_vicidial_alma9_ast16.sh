@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 18 on AlmaLinux/RockyLinux"
+echo "Vicidial installation and Asterisk 16 on AlmaLinux/RockyLinux"
 echo "==================================================================================="
 
 # Function to prompt user for input
