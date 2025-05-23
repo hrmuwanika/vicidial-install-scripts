@@ -112,7 +112,7 @@ libspeex-dev \
 libogg-dev
 
 # Other dependencies
-sudo apt install -y sox screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid sipsak libploticus0-dev libsox-fmt-all libsrtp2-dev \
+sudo apt install -y screen libnet-telnet-perl libasterisk-agi-perl autogen libtool unzip uuid sipsak libploticus0-dev libsox-fmt-all libsrtp2-dev \
 mpg123 ploticus shtool patch libncurses5-dev htop libcurl4 make autoconf automake pkg-config sqlite3 ntp postfix sngrep libelf-dev bc fail2ban
 
 sudo a2enmod dav
@@ -342,6 +342,15 @@ rm lame-3.99.5.tar.gz
 cd lame-3.99.5
 ./configure
 make
+make install
+
+# Install sox
+cd /usr/src
+wget http://downloads.sourceforge.net/project/sox/sox/14.4.1/sox-14.4.1.tar.gz
+tar -zxf sox-14.4.1.tar.gz
+cd sox-14.4.1
+./configure
+make -s
 make install
 
 # Install Jansson
