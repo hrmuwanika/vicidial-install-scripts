@@ -585,7 +585,6 @@ make install
 # Install configs and samples
 make samples
 make config
-ldconfig
 
 adduser asterisk -s /bin/bash -c "Asterisk User"
 
@@ -1077,9 +1076,8 @@ modprobe dahdi_dummy
 
 /usr/sbin/dahdi_cfg -vvvvvvvvvvvvv
 
-### sleep for 30 seconds before launching Asterisk
-
-sleep 30
+### sleep for 20 seconds before launching Asterisk
+sleep 20
 
 ### start up asterisk
 /usr/share/astguiclient/start_asterisk_boot.pl
