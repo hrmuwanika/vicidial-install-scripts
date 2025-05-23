@@ -319,9 +319,9 @@ wait_timeout                    = 180
 # Use one of the database diagnostics tools mentioned at the top of this file to count your database's potential total RAM usage, so you know if you are within
 # reasonable limits. Remember that other services will require enough RAM to operate properly (like Apache or PHP-FPM), so set your limits wisely.
 join_buffer_size                = 4M           # UPD
-read_buffer_size                = 3M           # UPD
-read_rnd_buffer_size            = 4M           # UPD
-sort_buffer_size                = 4M           # UPD
+read_buffer_size                = 4M           # UPD
+read_rnd_buffer_size            = 16M          # UPD
+sort_buffer_size                = 6M           # UPD
 
 # === Table Settings ===
 # In systemd managed systems like Ubuntu 16.04+ or CentOS 7+, you need to perform an extra action for table_open_cache & open_files_limit
