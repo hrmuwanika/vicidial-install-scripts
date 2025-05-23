@@ -1272,8 +1272,6 @@ rm -f CHANGES*
 rm -f LICENSE*
 rm -f CREDITS*
 
-sudo apt install -y sox
-
 cd /var/lib/asterisk/quiet-mp3
 sox ../mohmp3/macroform-cold_day.wav macroform-cold_day.wav vol 0.25
 sox ../mohmp3/macroform-cold_day.gsm macroform-cold_day.gsm vol 0.25
@@ -1290,6 +1288,22 @@ sox -t ul -r 8000 -c 1 ../mohmp3/reno_project-system.ulaw -t ul reno_project-sys
 sox ../mohmp3/manolo_camp-morning_coffee.wav manolo_camp-morning_coffee.wav vol 0.25
 sox ../mohmp3/manolo_camp-morning_coffee.gsm manolo_camp-morning_coffee.gsm vol 0.25
 sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_camp-morning_coffee.ulaw vol 0.25
+
+sudo cat <<EOF > /etc/asterisk/musiconhold.conf
+;
+; Music on Hold -- Sample Configuration
+;
+
+[default]
+mode=files
+directory=/var/lib/asterisk/mohmp3
+
+[quiet]
+mode=files
+directory=/var/lib/asterisk/quiet-mp3
+
+#include musiconhold-vicidial.conf
+EOF
 
 tee -a ~/.bashrc <<EOF
 
