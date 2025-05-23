@@ -1296,6 +1296,22 @@ sox ../mohmp3/manolo_camp-morning_coffee.wav manolo_camp-morning_coffee.wav vol 
 sox ../mohmp3/manolo_camp-morning_coffee.gsm manolo_camp-morning_coffee.gsm vol 0.25
 sox -t ul -r 8000 -c 1 ../mohmp3/manolo_camp-morning_coffee.ulaw -t ul manolo_camp-morning_coffee.ulaw vol 0.25
 
+sudo cat <<EOF > /etc/asterisk/musiconhold.conf
+;
+; Music on Hold -- Sample Configuration
+;
+
+[default]
+mode=files
+directory=/var/lib/asterisk/mohmp3
+
+[quiet]
+mode=files
+directory=/var/lib/asterisk/quiet-mp3
+
+#include musiconhold-vicidial.conf
+EOF
+
 tee -a ~/.bashrc <<EOF
 
 # Commands
