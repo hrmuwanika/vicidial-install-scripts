@@ -126,11 +126,17 @@ tee -a /etc/httpd/conf/httpd.conf <<EOF
 CustomLog /dev/null common
 
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options -Indexes +FollowSymLinks
+   Options Indexes MultiViews
     AllowOverride None
-    Require all granted
+    Order allow,deny
+    Allow from all
+    
+Require all granted
+
+<files *.mp3>
+            Forcetype application/forcedownload
+        </files>
 </Directory>
 EOF
 
@@ -387,18 +393,17 @@ systemctl restart mariadb.service
 
 # Install Perl Modules
 echo "Install Perl"
-yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
-
-cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile \
-Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail \
-Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX \
-Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText \
-HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message IO::Socket::SSL readline
+yum install -y perl-CPAN 
+yum install -y perl-YAML
+yum install -y perl-libwww-perl
+yum install -y perl-DBI
+yum install -y perl-DBD-MySQL
+yum install -y perl-GD 
 
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
-cpanm -f File::HomeDir
+ cpanm -f File::HomeDir
 cpanm -f File::Which
 cpanm CPAN::Meta::Requirements
 cpanm -f CPAN
@@ -406,16 +411,15 @@ cpanm YAML
 cpanm MD5
 cpanm Digest::MD5
 cpanm Digest::SHA1
-cpanm readline --force
-
+cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm DBD::mysql --force
+cpanm -f DBD::mysql
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
 cpanm Switch
-cpanm Mail::Sendmail --force
+cpanm Mail::Sendmail
 cpanm Unicode::Map
 cpanm Jcode
 cpanm Spreadsheet::WriteExcel
@@ -519,6 +523,7 @@ export PHP_PREFIX=”/usr”
 $PHP_PREFIX/bin/phpize
 ./configure –enable-eaccelerator=shared –with-php-config=$PHP_PREFIX/bin/php-config
 make
+make install
 
 # Download and Install PJSIP
 cd /usr/src/ 
