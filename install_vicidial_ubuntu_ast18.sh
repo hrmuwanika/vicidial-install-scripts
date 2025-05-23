@@ -521,6 +521,7 @@ export PHP_PREFIX=”/usr”
 $PHP_PREFIX/bin/phpize
 ./configure –enable-eaccelerator=shared –with-php-config=$PHP_PREFIX/bin/php-config
 make
+make install
 
 # Download and Install PJSIP
 cd /usr/src/ 
