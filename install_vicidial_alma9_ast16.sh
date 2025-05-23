@@ -140,17 +140,16 @@ Require all granted
 </Directory>
 EOF
 
-tee -a /etc/php.ini <<EOF
+sudo tee -a /etc/php.ini <<EOF
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
-max_execution_time = 3330
-max_input_time = 3360
+max_execution_time = 330
+max_input_time = 360
 post_max_size = 448M
 upload_max_filesize = 442M
-default_socket_timeout = 3360
+default_socket_timeout = 360
 date.timezone = Africa/Kigali
-max_input_vars = 50000
 upload_tmp_dir =/tmp
 EOF
 
