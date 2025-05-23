@@ -285,7 +285,7 @@ query_cache_limit               = 4M    # UPD
 query_cache_size                = 64M   # UPD
 query_cache_type                = 1     # Enabled by default
 
-key_buffer_size                 = 16M   # UPD
+key_buffer_size                 = 512M   # UPD
 
 low_priority_updates            = 1
 concurrent_insert               = 2
