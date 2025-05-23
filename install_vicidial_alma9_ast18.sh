@@ -36,7 +36,7 @@ timedatectl set-timezone Africa/Kigali
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config  
 setenforce 0
 
-yum -y install openssh-server
+yum -y install nano tar openssh-server
 
 # Enable root access to ssh
 sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -48,13 +48,12 @@ tee -a /etc/systemd/system.conf <<EOF
 DefaultLimitNOFILE=65536
 EOF
 
-# Update Server
+# Update the OS
 yum check-update
 yum -y update
 yum -y install epel-release
 yum -y update
 
-yum -y install nano tar openssh-server
 yum -y groupinstall 'Development Tools'
 yum -y install kernel* --exclude=kernel-debug* 
 
@@ -63,7 +62,7 @@ yum -y install yum-utils
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-9.rpm
-dnf -y module enable php:remi-8.2
+dnf -y module enable php:remi-8.3
 # dnf -y module enable mariadb:10.5 
 
 dnf -y install dnf-plugins-core
@@ -81,7 +80,7 @@ sudo cat <<EOF > /etc/yum.repos.d/mariadb.repo
 
 [mariadb]
 name = MariaDB
-baseurl = http://yum.mariadb.org/11.8/rhel9-amd64
+baseurl = http://yum.mariadb.org/11.7/rhel9-amd64
 module_hotfixes=1
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1 
@@ -94,7 +93,7 @@ sudo dnf -y install  mariadb-server mariadb
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 
-# sudo mysql_secure_installation
+# sudo mariadb_secure_installation
 
 yum -y install sox lame-devel php-opcache libss7 libss7* 
 
@@ -122,19 +121,23 @@ dnf config-manager --set-enabled crb
 sudo yum -y install libsrtp-devel 
 sudo yum -y install elfutils-libelf-devel
 
-tee -a /etc/httpd/conf/httpd.conf <<EOF
-CustomLog /dev/null common
-
+sudo tee -a /etc/httpd/conf/httpd.conf <<EOF
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
-    Options -Indexes +FollowSymLinks
+    Options Indexes MultiViews
     AllowOverride None
-    Require all granted
+    Order allow,deny
+    Allow from all
+    
+Require all granted
+
+        <files *.mp3>
+            Forcetype application/forcedownload
+        </files>
 </Directory>
 EOF
 
-tee -a /etc/php.ini <<EOF
+sudo tee -a /etc/php.ini <<EOF
 error_reporting  =  E_ALL & ~E_NOTICE
 memory_limit = 448M
 short_open_tag = On
@@ -387,18 +390,17 @@ systemctl restart mariadb.service
 
 # Install Perl Modules
 echo "Install Perl"
-yum -y install perl-CPAN perl-YAML perl-CPAN-DistnameInfo perl-libwww-perl perl-DBI perl-DBD-MySQL perl-GD perl-Env perl-Term-ReadLine-Gnu perl-SelfLoader perl-open.noarch 
-
-cpan -i Tk String::CRC Tk::TableMatrix Net::Address::IP::Local Term::ReadLine::Gnu XML::Twig Digest::Perl::MD5 Spreadsheet::Read Net::Address::IPv4::Local RPM::Specfile \
-Spreadsheet::XLSX Spreadsheet::ReadSXC MD5 Digest::MD5 Digest::SHA1 Bundle::CPAN Pod::Usage Getopt::Long DBI DBD::mysql Net::Telnet Time::HiRes Net::Server Mail::Sendmail \
-Unicode::Map Jcode Spreadsheet::WriteExcel OLE::Storage_Lite Proc::ProcessTable IO::Scalar Scalar::Util Spreadsheet::ParseExcel Archive::Zip Compress::Raw::Zlib Spreadsheet::XLSX \
-Test::Tester Spreadsheet::ReadSXC Text::CSV Test::NoWarnings Text::CSV_PP File::Temp Text::CSV_XS Spreadsheet::Read LWP::UserAgent HTML::Entities HTML::Strip HTML::FormatText \
-HTML::TreeBuilder Switch Time::Local Mail::POP3Client Mail::IMAPClient Mail::Message IO::Socket::SSL readline
+yum -y install perl-CPAN 
+yum -y install perl-YAML 
+yum -y install perl-libwww-perl 
+yum -y install perl-DBI 
+yum -y install perl-DBD-MySQL 
+yum -y install perl-GD 
 
 cd /usr/bin/
 curl -LOk http://xrl.us/cpanm
 chmod +x cpanm
-cpanm -f File::HomeDir
+ cpanm -f File::HomeDir
 cpanm -f File::Which
 cpanm CPAN::Meta::Requirements
 cpanm -f CPAN
@@ -406,16 +408,15 @@ cpanm YAML
 cpanm MD5
 cpanm Digest::MD5
 cpanm Digest::SHA1
-cpanm readline --force
-
+cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm DBD::mysql --force
+cpanm -f DBD::mysql
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
 cpanm Switch
-cpanm Mail::Sendmail --force
+cpanm Mail::Sendmail
 cpanm Unicode::Map
 cpanm Jcode
 cpanm Spreadsheet::WriteExcel
@@ -519,6 +520,7 @@ export PHP_PREFIX=”/usr”
 $PHP_PREFIX/bin/phpize
 ./configure –enable-eaccelerator=shared –with-php-config=$PHP_PREFIX/bin/php-config
 make
+make install
 
 # Download and Install PJSIP
 cd /usr/src/ 
