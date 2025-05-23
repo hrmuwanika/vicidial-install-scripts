@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "==================================================================================="
-echo "Vicidial installation and Asterisk 18 on Debian 12"
+echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04 LTS"
 echo "==================================================================================="
 
 # Retrieve the IP address
