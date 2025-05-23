@@ -126,8 +126,11 @@ Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
     AllowOverride None
     Order allow,deny
     Allow from all
+
+    Require all granted
+    
     <files *.mp3>
-    Forcetype application/forcedownload
+         Forcetype application/forcedownload
    </files>
 </Directory>
 EOF
