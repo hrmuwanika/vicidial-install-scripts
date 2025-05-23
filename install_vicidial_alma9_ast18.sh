@@ -281,9 +281,9 @@ innodb_write_io_threads         = 64
 # === MyISAM Settings ===
 # The following 3 options are ONLY supported by MariaDB & up to MySQL 5.7
 # Do NOT un-comment on MySQL 8.x+
-#query_cache_limit              = 4M    # UPD
-#query_cache_size               = 64M   # UPD
-#query_cache_type               = 1     # Enabled by default
+query_cache_limit               = 4M    # UPD
+query_cache_size                = 64M   # UPD
+query_cache_type                = 1     # Enabled by default
 
 key_buffer_size                 = 16M   # UPD
 
