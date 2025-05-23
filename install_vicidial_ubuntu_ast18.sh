@@ -1208,17 +1208,11 @@ mv -f ip_relay2 /usr/local/bin/ip_relay
 
 cd /usr/lib64/asterisk/modules
 
-# Install g723.1 codec
-rm codec_g723.so
-wget http://asterisk.hosting.lv/bin/codec_g723-ast140-gcc4-glibc-x86_64-core2-sse4.so
-mv codec_g723-ast140-gcc4-glibc-x86_64-core2-sse4.so codec_g723.so
-chmod +x codec_g723.so
-
 # Install g729 codec
-rm codec_g729.so
+cd /usr/lib64/asterisk/modules
 wget http://asterisk.hosting.lv/bin/codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so
 mv codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so codec_g729.so
-chmod +x codec_g729.so
+chmod 777 codec_g729.so
 
 ## Install Sounds
 cd /var/lib/asterisk/sounds
