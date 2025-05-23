@@ -119,15 +119,16 @@ sudo a2enmod dav
 sudo a2enmod dav_svn
 
 ### up to this point
-tee -a /etc/apache2/apache2.conf <<EOF
-CustomLog /dev/null common
-
+sudo tee -a /etc/apache2/apache2.conf <<EOF
 Alias /RECORDINGS/MP3 "/var/spool/asterisk/monitorDONE/MP3/"
-
 <Directory "/var/spool/asterisk/monitorDONE/MP3/">
     Options Indexes MultiViews
     AllowOverride None
-    Require all granted
+    Order allow,deny
+    Allow from all
+    <files *.mp3>
+    Forcetype application/forcedownload
+   </files>
 </Directory>
 EOF
 
