@@ -413,7 +413,8 @@ cpanm Digest::SHA1
 cpanm readline
 cpanm Bundle::CPAN
 cpanm DBI
-cpanm -f DBD::mysql
+cpanm DBD::MariaDB --force
+cpanm DBD::mysql --force
 cpanm Net::Telnet
 cpanm Time::HiRes
 cpanm Net::Server
