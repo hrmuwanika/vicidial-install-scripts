@@ -55,8 +55,7 @@ sudo systemctl enable mariadb.service
 # sudo mariadb-secure-installation
 
 # Install PHP 8.3
-sudo apt install -y ca-certificates apt-transport-https software-properties-common lsb-release gnupg2
-apt -y install software-properties-common
+sudo apt install -y lsb-release gnupg2
 add-apt-repository ppa:ondrej/php
 sudo apt update -y
 
@@ -384,7 +383,6 @@ MYSQLCONF
 mkdir /var/log/mysqld
 touch /var/log/mysqld/slow-queries.log
 chown -R mysql:mysql /var/log/mysqld
-systemctl restart mariadb
 
 systemctl enable apache2.service
 systemctl enable mariadb.service
@@ -405,9 +403,9 @@ cpanm MD5
 cpanm Digest::MD5
 cpanm Digest::SHA1
 cpanm readline --force
-
 cpanm Bundle::CPAN
 cpanm DBI
+cpanm DBD::MariaDB --force
 cpanm DBD::mysql --force
 cpanm Net::Telnet
 cpanm Time::HiRes
@@ -445,8 +443,6 @@ cpanm Crypt::Eksblowfish::Bcrypt
 cpanm Crypt::RC4
 cpanm Text::CSV
 cpanm Text::CSV_XS
-
-cpan install Crypt::Eksblowfish::Bcrypt
 
 # If the DBD::MYSQL Fail Run below Command
 sudo apt install -y libdbd-mysql-perl libdbd-mariadb-perl
