@@ -21,7 +21,7 @@ DB_USER="cron"
 DB_PASS="1234"
 
 # Dump all databases into a single SQL file
-mysqldump -u "$DB_USER" -p"$DB_PASS" --all-databases > "$BACKUP_FILE"
+mariadb-dump -u "$DB_USER" -p"$DB_PASS" --all-databases > "$BACKUP_FILE"
 
 # Add permissions to the backup file
 chmod 600 "$BACKUP_FILE"
