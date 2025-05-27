@@ -14,7 +14,7 @@ mkdir -p "$BACKUP_DIR"
 BACKUP_FILE="$BACKUP_DIR/vicidial_backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
 
 # Define the compressed filename
-COMPRESSED_FILE="$BACKUP_FILE.gz"
+# COMPRESSED_FILE="$BACKUP_FILE.gz"
 
 # Define MySQL username and password (replace with your MySQL credentials)
 DB_USER="cron"
@@ -27,6 +27,6 @@ mariadb-dump -u "$DB_USER" -p"$DB_PASS" --all-databases > "$BACKUP_FILE"
 chmod 600 "$BACKUP_FILE"
 
 # Compress the backup file
-gzip "$BACKUP_FILE"
+# gzip "$BACKUP_FILE"
 
-echo "Database backup completed. Backup stored in: $COMPRESSED_FILE"
+echo "Database backup completed. Backup stored in: $BACKUP_FILE"
