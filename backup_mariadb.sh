@@ -24,7 +24,7 @@ DB_PASS="1234"
 mariadb-dump -u "$DB_USER" -p"$DB_PASS" --all-databases > "$BACKUP_FILE"
 
 # Add permissions to the backup file
-chmod 600 "$BACKUP_FILE"
+# chmod 600 "$BACKUP_FILE"
 
 # Compress the backup file
 # gzip "$BACKUP_FILE"
