@@ -1343,10 +1343,11 @@ sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
 chkconfig asterisk off
 
 ## Install firewall
-yum -y install firewalld
+sudo dnf install firewalld -y
 
-systemctl enable firewalld
-systemctl start firewalld 
+
+sudo systemctl enable firewalld
+sudo systemctl start firewalld 
 
 # Firewall configuration
 firewall-cmd --permanent --zone=public --add-port=22/tcp
