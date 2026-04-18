@@ -5,7 +5,7 @@ echo "Vicidial installation and Asterisk 18 on Ubuntu 20.04 LTS"
 echo "==================================================================================="
 
 # Retrieve the IP address
-ip_address=192.168.150.100
+ip_address=192.168.1.100
 hostname=vici1
 
 hostnamectl set-hostname $hostname
