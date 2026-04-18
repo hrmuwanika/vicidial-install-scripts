@@ -1354,17 +1354,18 @@ sudo systemctl enable firewalld
 sudo systemctl start firewalld 
 
 # Firewall configuration
-firewall-cmd --permanent --zone=public --add-port=22/tcp
-firewall-cmd --permanent --zone=public --add-port=80/tcp
-firewall-cmd --permanent --zone=public --add-port=443/tcp
-firewall-cmd --permanent --zone=public --add-port=446/tcp
-firewall-cmd --permanent --zone=public --add-port=8089/tcp
-firewall-cmd --permanent --zone=public --add-port=4569/udp
-firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
-firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
-firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
-firewall-cmd --permanent --add-service=ntp
-firewall-cmd --reload
+sudo firewall-cmd --permanent --zone=public --add-port=22/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=446/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=8089/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=4569/udp
+sudo firewall-cmd --permanent --zone=public --add-port=5060-5061/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=5060-5061/udp
+sudo firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
+sudo firewall-cmd --permanent --add-source=192.168.1.0/24
+sudo firewall-cmd --permanent --add-service=ntp
+sudo firewall-cmd --reload
 
 systemctl restart firewalld
 
