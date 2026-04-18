@@ -1362,7 +1362,7 @@ firewall-cmd --permanent --zone=public --add-port=10000-20000/udp
 firewall-cmd --permanent --add-service=ntp
 firewall-cmd --reload
 
-systemctl restart firrewalld
+systemctl restart firewalld
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
