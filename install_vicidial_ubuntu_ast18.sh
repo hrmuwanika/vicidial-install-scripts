@@ -1331,20 +1331,17 @@ sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
 sudo sed -i 's/SERVER_EXTERNAL_IP/192.168.1.15/' /etc/asterisk/pjsip.conf
 
 ## Install firewall
-sudo apt install -y ufw
+sudo apt install -y firewalld
+sudo systemctl enable firewalld
+sudo systemctl start firewalld
 
-sudo ufw allow 22/tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 446/tcp
-sudo ufw allow 8089/tcp
-sudo ufw allow 4569/udp
-sudo ufw allow 5060:5061/tcp
-sudo ufw allow 5060:5061/udp
-sudo ufw allow 10000:20000/udp
-sudo ufw allow ntp
-sudo ufw enable 
-sudo ufw reload
+sudo firewall-cmd --zone=public --permanent --add-service=ssh
+sudo firewall-cmd --zone=public --permanent --add-service={http,https}
+sudo firewall-cmd --zone=public --permanent --add-port=4569/udp
+sudo firewall-cmd --zone=public --permanent --add-service={sip,sips}
+sudo firewall-cmd --zone=public --permanent --add-port=10000-20000/udp
+sudo firewall-cmd --permanent --add-source=192.168.1.0/24
+sudo firewall-cmd --reload
 
 chmod -R 777 /var/spool/asterisk/monitorDONE
 chown -R apache:apache /var/spool/asterisk/monitorDONE
